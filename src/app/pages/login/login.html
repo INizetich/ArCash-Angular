@@ -1,0 +1,82 @@
+<div class="theme-control">
+    <button id="theme-switcher" (click)="toggleTheme()" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+            <path class="sun" d="M12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0-2a8 8 0 1 0 0 16 8 8 0 0 0 0-16"/>
+            <path class="sun-ray" d="M12 2v2m0 16v2M4 12H2m20 0h-2m3-7l-2 2m-13 13l-2 2m17-15l2 2M3 19l2 2"/>
+        </svg>
+    </button>
+</div>
+<div>
+    <button id="back-button" aria-label="Volver" (click)="goBack()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" class="back-circle"/>
+            <path d="M14 8L10 12L14 16" class="back-arrow" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </button>
+</div>
+
+<div class="main">
+    <div class="left-panel">
+        <div class="logo">
+            <svg class="brand-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape"/>
+                <circle cx="60" cy="60" r="18" class="security-core"/>
+                <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross"/>
+            </svg>
+            <h1>AR<span>Cash</span></h1>
+            <h4>VIRTUAL WALLET</h4>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="formulario">
+            <h2>Iniciar Sesión</h2>
+
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+                <div class="input-container">
+                    <label>Username</label>
+                    <div class="input-wrapper">
+                        <input class="effect-1" type="text" formControlName="username">
+                        <span class="focus-border"></span>
+                    </div>
+                    <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="error-container">
+                        <small class="error-message" *ngIf="loginForm.get('username')?.hasError('required')">El campo Usuario es obligatorio.</small>
+                    </div>
+                </div>
+
+                <div class="input-container">
+                    <label>Password</label>
+        
+                    <div class="input-wrapper password-wrapper">
+                        <input class="effect-1" [type]="showPassword ? 'text' : 'password'" formControlName="password">
+                        <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path *ngIf="!showPassword" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <circle *ngIf="!showPassword" cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                <path *ngIf="showPassword" d="m1 1 22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path *ngIf="showPassword" d="M6.71 6.71C4.03 8.75 2 12 2 12s3 6 10 6c1.35 0 2.6-.3 3.71-.9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path *ngIf="showPassword" d="M14 14.12c-.55.19-1.14.29-1.76.29-2.48 0-4.5-2.02-4.5-4.5 0-.62.1-1.21.29-1.76" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path *ngIf="showPassword" d="M12 7c2.76 0 5 2.24 5 5 0 .28-.02.56-.07.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <span class="focus-border"></span>
+                    </div>
+                    <a class="access-link" (click)="goTo('forgot')">Forgot password?</a>
+                    <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-container">
+                        <small class="error-message" *ngIf="loginForm.get('password')?.hasError('required')">El campo Contraseña es obligatorio.</small>
+                    </div>
+                </div>
+
+                <button type="submit" [disabled]="loginForm.invalid || isLoading">
+                    {{ isLoading ? 'Iniciando...' : 'Iniciar Sesión' }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="global-footer">
+        <p>ArCash™ | Virtual Wallet</p>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=helparcash2025@gmail.com" target="_blank" class="email-link">helparcash2025@gmail.com</a>
+    </div>
+</div>

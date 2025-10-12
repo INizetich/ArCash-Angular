@@ -1,0 +1,379 @@
+
+
+/* Estilos específicos para la página home con animaciones optimizadas */
+.main-container {
+    background: transparent;
+    color: var(--text-primary);
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 1;
+    animation: pageSlideIn 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(15px);
+    will-change: transform, opacity;
+}
+
+@keyframes pageSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Control de tema */
+.theme-control {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 9999;
+}
+
+#theme-switcher {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.75rem;
+    position: relative;
+    z-index: 9999;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#theme-switcher:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+#theme-switcher:active {
+    transform: scale(0.95);
+}
+
+#theme-switcher svg {
+    width: 22px;
+    height: 22px;
+}
+
+.sun {
+    fill: var(--text-primary);
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.sun-ray {
+    stroke: var(--text-primary);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#theme-switcher:hover .sun {
+    opacity: 1;
+}
+
+#theme-switcher:hover .sun-ray {
+    opacity: 0.4;
+}
+
+/* Identidad de marca */
+.brand-identity {
+    padding-top: 10rem;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.brand-mark {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.5rem;
+}
+
+.vault-shape {
+    fill: none;
+    stroke: var(--text-accent);
+    stroke-width: 2.5;
+}
+
+.security-core {
+    fill: var(--text-accent);
+    stroke: var(--bg-primary);
+    stroke-width: 2;
+}
+
+.access-cross {
+    stroke: var(--bg-primary);
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+.brand-typography {
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.brand-name {
+    font-family: 'Unna', serif;
+    font-size: 2.5rem;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+}
+
+.brand-name-sub {
+    font-family: 'Unna', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-accent);
+}
+
+.brand-tagline {
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    opacity: 0.7;
+}
+
+/* Interfaz de acceso */
+
+.main-container{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr auto 1fr;
+}
+
+.brand-identity{
+    grid-column: 2/3;
+}
+.access-interface {
+    grid-column: 2/3;
+    grid-row: 2/3;
+    margin: 0 auto;
+    background-color: var(--tech-gradient-primary);
+    border-radius: 12px;
+    padding: 1.2rem;
+    width: 300px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-light);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s ease;
+}
+
+[data-theme='light']
+.access-btn.primary:hover{
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.400);
+}
+.access-btn.secondary:hover{
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.400);
+}
+
+.access-btn {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.access-btn.primary {
+    background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%);
+    text-align: center;
+    color: white;
+    padding-left: 105px;
+    box-shadow: 
+        0 4px 20px var(--shadow-primary),
+        0 2px 10px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 2;
+}
+
+.access-btn.primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent);
+    transition: left 0.5s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.access-btn.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 30px var(--shadow-primary),
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 20px var(--text-accent);
+    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
+}
+
+.access-btn.primary:hover::before {
+    left: 100%;
+}
+
+.access-btn.primary:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+
+.access-btn.secondary {
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(15px);
+    text-align: center;
+    padding-left: 100px;
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+    box-shadow: 
+        var(--glass-shadow-light),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+[data-theme="dark"] .access-btn.secondary {
+    background: var(--glass-bg-dark);
+    border: 1px solid var(--border-light);
+    box-shadow: 
+        var(--glass-shadow-dark),
+        inset 0 1px 0 rgba(57, 255, 204, 0.1);
+}
+
+.access-btn.secondary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.5s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.access-btn.secondary:hover {
+    border-color: var(--text-accent);
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 30px var(--shadow-secondary),
+        0 4px 15px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 0 15px var(--text-accent);
+}
+
+[data-theme="dark"] .access-btn.secondary:hover {
+    background: rgba(26, 26, 46, 0.5);
+    box-shadow: 
+        0 8px 30px var(--shadow-primary),
+        0 4px 15px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(57, 255, 204, 0.3),
+        0 0 20px var(--text-accent);
+}
+
+.access-btn.secondary:hover::before {
+    left: 100%;
+}
+
+.access-btn.secondary:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+.access-link {
+    display: block;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-accent);
+    text-decoration: none;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.access-link:hover {
+    text-decoration: underline;
+    opacity: 1;
+    color: var(--cobalt);
+    cursor: pointer;
+}
+
+.access-interface,
+.access-btn,
+.access-link {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Estilos específicos para tema oscuro en home */
+[data-theme="dark"] .vault-shape {
+    fill: var(--bg-secondary);
+    stroke: var(--text-accent);
+}
+
+[data-theme="dark"] .security-core {
+    fill: var(--text-accent);
+}
+
+[data-theme="dark"] .access-cross {
+    stroke: var(--text-primary);
+}
+
+[data-theme="dark"] .access-interface {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="dark"] .access-btn.secondary {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .access-btn.secondary:hover {
+    background-color: rgba(42, 77, 122, 0.2);
+    border-color: var(--text-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition: none !important;
+    }
+}
