@@ -113,7 +113,7 @@
                             <input class="effect-1" 
                                    [type]="showPassword ? 'text' : 'password'" 
                                    formControlName="password"
-                                   placeholder="Mínimo 8 caracteres">
+                                   placeholder="8+ caracteres: mayúscula, minúscula, número, especial">
                             <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                     <path *ngIf="!showPassword" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -128,8 +128,11 @@
                         </div>
                         <div *ngIf="registerForm.get('passwords.password')?.invalid && registerForm.get('passwords.password')?.touched" class="error-container">
                             <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('required')">La contraseña es requerida.</small>
-                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('minlength')">Debe tener al menos 8 caracteres.</small>
-                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('pattern')">Debe contener al menos: 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial.</small>
+                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('minLength')">Debe tener al menos 8 caracteres.</small>
+                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('lowercase')">Debe contener al menos una letra minúscula.</small>
+                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('uppercase')">Debe contener al menos una letra mayúscula.</small>
+                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('number')">Debe contener al menos un número.</small>
+                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('specialChar')">Debe contener al menos un carácter especial (!@#$%^&*...).</small>
                         </div>
                     </div>
 

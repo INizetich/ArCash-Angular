@@ -761,6 +761,22 @@ button:disabled {
     opacity: 0.6 !important;
 }
 
+/* Mejor contraste para modo claro */
+:root button:disabled {
+    background: var(--border-light) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    opacity: 0.7 !important;
+}
+
+/* Mantener estilo original para modo oscuro */
+[data-theme="dark"] button:disabled {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    border: none !important;
+    opacity: 0.6 !important;
+}
+
 button:disabled::before {
     display: none !important;
 }

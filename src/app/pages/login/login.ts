@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { themeService } from '../../services/theme-service';
 import { AuthService } from '../../services/auth-service';
 import { UtilService } from '../../services/util-service';
+import { DataService } from '../../services/data-service';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,7 @@ export class Login implements OnInit {
     private themeService: themeService,
     private authService: AuthService,
     private utilService: UtilService,
+    private dataService: DataService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.loginForm = this.fb.group({
@@ -63,15 +65,25 @@ export class Login implements OnInit {
       };
 
       this.authService.loginUser(loginData).subscribe({
-        next: (response) => {
+        next: async (response) => {
           this.isLoading = false;
           this.utilService.showToast("Inicio de sesión exitoso!", "success");
           this.loginForm.reset();
           
           if (isPlatformBrowser(this.platformId)) {
+            // Guardar información de sesión en localStorage
             localStorage.setItem('JWT', response.accessToken);
             localStorage.setItem('accountId', response.accountId);
             localStorage.setItem('role', response.role);
+            
+            try {
+              // Cargar los datos del usuario desde el backend
+              await this.dataService.loadUserData();
+              console.log('✅ Login: Datos del usuario cargados exitosamente');
+            } catch (error) {
+              console.error('❌ Login: Error cargando datos del usuario:', error);
+              // Aún así redirigir al dashboard, se intentará cargar ahí
+            }
           }
           
           setTimeout(() => {

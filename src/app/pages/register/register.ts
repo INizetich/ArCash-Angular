@@ -24,6 +24,44 @@ export function passwordMatchValidator(control: AbstractControl): ValidationErro
   return password === confirmPassword ? null : { passwordMismatch: true };
 }
 
+// Validador personalizado para contraseña segura
+export function strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
+  const value = control.value;
+  
+  if (!value) {
+    return null; // Si está vacío, el required se encarga
+  }
+
+  const errors: ValidationErrors = {};
+
+  // Verificar longitud mínima
+  if (value.length < 8) {
+    errors['minLength'] = true;
+  }
+
+  // Verificar al menos una minúscula
+  if (!/[a-z]/.test(value)) {
+    errors['lowercase'] = true;
+  }
+
+  // Verificar al menos una mayúscula
+  if (!/[A-Z]/.test(value)) {
+    errors['uppercase'] = true;
+  }
+
+  // Verificar al menos un número
+  if (!/\d/.test(value)) {
+    errors['number'] = true;
+  }
+
+  // Verificar al menos un carácter especial
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\?]/.test(value)) {
+    errors['specialChar'] = true;
+  }
+
+  return Object.keys(errors).length > 0 ? errors : null;
+}
+
 
 @Component({
   selector: 'app-register',
@@ -53,7 +91,7 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
   // Este método se ejecuta automáticamente una vez que el componente se ha inicializado.
   // Es el lugar perfecto para definir la estructura de nuestro formulario.
   ngOnInit(): void {
-    console.log('Register component initialized, current theme:', this.themeService.getTheme());
+
     this.registerForm = this.fb.group({
       // Definimos cada control con su valor inicial y sus validadores.
       nombre: ['', [Validators.required, Validators.pattern('[A-Za-zÁÉÍÓÚáéíóúÑñ\\s]{2,50}'), Validators.minLength(2), Validators.maxLength(50)]],
@@ -66,8 +104,7 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
       passwords: this.fb.group({
         password: ['', [
           Validators.required, 
-          Validators.minLength(8),
-          Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$')
+          strongPasswordValidator
         ]],
         confirmPassword: ['', [Validators.required]]
       }, { 
@@ -88,13 +125,21 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
       return;
     }
 
-    // Si llegamos aquí, el formulario es válido.
-    console.log('Formulario enviado con éxito!');
-    console.log(this.registerForm.value);
 
-      this.authService.registerUser(this.registerForm.value).subscribe({
+    
+    // Preparar los datos para enviar al backend
+    const formData = this.registerForm.value;
+    const userData = {
+      name: formData.nombre,
+      lastName: formData.apellido,
+      dni: formData.dni,
+      email: formData.email,
+      password: formData.passwords.password,
+      alias: formData.alias
+    };
+
+      this.authService.registerUser(userData).subscribe({
         next: () => {
-          console.log("usuario creado");
           this.utilService.showToast("Usuario registrado exitosamente!", "success");
           this.registerForm.reset();
           
@@ -104,7 +149,6 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
           }, 2000);
         },
         error: (error) => {
-          console.log("error en el POST");
           let errorMessage = "Error al registrar el usuario";
           
           if (error.error?.message) {
@@ -125,7 +169,6 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
   }
 
   toggleTheme(){
-    console.log('Toggle theme clicked!');
     this.themeService.toggleTheme();
   }
 

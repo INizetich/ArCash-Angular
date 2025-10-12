@@ -31,8 +31,10 @@ export class App implements OnInit, OnDestroy {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        // Ocultar footer global en las páginas de register y login
-        this.showGlobalFooter = !event.url.includes('/register') && !event.url.includes('/login');
+        // Ocultar footer global en las páginas de register, login y forgot
+        this.showGlobalFooter = !event.url.includes('/register') && 
+                               !event.url.includes('/login') && 
+                               !event.url.includes('/forgot');
       });
   }
 

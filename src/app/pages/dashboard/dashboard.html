@@ -1,0 +1,399 @@
+<!-- Loading Screen Elegante -->
+<div id="wallet-loader-overlay" [class.loaded]="!isLoading">
+    <div class="wallet-loader-container">
+        <div class="loading-logo-container">
+            <svg class="brand-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape"/>
+                <circle cx="60" cy="60" r="18" class="security-core"/>
+                <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross"/>
+            </svg>
+            <div class="spinner-circle"></div>
+        </div>
+        <div class="loading-brand">
+            <h1>AR<span>Cash</span></h1>
+            <p class="brand-tagline">The best virtual wallet</p>
+            <p class="loading-text">Cargando tu billetera...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Principal -->
+<div class="dashboard-container" [class.loaded]="!isLoading">
+    
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <svg class="nav-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape"/>
+                <circle cx="60" cy="60" r="18" class="security-core"/>
+                <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross"/>
+            </svg>
+            <div class="nav-brand-text">
+                <div class="nav-title">
+                    <span class="brand-primary">AR</span><span class="brand-secondary">Cash</span>
+                </div>
+                <div class="nav-tagline">The best virtual wallet</div>
+            </div>
+        </div>
+        
+        <div class="nav-actions">
+            <button class="theme-toggle" (click)="toggleTheme()" type="button">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path class="sun" d="M12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0-2a8 8 0 1 0 0 16 8 8 0 0 0 0-16"/>
+                    <path class="sun-ray" d="M12 2v2m0 16v2M4 12H2m20 0h-2m3-7l-2 2m-13 13l-2 2m17-15l2 2M3 19l2 2"/>
+                </svg>
+            </button>
+            
+            <div class="user-menu" (click)="openProfileModal()">
+                <div class="user-avatar">
+                    <span>{{userData.name?.charAt(0)}}{{userData.lastName?.charAt(0)}}</span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">{{userData.name}} {{userData.lastName}}</span>
+                    <span class="user-role">{{userData.username}}</span>
+                </div>
+            </div>
+            
+            <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1 class="welcome-title">
+                    Bienvenido, <span class="highlight">{{userData.name}}</span>
+                </h1>
+                <p class="welcome-subtitle">Gestiona tu dinero de forma inteligente</p>
+            </div>
+        </section>
+
+        <!-- Balance Card -->
+        <section class="balance-section">
+            <div class="balance-card">
+                <div class="balance-header">
+                    <h2>Saldo Disponible</h2>
+                    <button class="balance-toggle" (click)="toggleBalance()" [title]="balanceVisible ? 'Ocultar saldo' : 'Mostrar saldo'">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path *ngIf="balanceVisible" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
+                            <circle *ngIf="balanceVisible" cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                            <path *ngIf="!balanceVisible" d="m1 1 22 22M6.5 6.5C5.2 7.8 4 10 4 12s2.8 5.2 8 5.2c1.7 0 3.2-.5 4.5-1.3M17.5 17.5C18.8 16.2 20 14 20 12s-2.8-5.2-8-5.2c-1.7 0-3.2.5-4.5 1.3" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="balance-amount">
+                    <span class="currency">$</span>
+                    <span class="amount" *ngIf="balanceVisible">{{userData.balance | number:'1.2-2'}}</span>
+                    <span class="amount-hidden" *ngIf="!balanceVisible">•••••••</span>
+                </div>
+                
+                <div class="account-info">
+                    <div class="account-detail">
+                        <span class="label">Alias</span>
+                        <span class="value">{{userData.alias}}</span>
+                    </div>
+                    <div class="account-detail">
+                        <span class="label">CVU</span>
+                        <span class="value">{{userData.cvu}}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="actions-section">
+            <h2 class="section-title">Acciones Rápidas</h2>
+            <div class="actions-grid">
+                
+                <div class="action-card" (click)="openIngresarModal()">
+                    <div class="action-icon deposit">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2v20M5 9l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Ingresar Dinero</h3>
+                    <p>Agregar fondos a tu cuenta</p>
+                </div>
+
+                <div class="action-card" (click)="openTransferModal()">
+                    <div class="action-icon transfer">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 12H3M16 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Transferir</h3>
+                    <p>Enviar dinero a otros usuarios</p>
+                </div>
+
+                <div class="action-card" (click)="openAliasModal()">
+                    <div class="action-icon info">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3>Mi CVU</h3>
+                    <p>Ver datos de la cuenta</p>
+                </div>
+
+                <div class="action-card" (click)="openTaxModal()">
+                    <div class="action-icon calculator">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 6h8M8 10h8M8 14h8M8 18h8" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3>Calculadora</h3>
+                    <p>Calcular impuestos</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Recent Transactions -->
+        <section class="transactions-section">
+            <div class="transactions-header">
+                <h2 class="section-title">Movimientos Recientes</h2>
+                <button class="view-all-btn">Ver todos</button>
+            </div>
+            
+            <div class="transactions-container">
+                <div *ngIf="recentTransactions.length === 0" class="no-transactions">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <p>No hay transacciones recientes</p>
+                </div>
+                
+                <div *ngFor="let transaction of recentTransactions" 
+                     class="transaction-item" 
+                     (click)="openTransactionModal(transaction)">
+                    
+                    <div class="transaction-icon" [class]="transaction.type">
+                        <svg *ngIf="transaction.type === 'income'" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2v20M5 9l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <svg *ngIf="transaction.type === 'expense'" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 22V2M19 15l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    
+                    <div class="transaction-details">
+                        <h4 class="transaction-description">{{transaction.description}}</h4>
+                        <p class="transaction-date">{{formatDate(transaction.date)}}</p>
+                        <span *ngIf="transaction.status === 'FAILED'" class="transaction-status failed">Fallida</span>
+                    </div>
+                    
+                    <div class="transaction-amount" [class]="transaction.type">
+                        <span class="amount-value">
+                            {{transaction.type === 'income' ? '+' : '-'}}${{formatAmount(transaction.amount)}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- Modal para ingresar dinero -->
+<div *ngIf="showIngresarModal" class="modal" (click)="onModalBackdropClick($event, 'ingresar')">
+    <div class="modal-content">
+        <span class="close-button" (click)="closeIngresarModal()">&times;</span>
+        <h2>Ingresar dinero</h2>
+        <form (ngSubmit)="ingresarDinero()" #ingresarForm="ngForm">
+            <input 
+                type="number" 
+                [(ngModel)]="montoIngresar" 
+                name="montoIngresar"
+                placeholder="Monto a ingresar" 
+                required 
+                min="1" 
+                step="0.01">
+            <button type="submit" [disabled]="!ingresarForm.valid">Confirmar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para transferencias -->
+<div *ngIf="showTransferModal" class="modal" (click)="onModalBackdropClick($event, 'transfer')">
+    <div class="modal-content">
+        <span class="close-button" (click)="closeTransferModal()">&times;</span>
+        <h2>Transferir Dinero</h2>
+
+        <!-- Paso 1: Buscar cuenta -->
+        <div *ngIf="transferStep === 1" id="search-account-step">
+            <div class="form-group">
+                <input 
+                    type="text" 
+                    [(ngModel)]="destinatarioInput"
+                    placeholder=" "
+                    required>
+                <label>Alias o CVU</label>
+            </div>
+            <button (click)="buscarCuenta()">Buscar cuenta</button>
+        </div>
+
+        <!-- Paso 2: Confirmar cuenta -->
+        <div *ngIf="transferStep === 2" id="confirm-account-step">
+            <h3>Datos de la cuenta destino:</h3>
+            <div id="account-details" *ngIf="cuentaDestinoData">
+                <p><strong>Alias:</strong> {{cuentaDestinoData.alias}}</p>
+                <p><strong>CVU:</strong> {{cuentaDestinoData.cvu}}</p>
+                <p><strong>Titular:</strong> {{cuentaDestinoData.user.nombre}} {{cuentaDestinoData.user.apellido}}</p>
+                <p><strong>DNI:</strong> {{cuentaDestinoData.user.dni}}</p>
+            </div>
+            <button (click)="confirmarCuenta()">Confirmar cuenta</button>
+            <button (click)="cancelarBusqueda()" class="secondary">Cancelar</button>
+        </div>
+
+        <!-- Paso 3: Ingresar monto -->
+        <div *ngIf="transferStep === 3" id="amount-step">
+            <input 
+                type="number" 
+                [(ngModel)]="montoTransfer"
+                min="0" 
+                step="1" 
+                placeholder="$" 
+                required>
+            <button (click)="realizarTransferencia()">Transferir</button>
+            <button (click)="volverBusqueda()" class="secondary">Volver</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver alias y CVU -->
+<div *ngIf="showAliasModal" class="modal" (click)="onModalBackdropClick($event, 'alias')">
+    <div class="modal-content alias-modal">
+        <span class="close-button" (click)="closeAliasModal()">&times;</span>
+        <h2>Mi Alias y CVU</h2>
+        
+        <div class="info-alias-cvu">
+            <div class="info-line">
+                <div class="info-text">
+                    <strong>Alias:</strong> <span>{{userData.alias}}</span>
+                </div>
+                <button class="copy-button" (click)="copyToClipboard(userData.alias, 'Alias')" title="Copiar Alias">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 9h-9c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm0 11h-9v-9h9v9zm-4-17H6c-1.1 0-2 .9-2 2v9h2V5h10V3z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="info-line">
+                <div class="info-text">
+                    <strong>CVU:</strong> <span>{{userData.cvu}}</span>
+                </div>
+                <button class="copy-button" (click)="copyToClipboard(userData.cvu, 'CVU')" title="Copiar CVU">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 9h-9c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm0 11h-9v-9h9v9zm-4-17H6c-1.1 0-2 .9-2 2v9h2V5h10V3z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para calculadora de impuestos -->
+<div *ngIf="showTaxModal" class="modal" (click)="onModalBackdropClick($event, 'tax')">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close-button" (click)="closeTaxModal()">&times;</span>
+            <h2>Calculadora de Impuestos</h2>
+        </div>
+
+        <div *ngIf="!showTaxForm" id="currency-selection">
+            <p>¿En qué moneda querés calcular?</p>
+            <button class="currency-button" (click)="selectCurrency('ARS')">Pesos (ARS)</button>
+            <button class="currency-button" (click)="selectCurrency('USD')">Dólares (USD)</button>
+        </div>
+
+        <div *ngIf="showTaxForm" id="tax-form">
+            <label>Monto en {{selectedCurrency}}:</label>
+            <input 
+                type="number" 
+                [(ngModel)]="taxMonto"
+                min="0" 
+                step="0.01" 
+                placeholder="0.00">
+            <button (click)="calcularImpuestos()">Calcular</button>
+            <div *ngIf="taxResult" id="tax-result" [innerHTML]="taxResult"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de perfil -->
+<div *ngIf="showProfileModal" class="modal" (click)="onModalBackdropClick($event, 'profile')">
+    <div class="modal-content">
+        <span class="close-button" (click)="closeProfileModal()">&times;</span>
+        <h2>Perfil de Usuario</h2>
+        <div class="profile-details">
+            <div class="profile-photo">
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="12" fill="#ccc"/>
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#666"/>
+                </svg>
+            </div>
+            <p><strong>Nombre:</strong> <span>{{userData.name}}</span></p>
+            <p><strong>Apellido:</strong> <span>{{userData.lastName}}</span></p>
+            <p><strong>Correo:</strong> <span>{{userData.email}}</span></p>
+            <p><strong>DNI:</strong> <span>{{userData.dni}}</span></p>
+            
+            <p>
+                <strong>Nombre de usuario:</strong>
+                <span *ngIf="!editingUsername">{{userData.username}}</span>
+                <input 
+                    *ngIf="editingUsername" 
+                    type="text" 
+                    [(ngModel)]="newUsername"
+                    (keydown.enter)="saveUsername()"
+                    (keydown.escape)="cancelEditUsername()"
+                    maxlength="25"/>
+                <button *ngIf="!editingUsername" (click)="startEditUsername()" title="Editar nombre de usuario">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            </p>
+            
+            <p>
+                <strong>Alias:</strong>
+                <span *ngIf="!editingAlias">{{userData.alias}}</span>
+                <input 
+                    *ngIf="editingAlias" 
+                    type="text" 
+                    [(ngModel)]="newAlias"
+                    (keydown.enter)="saveAlias()"
+                    (keydown.escape)="cancelEditAlias()"
+                    maxlength="25"/>
+                <button *ngIf="!editingAlias" (click)="startEditAlias()" title="Editar alias">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            </p>
+            
+            <p><strong>CVU:</strong> <span>{{userData.cvu}}</span></p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles de transacción -->
+<div *ngIf="showTransactionModal" class="modal" (click)="onModalBackdropClick($event, 'transaction')">
+    <div class="modal-content">
+        <span class="close-button" (click)="closeTransactionModal()">&times;</span>
+        <h2>Detalle de la Transferencia</h2>
+        <ul class="transfer-details" *ngIf="selectedTransaction">
+            <li><b>ID Operación:</b> <span>{{selectedTransaction.id}}</span></li>
+            <li><b>Origen:</b> <span>{{selectedTransaction.from || 'Tu cuenta'}}</span></li>
+            <li><b>Destino:</b> <span>{{selectedTransaction.to || 'Tu cuenta'}}</span></li>
+            <li><b>Monto:</b> <span>{{formatAmount(selectedTransaction.amount)}}</span></li>
+            <li><b>Estado:</b> <span [class]="'estado-' + selectedTransaction.status?.toLowerCase()">{{selectedTransaction.status}}</span></li>
+            <li><b>Fecha:</b> <span>{{formatDate(selectedTransaction.date)}}</span></li>
+        </ul>
+    </div>
+</div>
