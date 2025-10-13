@@ -144,6 +144,16 @@
                     <p>Ver datos de la cuenta</p>
                 </div>
 
+                <div class="action-card" (click)="openFavoritesModal()">
+                    <div class="action-icon favorites">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Favoritos</h3>
+                    <p>Mis contactos favoritos</p>
+                </div>
+
                 <div class="action-card" (click)="openTaxModal()">
                     <div class="action-icon calculator">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -174,7 +184,7 @@
                     <p>No hay transacciones recientes</p>
                 </div>
                 
-                <div *ngFor="let transaction of recentTransactions" 
+                <div *ngFor="let transaction of recentTransactions; trackBy: trackTransaction" 
                      class="transaction-item" 
                      (click)="openTransactionModal(transaction)">
                     
@@ -267,6 +277,29 @@
                 required>
             <button (click)="realizarTransferencia()">Transferir</button>
             <button (click)="volverBusqueda()" class="secondary">Volver</button>
+        </div>
+
+        <!-- Paso 4: Agregar a favoritos -->
+        <div *ngIf="transferStep === 4" id="add-favorite-step">
+            <div class="transfer-success">
+                <div class="success-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3>¡Transferencia exitosa!</h3>
+                <p>¿Querés agregar este contacto a tus favoritos?</p>
+                
+                <div class="favorite-option">
+                    <button class="primary" (click)="openAddFavoriteModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Agregar a favoritos
+                    </button>
+                    <button class="secondary" (click)="skipAddToFavorites()">No, gracias</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -407,7 +440,7 @@
         <h2>Todas las Transacciones</h2>
         
         <div class="all-transactions-container">
-            <div *ngIf="recentTransactions.length === 0" class="no-transactions-message">
+            <div *ngIf="allTransactions.length === 0" class="no-transactions-message">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
                     <path d="M8 12h8" stroke="currentColor" stroke-width="2"/>
@@ -416,8 +449,8 @@
                 <p>No hay transacciones para mostrar</p>
             </div>
             
-            <div *ngIf="recentTransactions.length > 0" class="transactions-list">
-                <div *ngFor="let transaction of recentTransactions; trackBy: trackTransaction" 
+            <div *ngIf="allTransactions.length > 0" class="transactions-list">
+                <div *ngFor="let transaction of displayedTransactions; trackBy: trackTransaction" 
                      class="transaction-item-modal">
                     
                     <div class="transaction-icon-modal" [class]="transaction.type">
@@ -443,6 +476,213 @@
                         </span>
                     </div>
                 </div>
+                
+                <div *ngIf="hasMoreTransactions" class="load-more-container">
+                    <button class="load-more-btn" (click)="loadMoreTransactions()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2v20M5 9l7-7 7 7" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Cargar más transacciones
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de lista de favoritos -->
+<div *ngIf="showFavoritesModal" class="modal" (click)="onModalBackdropClick($event, 'favorites')">
+    <div class="modal-content favorites-modal">
+        <div class="modal-header">
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Contactos Favoritos
+            </h2>
+            <span class="close-button" (click)="closeFavoritesModal()">&times;</span>
+        </div>
+
+        <div class="favorites-list" *ngIf="favoriteContacts.length > 0">
+            <div class="favorite-card" *ngFor="let favorite of favoriteContacts; trackBy: trackFavorite" 
+                 (click)="openFavoriteDetailsModal(favorite)">
+                <div class="favorite-avatar">
+                    <span>{{favorite.accountOwnerName.split(' ')[0]?.charAt(0)}}{{favorite.accountOwnerName.split(' ')[1]?.charAt(0) || ''}}</span>
+                </div>
+                <div class="favorite-info">
+                    <h3 class="favorite-alias">{{favorite.contactAlias}}</h3>
+                    <p class="favorite-owner">{{favorite.accountOwnerName}}</p>
+                    <p class="favorite-account">{{favorite.accountAlias}}</p>
+                    <p class="favorite-description" *ngIf="favorite.description">{{favorite.description}}</p>
+                </div>
+                <div class="favorite-actions">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-favorites" *ngIf="favoriteContacts.length === 0">
+            <div class="empty-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+            </div>
+            <h3>No tienes favoritos</h3>
+            <p>Cuando realices transferencias, podrás agregar contactos a tus favoritos</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de detalles de favorito -->
+<div *ngIf="showFavoriteDetailsModal && selectedFavoriteContact" class="modal" (click)="onModalBackdropClick($event, 'favoriteDetails')">
+    <div class="modal-content favorite-details-modal">
+        <div class="modal-header">
+            <h2>{{selectedFavoriteContact.contactAlias}}</h2>
+            <span class="close-button" (click)="closeFavoriteDetailsModal()">&times;</span>
+        </div>
+
+        <div class="favorite-details">
+            <div class="favorite-profile">
+                <div class="favorite-avatar large">
+                    <span>{{selectedFavoriteContact.accountOwnerName.split(' ')[0]?.charAt(0)}}{{selectedFavoriteContact.accountOwnerName.split(' ')[1]?.charAt(0) || ''}}</span>
+                </div>
+                <div class="favorite-profile-info">
+                    <h3>{{selectedFavoriteContact.contactAlias}}</h3>
+                    <p class="owner-name">{{selectedFavoriteContact.accountOwnerName}}</p>
+                </div>
+            </div>
+
+            <div class="favorite-account-info">
+                <div class="info-row">
+                    <span class="label">Alias de cuenta:</span>
+                    <span class="value">{{selectedFavoriteContact.accountAlias}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">CBU:</span>
+                    <span class="value">{{selectedFavoriteContact.accountCbu}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Tipo de cuenta:</span>
+                    <span class="value">{{selectedFavoriteContact.accountType}}</span>
+                </div>
+                <div class="info-row" *ngIf="selectedFavoriteContact.description">
+                    <span class="label">Descripción:</span>
+                    <span class="value">{{selectedFavoriteContact.description}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Agregado:</span>
+                    <span class="value">{{selectedFavoriteContact.creationDate}}</span>
+                </div>
+                <div class="info-row" *ngIf="selectedFavoriteContact.lastUsed">
+                    <span class="label">Última transferencia:</span>
+                    <span class="value">{{selectedFavoriteContact.lastUsed}}</span>
+                </div>
+            </div>
+
+            <div class="favorite-actions-buttons">
+                <button class="primary transfer-btn" (click)="transferToFavorite(selectedFavoriteContact)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 12H3M16 17l5-5-5-5" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Transferir
+                </button>
+                <button class="secondary edit-btn" (click)="openEditFavoriteModal(selectedFavoriteContact)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Editar
+                </button>
+                <button class="danger remove-btn" (click)="removeFavoriteContact(selectedFavoriteContact)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar a favoritos -->
+<div *ngIf="showAddFavoriteModal" class="modal" (click)="onModalBackdropClick($event, 'addFavorite')">
+    <div class="modal-content add-favorite-modal">
+        <div class="modal-header">
+            <h2>Agregar a Favoritos</h2>
+            <span class="close-button" (click)="closeAddFavoriteModal()">&times;</span>
+        </div>
+
+        <div class="add-favorite-form">
+            <div class="form-group">
+                <input 
+                    type="text" 
+                    [(ngModel)]="favoriteContactAlias"
+                    placeholder=" "
+                    required
+                    maxlength="50">
+                <label>Nombre para agendar *</label>
+            </div>
+
+            <div class="form-group">
+                <textarea 
+                    [(ngModel)]="favoriteContactDescription"
+                    placeholder=" "
+                    maxlength="200"
+                    rows="3"></textarea>
+                <label>Descripción (opcional)</label>
+            </div>
+
+            <div class="form-actions">
+                <button class="primary" (click)="addToFavorites()" [disabled]="!favoriteContactAlias.trim()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Guardar favorito
+                </button>
+                <button class="secondary" (click)="closeAddFavoriteModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar favorito -->
+<div *ngIf="showEditFavoriteModal && selectedFavoriteContact" class="modal" (click)="onModalBackdropClick($event, 'editFavorite')">
+    <div class="modal-content edit-favorite-modal">
+        <div class="modal-header">
+            <h2>Editar Favorito</h2>
+            <span class="close-button" (click)="closeEditFavoriteModal()">&times;</span>
+        </div>
+
+        <div class="edit-favorite-form">
+            <div class="form-group">
+                <input 
+                    type="text" 
+                    [(ngModel)]="favoriteContactAlias"
+                    placeholder=" "
+                    required
+                    maxlength="50">
+                <label>Nombre para agendar *</label>
+            </div>
+
+            <div class="form-group">
+                <textarea 
+                    [(ngModel)]="favoriteContactDescription"
+                    placeholder=" "
+                    maxlength="200"
+                    rows="3"></textarea>
+                <label>Descripción (opcional)</label>
+            </div>
+
+            <div class="form-actions">
+                <button class="primary" (click)="updateFavoriteContact()" [disabled]="!favoriteContactAlias.trim()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Guardar cambios
+                </button>
+                <button class="secondary" (click)="closeEditFavoriteModal()">Cancelar</button>
             </div>
         </div>
     </div>

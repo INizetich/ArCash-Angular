@@ -7,6 +7,9 @@ import { themeService } from '../../services/theme-service';
 import { UtilService } from '../../services/util-service';
 import { AuthService } from '../../services/auth-service';
 import { DataService } from '../../services/data-service';
+import { ModalService } from '../../services/modal-service';
+import { TransactionService } from '../../services/transaction-service';
+import { FavoriteService } from '../../services/favorite-service';
 import Transaction from '../../models/transaction';
 import UserData from '../../models/user-data';
 
@@ -22,8 +25,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Suscripciones
   private subscriptions: Subscription[] = [];
 
-  // Propiedades para cleanup
-  private mouseListener?: (e: MouseEvent) => void;
+
 
   // Estados de carga y visibilidad
   isLoading = true;
@@ -44,8 +46,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Transacciones recientes
   recentTransactions: Transaction[] = [];
+  
+  // Todas las transacciones para el modal
+  allTransactions: Transaction[] = [];
+  
+  // Paginación para transacciones
+  displayedTransactions: Transaction[] = [];
+  transactionPageSize = 20;
+  currentTransactionPage = 0;
 
-  // Estados de modales
+  // Sistema de modal único para mejor performance
+  currentModal: string | null = null;
+  
+  // Estados de modales (mantener para compatibilidad pero optimizar uso)
   showIngresarModal = false;
   showTransferModal = false;
   showAliasModal = false;
@@ -53,13 +66,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showProfileModal = false;
   showTransactionModal = false;
   showAllTransactionsModal = false;
+  showFavoritesModal = false;
+  showAddFavoriteModal = false;
+  showFavoriteDetailsModal = false;
+  showEditFavoriteModal = false;
 
   // Estados del proceso de transferencia
-  transferStep = 1; // 1: buscar, 2: confirmar, 3: monto
+  transferStep = 1; // 1: buscar, 2: confirmar, 3: monto, 4: agregar a favoritos
   destinatarioInput = '';
   montoTransfer = 0;
   montoIngresar = 0;
   cuentaDestinoData: any = null;
+  transferCompletedData: any = null; // Para guardar datos después de transferencia exitosa
+
+  // Estados de contactos favoritos
+  favoriteContacts: any[] = [];
+  selectedFavoriteContact: any = null;
+  favoriteContactAlias = '';
+  favoriteContactDescription = '';
+  showAddToFavoritesOption = false;
 
   // Estados de la calculadora de impuestos
   selectedCurrency = 'ARS';
@@ -81,90 +106,161 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private themeService: themeService,
     private utilService: UtilService,
     private authService: AuthService,
-    private dataService: DataService
-  ) {}
-
-  ngOnInit(): void {
-    console.log('🚀 Dashboard component initialized');
-    this.setupMouseTracking();
-    this.checkAuthentication();
-    this.setupSubscriptions();
-    
-    // Cargar transacciones inmediatamente
-    this.loadTransactionsOnInit();
-    
-    // Simular carga elegante con progreso real
-    this.startElegantLoading();
+    private dataService: DataService,
+    private modalService: ModalService,
+    private transactionService: TransactionService,
+    private favoriteService: FavoriteService
+  ) {
+    // Detectar dispositivos de baja potencia para optimizaciones
+    this.detectLowPowerDevice();
   }
-
-  private setupMouseTracking(): void {
-    let ticking = false;
+  
+  private detectLowPowerDevice(): void {
+    // Detectar si el dispositivo puede tener problemas de performance
+    const isLowPower = navigator.hardwareConcurrency <= 2 || 
+                      (navigator as any).deviceMemory <= 2 ||
+                      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    this.mouseListener = (e: MouseEvent) => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const x = (e.clientX / window.innerWidth) * 100;
-          const y = (e.clientY / window.innerHeight) * 100;
-          
-          document.documentElement.style.setProperty('--mouse-x', `${x}%`);
-          document.documentElement.style.setProperty('--mouse-y', `${y}%`);
-          
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    // Throttle usando requestAnimationFrame para mejor performance
-    document.addEventListener('mousemove', this.mouseListener, { passive: true });
-  }
-
-  private startElegantLoading(): void {
-    // Reducir tiempo de carga para mejor UX
-    setTimeout(() => {
-      this.isLoading = false;
-    }, 800); // Reducido a 0.8 segundos
-
-    // Cargar datos reales en paralelo de forma más eficiente
-    this.loadDataInBackground();
-  }
-
-  private async loadTransactionsOnInit(): Promise<void> {
-    try {
-      console.log('💳 Cargando transacciones al iniciar...');
+    if (isLowPower) {
+      // Agregar clase para reducir animaciones en dispositivos lentos
+      document.body.classList.add('reduce-motion');
       
-      // Verificar si ya hay transacciones cargadas
-      const currentTransactions = this.dataService.getCurrentTransactions();
-      if (!currentTransactions || currentTransactions.length === 0) {
-        console.log('📥 No hay transacciones en cache, cargando desde servidor...');
-        await this.dataService.loadTransactions();
-      } else {
-        console.log('✅ Transacciones ya disponibles en cache:', currentTransactions.length);
-        this.recentTransactions = currentTransactions;
-      }
-    } catch (error) {
-      console.error('❌ Error cargando transacciones:', error);
+      // Reducir aún más los tiempos de animación
+      document.documentElement.style.setProperty('--animation-speed', '0.1s');
     }
   }
 
-  private setupSubscriptions(): void {
-   
+  ngOnInit(): void {
+    console.log('🚀 Dashboard component initialized');
+    this.checkAuthentication();
+    this.setupSubscriptions();
     
+    // Cargar datos usando los services
+    this.initializeServices();
+    
+    // Cargar simple y rápido
+    this.startSimpleLoading();
+  }
+
+  private async initializeServices(): Promise<void> {
+    try {
+      // Cargar datos iniciales usando los services (con caché si está disponible)
+      await Promise.all([
+        this.transactionService.loadAllTransactions(), // Usar caché
+        this.favoriteService.loadFavoriteContacts()    // Usar caché
+      ]);
+    } catch (error) {
+      console.error('Error inicializando services:', error);
+    }
+  }
+
+  private updateModalStates(currentModal: string | null): void {
+    // Resetear todos los estados de modales
+    this.showIngresarModal = false;
+    this.showTransferModal = false;
+    this.showAliasModal = false;
+    this.showTaxModal = false;
+    this.showProfileModal = false;
+    this.showTransactionModal = false;
+    this.showAllTransactionsModal = false;
+    this.showFavoritesModal = false;
+    this.showAddFavoriteModal = false;
+    this.showFavoriteDetailsModal = false;
+    this.showEditFavoriteModal = false;
+
+    // Activar el modal correspondiente
+    switch (currentModal) {
+      case 'ingresar':
+        this.showIngresarModal = true;
+        break;
+      case 'transfer':
+        this.showTransferModal = true;
+        break;
+      case 'alias':
+        this.showAliasModal = true;
+        break;
+      case 'tax':
+        this.showTaxModal = true;
+        break;
+      case 'profile':
+        this.showProfileModal = true;
+        break;
+      case 'transaction':
+        this.showTransactionModal = true;
+        break;
+      case 'allTransactions':
+        this.showAllTransactionsModal = true;
+        break;
+      case 'favorites':
+        this.showFavoritesModal = true;
+        break;
+      case 'addFavorite':
+        this.showAddFavoriteModal = true;
+        break;
+      case 'favoriteDetails':
+        this.showFavoriteDetailsModal = true;
+        break;
+      case 'editFavorite':
+        this.showEditFavoriteModal = true;
+        break;
+    }
+  }
+
+  private startSimpleLoading(): void {
+    // Carga rápida y simple sin efectos
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 200); // Muy rápido
+
+    // Cargar datos en background sin efectos
+    this.loadDataInBackground();
+  }
+
+
+
+  private setupSubscriptions(): void {
     // Suscribirse a los datos del usuario
     const userDataSub = this.dataService.userData$.subscribe(userData => {
       if (userData) {
-       
         this.userData = userData;
       }
     });
     this.subscriptions.push(userDataSub);
 
-    // Suscribirse a las transacciones
-    const transactionsSub = this.dataService.transactions$.subscribe(transactions => {
-    
+    // Suscribirse a las transacciones usando el service
+    const recentTransactionsSub = this.transactionService.recentTransactions$.subscribe(transactions => {
       this.recentTransactions = transactions;
     });
-    this.subscriptions.push(transactionsSub);
+    this.subscriptions.push(recentTransactionsSub);
+
+    const allTransactionsSub = this.transactionService.allTransactions$.subscribe(transactions => {
+      this.allTransactions = transactions;
+    });
+    this.subscriptions.push(allTransactionsSub);
+
+    const displayedTransactionsSub = this.transactionService.displayedTransactions$.subscribe(transactions => {
+      this.displayedTransactions = transactions;
+    });
+    this.subscriptions.push(displayedTransactionsSub);
+
+    // Suscribirse a los favoritos usando el service
+    const favoritesSub = this.favoriteService.favoriteContacts$.subscribe(favorites => {
+      this.favoriteContacts = favorites;
+    });
+    this.subscriptions.push(favoritesSub);
+
+    const selectedFavoriteSub = this.favoriteService.selectedFavorite$.subscribe(favorite => {
+      this.selectedFavoriteContact = favorite;
+    });
+    this.subscriptions.push(selectedFavoriteSub);
+
+    // Suscribirse al estado de los modales
+    const modalSub = this.modalService.modalState$.subscribe(state => {
+      this.currentModal = state.currentModal;
+      // Actualizar los estados de modales específicos
+      this.updateModalStates(state.currentModal);
+    });
+    this.subscriptions.push(modalSub);
   }
 
   private async loadDataInBackground(): Promise<void> {
@@ -198,11 +294,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Limpiar suscripciones para evitar memory leaks
     this.subscriptions.forEach(sub => sub.unsubscribe());
-    
-    // Limpiar event listener del mouse para mejor performance
-    if (this.mouseListener) {
-      document.removeEventListener('mousemove', this.mouseListener);
-    }
   }
 
   // --- AUTENTICACIÓN ---
@@ -275,9 +366,56 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     try {
-      await this.dataService.realizarTransferencia(this.cuentaDestinoData.idaccount, this.montoTransfer);
-      this.utilService.showToast('Transferencia realizada con éxito', 'success');
-      this.closeTransferModal();
+      let accountIdForTransfer = this.cuentaDestinoData.idaccount;
+
+      // Si viene de un favorito, necesitamos convertir el CBU a ID numérico
+      if (this.cuentaDestinoData.isFromFavorite) {
+        console.log('Transferencia a favorito detectada, convirtiendo CBU a ID numérico...');
+        console.log('CBU:', this.cuentaDestinoData.cvu);
+        
+        try {
+          // Buscar la cuenta usando el CBU para obtener el ID real
+          const accountData = await this.dataService.buscarCuenta(this.cuentaDestinoData.cvu);
+          accountIdForTransfer = parseInt(accountData.idaccount);
+          
+          if (isNaN(accountIdForTransfer)) {
+            console.error('Error: No se pudo obtener un ID válido de la búsqueda:', accountData);
+            this.utilService.showToast('Error: No se pudo obtener el ID de cuenta para la transferencia', 'error');
+            return;
+          }
+          
+          console.log('ID numérico obtenido:', accountIdForTransfer);
+        } catch (searchError) {
+          console.error('Error buscando cuenta para transferencia:', searchError);
+          this.utilService.showToast('Error al buscar información de la cuenta', 'error');
+          return;
+        }
+      }
+
+      console.log('Realizando transferencia con ID:', accountIdForTransfer, 'Monto:', this.montoTransfer);
+      await this.dataService.realizarTransferencia(accountIdForTransfer, this.montoTransfer);
+      
+      // Guardar datos para posible agregado a favoritos
+      this.transferCompletedData = { ...this.cuentaDestinoData };
+      
+      // Verificar si ya es favorito
+      const isAlreadyFavorite = this.favoriteContacts.some(fav => 
+        fav.accountCbu === this.cuentaDestinoData.cvu
+      );
+      
+      if (!isAlreadyFavorite) {
+        // Mostrar opción para agregar a favoritos
+        this.transferStep = 4;
+        this.showAddToFavoritesOption = true;
+      } else {
+        // Si ya es favorito, actualizar el orden y cerrar
+        await this.favoriteService.loadFavoriteContacts(true); // Forzar recarga
+        this.utilService.showToast('Transferencia realizada con éxito', 'success');
+        this.closeTransferModal();
+      }
+      
+      // Recargar transacciones y balance
+      await this.transactionService.loadAllTransactions(true); // Forzar recarga
     } catch (error) {
       console.error('Error realizando transferencia:', error);
       this.utilService.showToast('Error al realizar la transferencia', 'error');
@@ -330,27 +468,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- MÉTODOS DE MODALES ---
+  // --- MÉTODOS OPTIMIZADOS DE MODALES ---
+  
+  private closeAllModals(): void {
+    this.modalService.closeModal();
+  }
+  
+  private openModal(modalType: string): void {
+    this.modalService.openModal(modalType);
+  }
+
   openIngresarModal(): void {
-    this.showIngresarModal = true;
     this.montoIngresar = 0;
+    this.openModal('ingresar');
   }
 
   closeIngresarModal(): void {
-    this.showIngresarModal = false;
+    this.closeAllModals();
     this.montoIngresar = 0;
   }
 
   openTransferModal(): void {
-    this.showTransferModal = true;
     this.transferStep = 1;
     this.destinatarioInput = '';
     this.montoTransfer = 0;
     this.cuentaDestinoData = null;
+    this.openModal('transfer');
   }
 
   closeTransferModal(): void {
-    this.showTransferModal = false;
+    this.closeAllModals();
     this.transferStep = 1;
     this.destinatarioInput = '';
     this.montoTransfer = 0;
@@ -358,55 +505,292 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   openAliasModal(): void {
-    this.showAliasModal = true;
+    this.openModal('alias');
   }
 
   closeAliasModal(): void {
-    this.showAliasModal = false;
+    this.closeAllModals();
   }
 
   openTaxModal(): void {
-    this.showTaxModal = true;
     this.showTaxForm = false;
     this.selectedCurrency = 'ARS';
     this.taxMonto = 0;
     this.taxResult = '';
+    this.openModal('tax');
   }
 
   closeTaxModal(): void {
-    this.showTaxModal = false;
+    this.closeAllModals();
     this.showTaxForm = false;
   }
 
   openProfileModal(): void {
-    this.showProfileModal = true;
     this.editingAlias = false;
     this.editingUsername = false;
+    this.openModal('profile');
   }
 
   closeProfileModal(): void {
-    this.showProfileModal = false;
+    this.closeAllModals();
     this.editingAlias = false;
     this.editingUsername = false;
   }
 
   openTransactionModal(transaction: Transaction): void {
     this.selectedTransaction = transaction;
-    this.showTransactionModal = true;
+    this.openModal('transaction');
     console.log('📄 Abriendo modal de transacción:', transaction);
   }
 
   closeTransactionModal(): void {
-    this.showTransactionModal = false;
+    this.closeAllModals();
     this.selectedTransaction = null;
   }
 
-  openAllTransactionsModal(): void {
-    this.showAllTransactionsModal = true;
+  async openAllTransactionsModal(): Promise<void> {
+    try {
+      await this.transactionService.loadAllTransactions(); // Usar caché si está disponible
+      this.openModal('allTransactions');
+    } catch (error) {
+      console.error('Error cargando todas las transacciones:', error);
+      this.utilService.showToast('Error al cargar las transacciones', 'error');
+    }
+  }
+  
+  loadMoreTransactions(): void {
+    this.transactionService.loadMoreTransactions();
+  }
+  
+  get hasMoreTransactions(): boolean {
+    return this.transactionService.hasMoreTransactions();
   }
 
   closeAllTransactionsModal(): void {
-    this.showAllTransactionsModal = false;
+    this.closeAllModals();
+  }
+
+  // --- MÉTODOS DE CONTACTOS FAVORITOS ---
+
+  async openFavoritesModal(): Promise<void> {
+    // Cargar favoritos antes de abrir el modal para mejor UX
+    await this.favoriteService.loadFavoriteContacts(); // Usar caché si está disponible
+    this.openModal('favorites');
+  }
+
+  closeFavoritesModal(): void {
+    this.closeAllModals();
+  }
+
+
+
+  openFavoriteDetailsModal(favorite: any): void {
+    this.favoriteService.selectFavorite(favorite);
+    this.openModal('favoriteDetails');
+  }
+
+  closeFavoriteDetailsModal(): void {
+    this.closeAllModals();
+    this.favoriteService.clearSelectedFavorite();
+  }
+
+  async transferToFavorite(favorite: any): Promise<void> {
+    // Configurar datos de transferencia usando el service
+    this.cuentaDestinoData = this.favoriteService.createTransferDataFromFavorite(favorite);
+    this.transferStep = 3;
+    
+    // Cerrar todos los modales y abrir el de transferencia inmediatamente
+    this.closeAllModals();
+    this.openModal('transfer');
+  }
+
+  openAddFavoriteModal(): void {
+    this.favoriteContactAlias = '';
+    this.favoriteContactDescription = '';
+    this.openModal('addFavorite');
+  }
+
+  closeAddFavoriteModal(): void {
+    this.closeAllModals();
+    this.favoriteContactAlias = '';
+    this.favoriteContactDescription = '';
+    this.showAddToFavoritesOption = false;
+  }
+
+  async addToFavorites(): Promise<void> {
+    if (!this.favoriteContactAlias.trim()) {
+      this.utilService.showToast('Por favor ingresa un nombre para el contacto', 'error');
+      return;
+    }
+
+    if (!this.transferCompletedData) {
+      this.utilService.showToast('Error: datos de transferencia no disponibles', 'error');
+      return;
+    }
+
+    // Validar que idaccount existe y es válido
+    if (!this.transferCompletedData.idaccount) {
+      console.error('Error: idaccount no disponible en transferCompletedData:', this.transferCompletedData);
+      this.utilService.showToast('Error: ID de cuenta no disponible', 'error');
+      return;
+    }
+
+    let accountId: number;
+
+    // Verificar si los datos vienen de un favorito (donde idaccount es un CBU)
+    if (this.transferCompletedData.isFromFavorite) {
+      // Los datos vienen de un favorito, necesitamos buscar el ID real de la cuenta
+      this.utilService.showToast('Buscando información de la cuenta...', 'info');
+      
+      try {
+        // Buscar la cuenta usando el CBU para obtener el ID real
+        const accountData = await this.dataService.buscarCuenta(this.transferCompletedData.cvu);
+        accountId = parseInt(accountData.idaccount);
+        
+        if (isNaN(accountId)) {
+          console.error('Error: No se pudo obtener un ID válido de la búsqueda:', accountData);
+          this.utilService.showToast('Error: No se pudo obtener el ID de cuenta', 'error');
+          return;
+        }
+      } catch (error) {
+        console.error('Error buscando cuenta:', error);
+        this.utilService.showToast('Error al buscar información de la cuenta', 'error');
+        return;
+      }
+    } else {
+      // Los datos vienen de una búsqueda normal, convertir directamente
+      accountId = parseInt(this.transferCompletedData.idaccount.toString());
+      
+      if (isNaN(accountId)) {
+        console.error('Error: idaccount no se puede convertir a número:', this.transferCompletedData.idaccount);
+        this.utilService.showToast('Error: ID de cuenta inválido', 'error');
+        return;
+      }
+    }
+
+    // Verificar si ya existe como favorito
+    // Primero verificar por CBU (método original)
+    const isAlreadyFavoriteByCbu = this.favoriteContacts.some(fav => 
+      fav.accountCbu === this.transferCompletedData.cvu
+    );
+
+    // También verificar si podemos comparar por accountId
+    console.log('Verificación de duplicados:', {
+      cvu: this.transferCompletedData.cvu,
+      accountId: accountId,
+      favoriteContacts: this.favoriteContacts.map(fav => ({
+        id: fav.id,
+        alias: fav.contactAlias,
+        accountCbu: fav.accountCbu,
+        accountAlias: fav.accountAlias
+      })),
+      isAlreadyFavoriteByCbu: isAlreadyFavoriteByCbu
+    });
+
+    // Verificar si estás intentando agregarte a ti mismo
+    const currentUser = this.dataService.getCurrentUserData();
+    console.log('Verificación de usuario actual:', {
+      currentUserIdAccount: currentUser?.idAccount,
+      currentUserIdAccountType: typeof currentUser?.idAccount,
+      targetAccountId: accountId,
+      targetAccountIdType: typeof accountId,
+      isAddingSelf: currentUser?.idAccount === accountId.toString() || parseInt(currentUser?.idAccount || '0') === accountId
+    });
+
+    // Verificar ambas formas de comparación (string vs number)
+    const isSelfAsString = currentUser?.idAccount === accountId.toString();
+    const isSelfAsNumber = parseInt(currentUser?.idAccount || '0') === accountId;
+    
+    if (isSelfAsString || isSelfAsNumber) {
+      this.utilService.showToast('No puedes agregarte a ti mismo como favorito', 'error');
+      return;
+    }
+
+    if (isAlreadyFavoriteByCbu) {
+      this.utilService.showToast('Esta cuenta ya está en tus favoritos', 'error');
+      return;
+    }
+
+    console.log('Agregando a favoritos:', {
+      accountId: accountId,
+      alias: this.favoriteContactAlias.trim(),
+      description: this.favoriteContactDescription.trim() || undefined,
+      originalData: this.transferCompletedData,
+      favoriteContacts: this.favoriteContacts
+    });
+
+    // Verificar que el token JWT esté presente
+    const jwt = localStorage.getItem('JWT');
+    console.log('Estado del token JWT:', {
+      presente: !!jwt,
+      longitud: jwt ? jwt.length : 0,
+      primeros10Chars: jwt ? jwt.substring(0, 10) + '...' : 'N/A'
+    });
+
+    const success = await this.favoriteService.addFavoriteContact(
+      accountId, 
+      this.favoriteContactAlias.trim(),
+      this.favoriteContactDescription.trim() || undefined
+    );
+
+    if (success) {
+      this.closeAddFavoriteModal();
+      this.closeTransferModal();
+    }
+  }
+
+  skipAddToFavorites(): void {
+    this.utilService.showToast('Transferencia realizada con éxito', 'success');
+    this.closeAddFavoriteModal();
+    this.closeTransferModal();
+  }
+
+  openEditFavoriteModal(favorite: any): void {
+    // Configurar datos del favorito para editar
+    this.selectedFavoriteContact = favorite;
+    this.favoriteContactAlias = favorite.contactAlias;
+    this.favoriteContactDescription = favorite.description || '';
+    
+    // Cerrar todos los modales y abrir el de edición inmediatamente
+    this.closeAllModals();
+    this.openModal('editFavorite');
+  }
+
+  closeEditFavoriteModal(): void {
+    this.closeAllModals();
+    this.selectedFavoriteContact = null;
+    this.favoriteContactAlias = '';
+    this.favoriteContactDescription = '';
+  }
+
+  async updateFavoriteContact(): Promise<void> {
+    if (!this.favoriteContactAlias.trim()) {
+      this.utilService.showToast('Por favor ingresa un nombre para el contacto', 'error');
+      return;
+    }
+
+    if (!this.selectedFavoriteContact) {
+      this.utilService.showToast('Error: contacto no seleccionado', 'error');
+      return;
+    }
+
+    const success = await this.favoriteService.updateFavoriteContact(
+      this.selectedFavoriteContact.id,
+      this.favoriteContactAlias.trim(),
+      this.favoriteContactDescription.trim() || undefined
+    );
+
+    if (success) {
+      this.closeEditFavoriteModal();
+    }
+  }
+
+  async removeFavoriteContact(favorite: any): Promise<void> {
+    const success = await this.favoriteService.removeFavoriteContact(favorite.id, favorite.contactAlias);
+    
+    if (success) {
+      this.closeFavoriteDetailsModal();
+    }
   }
 
   // --- MÉTODOS DE NAVEGACIÓN ENTRE PASOS ---
@@ -467,6 +851,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Limpiar localStorage usando el método del AuthService
     this.authService.clearLocalSession();
     
+    // Limpiar todos los cachés de los servicios
+    this.clearAllCaches();
+    
     // Limpiar cualquier otro dato local si es necesario
     this.userData = {
       name: 'Cargando...',
@@ -489,6 +876,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
     
     // Redireccionar al login
     this.router.navigate(['/login']);
+  }
+
+  private clearAllCaches(): void {
+    try {
+      // Limpiar cachés específicos de los servicios
+      this.favoriteService.invalidateCache();
+      this.transactionService.invalidateCache();
+      
+      // Limpiar cualquier otro caché de ArCash que pueda existir
+      const keys = Object.keys(localStorage);
+      const arcashKeys = keys.filter(key => key.startsWith('arcash_'));
+      
+      arcashKeys.forEach(key => {
+        localStorage.removeItem(key);
+        console.log('🗑️ Removed cache key:', key);
+      });
+      
+      console.log('🧹 Todos los cachés de ArCash limpiados durante el logout');
+    } catch (error) {
+      console.error('Error limpiando cachés:', error);
+    }
   }
 
   // --- PERFIL ---
@@ -562,46 +970,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   formatAmount(amount: number): string {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(amount);
+    return this.transactionService.formatAmount(amount);
   }
 
   formatDate(date: Date): string {
-    return new Intl.DateTimeFormat('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    }).format(new Date(date));
+    return this.transactionService.formatDate(date);
   }
 
   formatDateDetailed(date: Date): string {
-    const dateObj = new Date(date);
-    const dateStr = dateObj.toLocaleDateString('es-AR', {
-      weekday: 'long',
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    });
-    
-    const timeStr = dateObj.toLocaleTimeString('es-AR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
-    
-    return `${dateStr} a las ${timeStr}`;
+    return this.transactionService.formatDateDetailed(date);
   }
 
   getTransactionClass(transaction: Transaction): string {
-    if (transaction.status === 'FAILED') return 'monto fallida';
-    return transaction.type === 'income' ? 'monto positivo' : 'monto negativo';
+    return this.transactionService.getTransactionClass(transaction);
   }
 
   getTransactionOrigin(transaction: Transaction): string {
@@ -631,35 +1012,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   onModalBackdropClick(event: MouseEvent, modalType: string): void {
+    // Solo cerrar si se hace clic en el backdrop (no en el contenido del modal)
     if (event.target === event.currentTarget) {
-      switch (modalType) {
-        case 'ingresar':
-          this.closeIngresarModal();
-          break;
-        case 'transfer':
-          this.closeTransferModal();
-          break;
-        case 'alias':
-          this.closeAliasModal();
-          break;
-        case 'tax':
-          this.closeTaxModal();
-          break;
-        case 'profile':
-          this.closeProfileModal();
-          break;
-        case 'transaction':
-          this.closeTransactionModal();
-          break;
-        case 'allTransactions':
-          this.closeAllTransactionsModal();
-          break;
-      }
+      // Usar el método optimizado para cerrar modales
+      this.closeAllModals();
     }
   }
 
   trackTransaction(index: number, transaction: Transaction): number {
     return transaction.id;
+  }
+  
+  trackFavorite(index: number, favorite: any): number {
+    return favorite.id;
   }
 
 }

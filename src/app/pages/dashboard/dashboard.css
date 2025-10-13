@@ -7,6 +7,14 @@
     box-sizing: border-box;
 }
 
+/* Desactivar transiciones complejas para mejor performance */
+.reduce-motion * {
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+}
+
 body {
     font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background: var(--bg-primary);
@@ -23,14 +31,14 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, var(--obsidian) 0%, var(--carbon) 100%);
+    background: #1a1f2e;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
     opacity: 1;
     visibility: visible;
-    transition: all 0.8s ease;
+    /* Sin transiciones complejas */
 }
 
 #wallet-loader-overlay.loaded {
@@ -89,11 +97,11 @@ body {
     right: -10px;
     bottom: -10px;
     border: 2px solid transparent;
-    border-top: 2px solid var(--neon-cyan);
+    border-top: 2px solid #00d4ff;
     border-radius: 50%;
-    animation: spin 2s linear infinite;
+    animation: spin 1s linear infinite;
     z-index: 1;
-    will-change: transform;
+    /* Animación más rápida y simple */
 }
 
 .loading-brand h1 {
@@ -116,15 +124,7 @@ body {
 /* ====================================
    DASHBOARD CONTAINER
    ==================================== */
-.dashboard-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-    position: relative;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-    will-change: opacity, transform;
-}
+
 
 .dashboard-container::before {
     content: '';
@@ -133,71 +133,25 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
-        radial-gradient(circle at var(--mouse-x, 20%) var(--mouse-y, 20%), rgba(255, 0, 110, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at calc(100% - var(--mouse-x, 80%)) calc(100% - var(--mouse-y, 80%)), rgba(0, 212, 255, 0.06) 0%, transparent 50%),
-        radial-gradient(circle at var(--mouse-x, 40%) var(--mouse-y, 60%), rgba(139, 95, 191, 0.04) 0%, transparent 50%),
-        conic-gradient(from 0deg at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-            rgba(255, 0, 111, 0.027) 0deg, 
-            rgba(0, 212, 255, 0.02) 120deg, 
-            rgba(139, 95, 191, 0.02) 240deg, 
-            rgba(255, 0, 110, 0.02) 360deg);
     pointer-events: none;
     z-index: 0;
-    transition: opacity 0.4s ease;
-    animation: techPulse 12s ease-in-out infinite;
-    will-change: opacity;
+    /* Sin animaciones ni transiciones */
 }
 
-@keyframes techPulse {
-    0%, 100% { 
-        opacity: 0.7; 
-    }
-    50% { 
-        opacity: 0.9; 
-    }
-}
+/* Keyframes eliminados para mejor performance */
 
-/* Animación específica para modo claro - tonos rositas */
-:root:not([data-theme="dark"]) .dashboard-container::before {
-    animation: rosePulse 15s ease-in-out infinite;
-}
+/* Sin animaciones para mejor performance */
 
-@keyframes rosePulse {
-    0%, 100% { 
-        opacity: 0.6; 
-    }
-    33% { 
-        opacity: 0.8; 
-    }
-    66% { 
-        opacity: 0.7; 
-    }
-}
+/* Keyframes eliminados para mejor performance */
 
 /* Modo oscuro para el overlay de efectos */
 [data-theme="dark"] .dashboard-container::before {
     background: 
-        radial-gradient(circle at var(--mouse-x, 20%) var(--mouse-y, 20%), rgba(57, 255, 204, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at calc(100% - var(--mouse-x, 80%)) calc(100% - var(--mouse-y, 80%)), rgba(255, 0, 110, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at var(--mouse-x, 40%) var(--mouse-y, 60%), rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-        conic-gradient(from 180deg at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-            rgba(57, 255, 204, 0.08) 0deg, 
-            rgba(255, 0, 110, 0.06) 120deg, 
-            rgba(0, 212, 255, 0.04) 240deg, 
-            rgba(57, 255, 204, 0.08) 360deg);
-    animation: cyberpunkPulse 10s ease-in-out infinite;
-    will-change: opacity;
+        linear-gradient(135deg, rgba(10, 15, 25, 0.9) 0%, rgba(5, 10, 20, 0.95) 100%);
+    /* Sin animaciones ni mouse tracking */
 }
 
-@keyframes cyberpunkPulse {
-    0%, 100% { 
-        opacity: 0.8; 
-    }
-    50% { 
-        opacity: 1; 
-    }
-}
+/* Keyframes eliminados para mejor performance */
 
 .dashboard-container.loaded {
     opacity: 1;
@@ -208,11 +162,12 @@ body {
    TOP NAVIGATION
    ==================================== */
 .top-nav {
+    color: var(--text-primary);
     position: sticky;
     top: 0;
     z-index: 100;
     background: transparent;
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(5px);
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
@@ -391,7 +346,7 @@ body {
 
 .balance-card {
     background: var(--glass-bg-light);
-    backdrop-filter: blur(20px);
+    
     border: 1px solid var(--glass-border-light);
     border-radius: 20px;
     padding: 2rem;
@@ -529,50 +484,21 @@ body {
 }
 
 .action-card {
-    background: var(--glass-bg-light);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border-light);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 16px;
     padding: 1.5rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    /* Sin efectos complejos */
 }
 
-/* Modo oscuro para action-cards */
+/* Modo oscuro para action-cards - simplificado */
 [data-theme="dark"] .action-card {
-    background: rgba(26, 26, 46, 0.3);
+    background: rgba(26, 26, 46, 0.5);
     border: 1px solid rgba(57, 255, 204, 0.25);
 }
 
-.action-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-}
-
-.action-card:hover::before {
-    transform: scaleX(1);
-}
-
-.action-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 212, 255, 0.2);
-   
-}
-
-/* Hover específico para modo oscuro */
-[data-theme="dark"] .action-card:hover {
-    box-shadow: 0 15px 30px rgba(57, 255, 204, 0.3);
-    border-color: var(--neon-cyan);
-}
+/* Sin efectos hover para mejor performance */
 
 .action-icon {
     width: 48px;
@@ -646,7 +572,7 @@ body {
 
 .transactions-container {
     background: var(--glass-bg-light);
-    backdrop-filter: blur(20px);
+    
     border: 1px solid var(--glass-border-light);
     border-radius: 16px;
     overflow: hidden;
@@ -831,44 +757,40 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    opacity: 0;
-    animation: modalFadeIn 0.3s ease forwards;
+    /* Sin animaciones para mejor performance */
 }
 
-@keyframes modalFadeIn {
-    to { opacity: 1; }
-}
+/* Keyframes removidos para mejor performance */
 
 .modal-content {
-    background: linear-gradient(135deg, 
-        rgba(139, 95, 191, 0.15) 0%, 
-        rgba(0, 212, 255, 0.1) 100%);
-    backdrop-filter: blur(20px);
+    background: rgba(20, 25, 35, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
+    border-radius: 12px;
     padding: 30px;
     max-width: 90vw;
     width: 450px;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transform: scale(0.9) translateY(20px);
-    animation: modalSlideIn 0.3s ease forwards;
+    /* Sin sombras complejas ni animaciones */
 }
 
-@keyframes modalSlideIn {
-    to {
-        transform: scale(1) translateY(0);
-    }
+/* Keyframes removidos para mejor performance */
+
+/* Optimización: Usar contain para limitar el scope de rendering */
+.modal-content {
+    contain: layout style paint;
+}
+
+/* Clase para deshabilitar animaciones durante scroll/interacciones intensivas */
+.reduce-motion .modal,
+.reduce-motion .modal-content {
+    animation: none !important;
+    transition: none !important;
 }
 
 .modal-content h2 {
@@ -901,11 +823,7 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
-.close-button:hover {
-    color: var(--plasma-pink);
-    background: rgba(255, 0, 110, 0.2);
-    transform: rotate(90deg);
-}
+/* Sin efectos hover para mejor performance */
 
 /* Form Elements in Modals */
 .modal-content input[type="text"],
@@ -920,7 +838,7 @@ body {
     font-size: 16px;
     margin-bottom: 20px;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    
 }
 
 .modal-content input:focus {
@@ -950,24 +868,14 @@ body {
     overflow: hidden;
 }
 
-.modal-content button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
-}
-
-.modal-content button:active {
-    transform: translateY(0);
-}
+/* Sin efectos hover para mejor performance */
 
 .modal-content button.secondary {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.modal-content button.secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
-}
+/* Sin efectos hover para mejor performance */
 
 .modal-content button:disabled {
     opacity: 0.5;
@@ -992,7 +900,7 @@ body {
     color: #ffffff;
     font-size: 16px;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    
 }
 
 .form-group label {
@@ -1177,6 +1085,8 @@ body {
     background: rgba(0, 212, 255, 0.2) !important;
     font-size: 14px !important;
 }
+
+
 
 /* Transaction Details Modal */
 .transfer-details {
@@ -1557,7 +1467,7 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(5px);
+    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1784,7 +1694,7 @@ body {
     border-radius: 12px;
     cursor: default;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    
 }
 
 .transaction-icon-modal {
@@ -1855,6 +1765,33 @@ body {
     color: var(--plasma-pink);
 }
 
+/* Botón de cargar más transacciones */
+.load-more-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(139, 233, 253, 0.2);
+}
+
+.load-more-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--cyber-blue) 0%, var(--neon-cyan) 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+/* Sin efectos hover para mejor performance */
+
 /* Modo oscuro para el modal de todas las transacciones */
 [data-theme="dark"] .transaction-item-modal {
     background: rgba(0, 0, 0, 0.3);
@@ -1908,5 +1845,576 @@ body {
 
 [data-theme="dark"] .transfer-details span {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ====================================
+   ESTILOS PARA CONTACTOS FAVORITOS
+   ==================================== */
+
+/* Icono de favoritos en las acciones rápidas */
+.action-icon.favorites {
+    background: linear-gradient(135deg, var(--plasma-pink) 0%, var(--electric-purple) 100%);
+    box-shadow: 0 4px 20px rgba(255, 0, 110, 0.3);
+}
+
+.action-icon.favorites:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 30px rgba(255, 0, 110, 0.4);
+}
+
+/* Modal de lista de favoritos */
+.favorites-modal {
+    min-width: 500px;
+    max-width: 700px;
+    max-height: 80vh;
+}
+
+.favorites-list {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.favorite-card {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: rgba(var(--platinum-rgb), 0.1);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+}
+
+[data-theme="dark"] .favorite-card {
+    background: rgba(var(--carbon-rgb), 0.3);
+    border-color: var(--border-color);
+}
+
+.favorite-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--shadow-primary);
+    border-color: var(--text-accent);
+    background: rgba(var(--platinum-rgb), 0.15);
+}
+
+[data-theme="dark"] .favorite-card:hover {
+    background: rgba(var(--carbon-rgb), 0.5);
+    box-shadow: 0 8px 25px var(--shadow-primary);
+}
+
+.favorite-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--tech-gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    margin-right: 16px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.favorite-avatar.large {
+    width: 64px;
+    height: 64px;
+    font-size: 20px;
+}
+
+.favorite-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.favorite-alias {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.favorite-owner {
+    font-size: 0.9rem;
+    color: var(--text-accent);
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+
+.favorite-account {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.favorite-description {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    opacity: 0.7;
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.favorite-actions {
+    color: var(--text-accent);
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.favorite-card:hover .favorite-actions {
+    background: rgba(var(--text-accent), 0.1);
+    transform: translateX(5px);
+}
+
+/* Estado vacío de favoritos */
+.empty-favorites {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-primary);
+    opacity: 0.7;
+}
+
+.empty-icon {
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-icon svg {
+    stroke: var(--text-accent);
+}
+
+.empty-favorites h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.empty-favorites p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    max-width: 300px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* Modal de detalles de favorito */
+.favorite-details-modal {
+    min-width: 500px;
+    max-width: 600px;
+}
+
+.favorite-details {
+    padding: 20px 0;
+}
+
+.favorite-profile {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: rgba(var(--text-accent), 0.05);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(var(--text-accent), 0.15);
+}
+
+.favorite-profile-info {
+    margin-left: 20px;
+}
+
+.favorite-profile-info h3 {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.owner-name {
+    font-size: 1rem;
+    color: var(--text-accent);
+    font-weight: 500;
+}
+
+.favorite-account-info {
+    margin-bottom: 24px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row .label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.info-row .value {
+    color: var(--text-primary);
+    font-weight: 600;
+    max-width: 60%;
+    text-align: right;
+    word-break: break-all;
+}
+
+/* Botones de acciones de favoritos */
+.favorite-actions-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.favorite-actions-buttons button {
+    flex: 1;
+    min-width: 140px;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.transfer-btn {
+    background: var(--tech-gradient-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.transfer-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+}
+
+.edit-btn {
+    background: rgba(var(--electric-purple), 0.1);
+    color: var(--electric-purple);
+    border: 1px solid rgba(var(--electric-purple), 0.3);
+}
+
+.edit-btn:hover {
+    background: rgba(var(--electric-purple), 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+}
+
+.remove-btn {
+    background: rgba(var(--plasma-pink), 0.1);
+    color: var(--plasma-pink);
+    border: 1px solid rgba(var(--plasma-pink), 0.3);
+}
+
+.remove-btn:hover {
+    background: rgba(var(--plasma-pink), 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 0, 110, 0.3);
+}
+
+/* Modales de agregar/editar favorito */
+.add-favorite-modal,
+.edit-favorite-modal {
+    min-width: 450px;
+    max-width: 500px;
+}
+
+.add-favorite-form,
+.edit-favorite-form {
+    padding: 20px 0;
+}
+
+.add-favorite-form .form-group,
+.edit-favorite-form .form-group {
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.add-favorite-form input,
+.add-favorite-form textarea,
+.edit-favorite-form input,
+.edit-favorite-form textarea {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    background: rgba(var(--platinum-rgb), 0.05);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    resize: vertical;
+}
+
+[data-theme="dark"] .add-favorite-form input,
+[data-theme="dark"] .add-favorite-form textarea,
+[data-theme="dark"] .edit-favorite-form input,
+[data-theme="dark"] .edit-favorite-form textarea {
+    background: rgba(var(--carbon-rgb), 0.3);
+    border-color: var(--border-color);
+}
+
+.add-favorite-form input:focus,
+.add-favorite-form textarea:focus,
+.edit-favorite-form input:focus,
+.edit-favorite-form textarea:focus {
+    outline: none;
+    border-color: var(--text-accent);
+    box-shadow: 0 0 0 3px rgba(var(--text-accent), 0.1);
+    background: rgba(var(--text-accent), 0.05);
+}
+
+.add-favorite-form label,
+.edit-favorite-form label {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    background: var(--bg-primary);
+    padding: 0 4px;
+}
+
+.add-favorite-form input:focus + label,
+.add-favorite-form input:not(:placeholder-shown) + label,
+.add-favorite-form textarea:focus + label,
+.add-favorite-form textarea:not(:placeholder-shown) + label,
+.edit-favorite-form input:focus + label,
+.edit-favorite-form input:not(:placeholder-shown) + label,
+.edit-favorite-form textarea:focus + label,
+.edit-favorite-form textarea:not(:placeholder-shown) + label {
+    transform: translateY(-28px) scale(0.85);
+    color: var(--text-accent);
+    font-weight: 600;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.form-actions button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.form-actions .primary {
+    background: var(--tech-gradient-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.form-actions .primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+}
+
+.form-actions .primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.form-actions .secondary {
+    background: rgba(var(--text-secondary), 0.1);
+    color: var(--text-secondary);
+    border: 1px solid rgba(var(--text-secondary), 0.3);
+}
+
+.form-actions .secondary:hover {
+    background: rgba(var(--text-secondary), 0.2);
+    transform: translateY(-2px);
+}
+
+/* Paso 4: Agregar a favoritos después de transferencia */
+#add-favorite-step {
+    text-align: center;
+    padding: 20px;
+}
+
+.transfer-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.success-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--tech-gradient-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: successPulse 2s ease-in-out infinite;
+}
+
+.success-icon svg {
+    stroke: white;
+    stroke-width: 3;
+}
+
+@keyframes successPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(57, 255, 204, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 20px rgba(57, 255, 204, 0);
+    }
+}
+
+.transfer-success h3 {
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.transfer-success p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.favorite-option {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.favorite-option button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.favorite-option .primary {
+    background: var(--tech-gradient-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.favorite-option .primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+}
+
+.favorite-option .secondary {
+    background: rgba(var(--text-secondary), 0.1);
+    color: var(--text-secondary);
+    border: 1px solid rgba(var(--text-secondary), 0.3);
+}
+
+.favorite-option .secondary:hover {
+    background: rgba(var(--text-secondary), 0.2);
+    transform: translateY(-2px);
+}
+
+/* Responsividad para favoritos */
+@media (max-width: 768px) {
+    .favorites-modal,
+    .favorite-details-modal,
+    .add-favorite-modal,
+    .edit-favorite-modal {
+        min-width: 90vw;
+        max-width: 95vw;
+        margin: 20px;
+    }
+    
+    .favorite-card {
+        padding: 12px;
+    }
+    
+    .favorite-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+        margin-right: 12px;
+    }
+    
+    .favorite-alias {
+        font-size: 1rem;
+    }
+    
+    .favorite-actions-buttons {
+        flex-direction: column;
+    }
+    
+    .favorite-actions-buttons button {
+        min-width: auto;
+    }
+    
+    .favorite-option {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .favorite-option button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Animaciones de entrada para favoritos */
+.favorite-card {
+    animation: slideInUp 0.3s ease;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 

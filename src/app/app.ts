@@ -1,6 +1,5 @@
 import { Component, signal, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
-import { Home } from "./pages/home/home";
 import { Footer } from "./components/footer/footer";
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -32,8 +31,8 @@ export class App implements OnInit, OnDestroy {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         // Ocultar footer global en las páginas de register, login y forgot
-        this.showGlobalFooter = !event.url.includes('/register') && 
-                               !event.url.includes('/login') && 
+        this.showGlobalFooter = !event.url.includes('/register') &&
+                               !event.url.includes('/login') &&
                                !event.url.includes('/forgot');
       });
   }
@@ -52,16 +51,16 @@ export class App implements OnInit, OnDestroy {
   private initMouseTracking() {
     // Optimizar mouse tracking con throttling
     let ticking = false;
-    
+
     const updateMouse = (e: MouseEvent) => {
       if (!ticking) {
         requestAnimationFrame(() => {
           const x = (e.clientX / window.innerWidth) * 100;
           const y = (e.clientY / window.innerHeight) * 100;
-          
+
           document.documentElement.style.setProperty('--mouse-x', `${x}%`);
           document.documentElement.style.setProperty('--mouse-y', `${y}%`);
-          
+
           ticking = false;
         });
         ticking = true;
@@ -74,7 +73,7 @@ export class App implements OnInit, OnDestroy {
   private handleMouseMove = (e: MouseEvent) => {
     const x = (e.clientX / window.innerWidth) * 100;
     const y = (e.clientY / window.innerHeight) * 100;
-    
+
     document.documentElement.style.setProperty('--mouse-x', `${x}%`);
     document.documentElement.style.setProperty('--mouse-y', `${y}%`);
   }

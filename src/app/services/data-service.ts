@@ -465,4 +465,165 @@ export class DataService {
     }
   }
 
+  // --- GESTIÓN DE CONTACTOS FAVORITOS ---
+
+  async getFavoriteContacts(): Promise<any[]> {
+    const jwt = localStorage.getItem('JWT');
+    if (!jwt) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    try {
+      const response = await this.http.get<any>(`${this.baseUrl}/favorites/list`, {
+        headers: {
+          'Authorization': `Bearer ${jwt}`,
+          'Content-Type': 'application/json'
+        }
+      }).toPromise();
+
+      return response?.favorites || [];
+    } catch (error) {
+      console.error('Error obteniendo contactos favoritos:', error);
+      throw error;
+    }
+  }
+
+  async getFavoriteContactsOrderedByUsage(): Promise<any[]> {
+    const jwt = localStorage.getItem('JWT');
+    if (!jwt) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    try {
+      const response = await this.http.get<any>(`${this.baseUrl}/favorites/list/recent`, {
+        headers: {
+          'Authorization': `Bearer ${jwt}`,
+          'Content-Type': 'application/json'
+        }
+      }).toPromise();
+
+      return response?.favorites || [];
+    } catch (error) {
+      console.error('Error obteniendo contactos favoritos ordenados:', error);
+      throw error;
+    }
+  }
+
+  async addFavoriteContact(accountId: number, contactAlias: string, description?: string): Promise<boolean> {
+    const jwt = localStorage.getItem('JWT');
+    if (!jwt) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    try {
+      // Primero, verificar que el token funcione haciendo una solicitud que sabemos que funciona
+      console.log('Verificando token con solicitud de prueba...');
+      try {
+        await this.getFavoriteContacts();
+        console.log('✅ Token válido - la solicitud de obtener favoritos funcionó');
+      } catch (tokenError) {
+        console.error('❌ Token inválido - la solicitud de prueba falló:', tokenError);
+        throw new Error('Token de autenticación inválido');
+      }
+
+      // El backend espera Long accountId, String contactAlias, String description
+      const body = {
+        accountId: accountId, // Asegurar que es número
+        contactAlias: contactAlias,
+        description: description || ''
+      };
+
+      console.log('Enviando solicitud para agregar favorito:', body);
+      console.log('Tipos de datos:', {
+        accountId: typeof body.accountId,
+        contactAlias: typeof body.contactAlias,
+        description: typeof body.description
+      });
+      console.log('Token JWT:', jwt ? 'Presente (longitud: ' + jwt.length + ')' : 'Ausente');
+
+      const headers = {
+        'Authorization': `Bearer ${jwt}`,
+        'Content-Type': 'application/json'
+      };
+
+      console.log('Headers que se enviarán:', headers);
+      console.log('URL completa:', `${this.baseUrl}/favorites/add`);
+
+      const response = await this.http.post<any>(`${this.baseUrl}/favorites/add`, body, {
+        headers: headers
+      }).toPromise();
+
+      console.log('Respuesta del servidor:', response);
+      
+      if (response?.status === 'SUCCESS') {
+        return true;
+      } else {
+        // El backend retornó status ERROR o no SUCCESS
+        console.error('Backend retornó error:', response);
+        return false;
+      }
+    } catch (error: any) {
+      console.error('Error agregando contacto favorito:', error);
+      console.error('Detalles del error:', {
+        status: error.status,
+        statusText: error.statusText,
+        message: error.message,
+        error: error.error
+      });
+
+      // Imprimir más detalles si hay respuesta del servidor
+      if (error.error) {
+        console.error('Respuesta del servidor:', error.error);
+      }
+
+      throw error;
+    }
+  }
+
+  async updateFavoriteContact(contactId: number, contactAlias?: string, description?: string): Promise<boolean> {
+    const jwt = localStorage.getItem('JWT');
+    if (!jwt) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    try {
+      const body: any = {};
+      if (contactAlias) body.contactAlias = contactAlias;
+      if (description !== undefined) body.description = description;
+
+      const response = await this.http.put<any>(`${this.baseUrl}/favorites/update/${contactId}`, body, {
+        headers: {
+          'Authorization': `Bearer ${jwt}`,
+          'Content-Type': 'application/json'
+        }
+      }).toPromise();
+
+      return response?.status === 'SUCCESS';
+    } catch (error) {
+      console.error('Error actualizando contacto favorito:', error);
+      throw error;
+    }
+  }
+
+  async removeFavoriteContact(favoriteId: number): Promise<boolean> {
+    const jwt = localStorage.getItem('JWT');
+    if (!jwt) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    try {
+      const response = await this.http.delete<any>(`${this.baseUrl}/favorites/${favoriteId}`, {
+        headers: {
+          'Authorization': `Bearer ${jwt}`,
+          'Content-Type': 'application/json'
+        }
+      }).toPromise();
+
+      return response?.status === 'SUCCESS';
+    } catch (error) {
+      console.error('Error eliminando contacto favorito:', error);
+      throw error;
+    }
+  }
+
 }

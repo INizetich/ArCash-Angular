@@ -35,6 +35,9 @@ export class Login implements OnInit {
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      // Limpiar cualquier caché residual de sesiones anteriores
+      this.clearAllCaches();
+      
       // Verificar si hay una sesión activa
       const token = localStorage.getItem('JWT');
       if (token) {
@@ -42,6 +45,23 @@ export class Login implements OnInit {
         this.router.navigate(['/dashboard']);
         return;
       }
+    }
+  }
+
+  private clearAllCaches(): void {
+    try {
+      // Limpiar cualquier caché de ArCash que pueda existir
+      const keys = Object.keys(localStorage);
+      const arcashKeys = keys.filter(key => key.startsWith('arcash_'));
+      
+      if (arcashKeys.length > 0) {
+        arcashKeys.forEach(key => {
+          localStorage.removeItem(key);
+        });
+        console.log('🧹 Cachés residuales limpiados en login:', arcashKeys.length, 'elementos');
+      }
+    } catch (error) {
+      console.error('Error limpiando cachés residuales:', error);
     }
   }
 
