@@ -6,5 +6,7 @@ export default interface Transaction {
   date: Date;
   from?: string;
   to?: string;
+  originId?: number;
+  destinationId?: number;
   status?: 'COMPLETED' | 'FAILED';
 }

@@ -93,6 +93,7 @@ body {
     border-radius: 50%;
     animation: spin 2s linear infinite;
     z-index: 1;
+    will-change: transform;
 }
 
 .loading-brand h1 {
@@ -121,7 +122,8 @@ body {
     position: relative;
     opacity: 0;
     transform: translateY(20px);
-    transition: all 0.8s ease;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    will-change: opacity, transform;
 }
 
 .dashboard-container::before {
@@ -142,38 +144,34 @@ body {
             rgba(255, 0, 110, 0.02) 360deg);
     pointer-events: none;
     z-index: 0;
-    transition: all 0.4s ease;
-    animation: techPulse 8s ease-in-out infinite;
+    transition: opacity 0.4s ease;
+    animation: techPulse 12s ease-in-out infinite;
+    will-change: opacity;
 }
 
 @keyframes techPulse {
     0%, 100% { 
         opacity: 0.7; 
-        filter: hue-rotate(0deg);
     }
     50% { 
         opacity: 0.9; 
-        filter: hue-rotate(10deg);
     }
 }
 
 /* Animación específica para modo claro - tonos rositas */
 :root:not([data-theme="dark"]) .dashboard-container::before {
-    animation: rosePulse 10s ease-in-out infinite;
+    animation: rosePulse 15s ease-in-out infinite;
 }
 
 @keyframes rosePulse {
     0%, 100% { 
         opacity: 0.6; 
-        filter: hue-rotate(0deg) saturate(1.2);
     }
     33% { 
         opacity: 0.8; 
-        filter: hue-rotate(10deg) saturate(1.3);
     }
     66% { 
         opacity: 0.7; 
-        filter: hue-rotate(-5deg) saturate(1.25);
     }
 }
 
@@ -188,17 +186,16 @@ body {
             rgba(255, 0, 110, 0.06) 120deg, 
             rgba(0, 212, 255, 0.04) 240deg, 
             rgba(57, 255, 204, 0.08) 360deg);
-    animation: cyberpunkPulse 6s ease-in-out infinite;
+    animation: cyberpunkPulse 10s ease-in-out infinite;
+    will-change: opacity;
 }
 
 @keyframes cyberpunkPulse {
     0%, 100% { 
         opacity: 0.8; 
-        transform: scale(1); 
     }
     50% { 
         opacity: 1; 
-        transform: scale(1.02); 
     }
 }
 
@@ -978,6 +975,8 @@ body {
     transform: none;
 }
 
+
+
 /* Form Group for Floating Labels */
 .form-group {
     position: relative;
@@ -1210,6 +1209,17 @@ body {
 .transfer-details span {
     text-align: right;
     font-family: 'Courier New', monospace;
+}
+
+/* Colores para los montos en el modal */
+.transfer-details span.income {
+    color: var(--laser-green) !important;
+    font-weight: 600;
+}
+
+.transfer-details span.expense {
+    color: var(--plasma-pink) !important;
+    font-weight: 600;
 }
 
 .estado-completed {
@@ -1534,5 +1544,369 @@ body {
 
 .loading-text {
     animation: pulse 2s ease-in-out infinite;
+}
+
+/* ====================================
+   ESTILOS BÁSICOS PARA MODALES
+   ==================================== */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Modo oscuro para modal */
+[data-theme="dark"] .modal-content {
+    background: var(--obsidian);
+    border: 1px solid rgba(57, 255, 204, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    line-height: 1;
+}
+
+.close-button:hover {
+    color: var(--cyber-blue);
+}
+
+.modal h2 {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* ====================================
+   ESTILOS PARA MODAL DE TRANSACCIONES
+   ==================================== */
+
+.transfer-details {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+}
+
+.transfer-details li {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.95rem;
+    gap: 1rem;
+}
+
+.transfer-details li:last-child {
+    border-bottom: none;
+}
+
+.transfer-details b {
+    color: var(--text-secondary);
+    font-weight: 600;
+    flex: 0 0 auto;
+    min-width: 120px;
+}
+
+.transfer-details span {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: right;
+    flex: 1;
+    word-break: break-word;
+}
+
+/* Modo oscuro para transfer-details */
+[data-theme="dark"] .transfer-details b {
+    color: var(--neon-cyan);
+}
+
+[data-theme="dark"] .transfer-details span {
+    color: var(--platinum);
+}
+
+[data-theme="dark"] .transfer-details li {
+    border-bottom-color: rgba(57, 255, 204, 0.2);
+}
+
+/* Estados de transacciones */
+.estado-completed {
+    color: var(--success-color, #10b981) !important;
+    font-weight: 600;
+}
+
+.estado-failed {
+    color: var(--error-color, #ef4444) !important;
+    font-weight: 600;
+}
+
+/* Estados específicos para modo oscuro */
+[data-theme="dark"] .estado-completed {
+    color: #34d399 !important;
+}
+
+[data-theme="dark"] .estado-failed {
+    color: #f87171 !important;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .transfer-details li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        padding: 0.75rem 0;
+    }
+    
+    .transfer-details b,
+    .transfer-details span {
+        text-align: left;
+        width: 100%;
+    }
+    
+    .transfer-details b {
+        min-width: auto;
+        margin-bottom: 0.25rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+}
+
+/* Optimizaciones de performance */
+.modal * {
+    will-change: auto;
+}
+
+.modal.show * {
+    will-change: transform, opacity;
+}
+
+/* ====================================
+   MODAL DE TODAS LAS TRANSACCIONES
+   ==================================== */
+
+.all-transactions-modal {
+    max-width: 700px !important;
+    max-height: 80vh !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.all-transactions-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+    margin-top: 20px;
+}
+
+.all-transactions-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.all-transactions-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.all-transactions-container::-webkit-scrollbar-thumb {
+    background: var(--cyber-blue);
+    border-radius: 10px;
+}
+
+.all-transactions-container::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-cyan);
+}
+
+.no-transactions-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+.no-transactions-message svg {
+    color: var(--cyber-blue);
+    margin-bottom: 15px;
+    opacity: 0.6;
+}
+
+.no-transactions-message p {
+    font-size: 16px;
+    margin: 0;
+}
+
+.transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.transaction-item-modal {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(139, 233, 253, 0.2);
+    border-radius: 12px;
+    cursor: default;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.transaction-icon-modal {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.transaction-icon-modal.income {
+    background: rgba(0, 255, 127, 0.2);
+    color: var(--laser-green);
+}
+
+.transaction-icon-modal.expense {
+    background: rgba(255, 20, 147, 0.2);
+    color: var(--plasma-pink);
+}
+
+.transaction-info-modal {
+    flex: 1;
+    min-width: 0;
+}
+
+.transaction-description-modal {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transaction-date-modal {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.transaction-status-modal.failed {
+    font-size: 11px;
+    color: var(--plasma-pink);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.transaction-amount-modal {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.amount-value-modal {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+}
+
+.transaction-amount-modal.income .amount-value-modal {
+    color: var(--laser-green);
+}
+
+.transaction-amount-modal.expense .amount-value-modal {
+    color: var(--plasma-pink);
+}
+
+/* Modo oscuro para el modal de todas las transacciones */
+[data-theme="dark"] .transaction-item-modal {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(139, 233, 253, 0.3);
+}
+
+[data-theme="dark"] .no-transactions-message {
+    color: var(--text-secondary-dark);
+}
+
+[data-theme="dark"] .transaction-description-modal {
+    color: var(--text-primary-dark);
+}
+
+[data-theme="dark"] .transaction-date-modal {
+    color: var(--text-secondary-dark);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .all-transactions-modal {
+        max-width: 95% !important;
+        margin: 20px auto !important;
+        max-height: 85vh !important;
+    }
+    
+    .transaction-item-modal {
+        padding: 12px;
+    }
+    
+    .transaction-icon-modal {
+        width: 35px;
+        height: 35px;
+        margin-right: 12px;
+    }
+    
+    .transaction-description-modal {
+        font-size: 13px;
+    }
+    
+    .amount-value-modal {
+        font-size: 14px;
+    }
+}
+
+/* Mejorar contraste para accesibilidad */
+.transfer-details span {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .transfer-details span {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 

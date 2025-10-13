@@ -162,7 +162,7 @@
         <section class="transactions-section">
             <div class="transactions-header">
                 <h2 class="section-title">Movimientos Recientes</h2>
-                <button class="view-all-btn">Ver todos</button>
+                <button class="view-all-btn" (click)="openAllTransactionsModal()">Ver todos</button>
             </div>
             
             <div class="transactions-container">
@@ -195,7 +195,7 @@
                     
                     <div class="transaction-amount" [class]="transaction.type">
                         <span class="amount-value">
-                            {{transaction.type === 'income' ? '+' : '-'}}${{formatAmount(transaction.amount)}}
+                            {{transaction.type === 'income' ? '+' : '-'}}{{formatAmount(transaction.amount)}}
                         </span>
                     </div>
                 </div>
@@ -219,7 +219,7 @@
                 required 
                 min="1" 
                 step="0.01">
-            <button type="submit" [disabled]="!ingresarForm.valid">Confirmar</button>
+            <button type="submit"[disabled]="!ingresarForm.valid">Confirmar</button>
         </form>
     </div>
 </div>
@@ -389,11 +389,61 @@
         <h2>Detalle de la Transferencia</h2>
         <ul class="transfer-details" *ngIf="selectedTransaction">
             <li><b>ID Operación:</b> <span>{{selectedTransaction.id}}</span></li>
-            <li><b>Origen:</b> <span>{{selectedTransaction.from || 'Tu cuenta'}}</span></li>
-            <li><b>Destino:</b> <span>{{selectedTransaction.to || 'Tu cuenta'}}</span></li>
-            <li><b>Monto:</b> <span>{{formatAmount(selectedTransaction.amount)}}</span></li>
+            <li><b>Origen:</b> <span>{{getTransactionOrigin(selectedTransaction)}}</span></li>
+            <li><b>Destino:</b> <span>{{getTransactionDestination(selectedTransaction)}}</span></li>
+            <li><b>Monto:</b> <span [class]="selectedTransaction.type">
+                {{selectedTransaction.type === 'income' ? '+' : '-'}}{{formatAmount(selectedTransaction.amount)}}
+            </span></li>
             <li><b>Estado:</b> <span [class]="'estado-' + selectedTransaction.status?.toLowerCase()">{{selectedTransaction.status}}</span></li>
-            <li><b>Fecha:</b> <span>{{formatDate(selectedTransaction.date)}}</span></li>
+            <li><b>Fecha y hora:</b> <span>{{formatDateDetailed(selectedTransaction.date)}}</span></li>
         </ul>
+    </div>
+</div>
+
+<!-- Modal para ver todas las transacciones -->
+<div *ngIf="showAllTransactionsModal" class="modal" (click)="onModalBackdropClick($event, 'allTransactions')">
+    <div class="modal-content all-transactions-modal">
+        <span class="close-button" (click)="closeAllTransactionsModal()">&times;</span>
+        <h2>Todas las Transacciones</h2>
+        
+        <div class="all-transactions-container">
+            <div *ngIf="recentTransactions.length === 0" class="no-transactions-message">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 12h8" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 8v8" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <p>No hay transacciones para mostrar</p>
+            </div>
+            
+            <div *ngIf="recentTransactions.length > 0" class="transactions-list">
+                <div *ngFor="let transaction of recentTransactions; trackBy: trackTransaction" 
+                     class="transaction-item-modal">
+                    
+                    <div class="transaction-icon-modal" [class]="transaction.type">
+                        <svg *ngIf="transaction.type === 'income'" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 5l7 7-7 7" stroke="currentColor" stroke-width="2"/>
+                            <path d="M19 12H5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <svg *ngIf="transaction.type === 'expense'" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2"/>
+                            <path d="M5 12h14" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    
+                    <div class="transaction-info-modal">
+                        <h4 class="transaction-description-modal">{{transaction.description}}</h4>
+                        <p class="transaction-date-modal">{{formatDate(transaction.date)}}</p>
+                        <span *ngIf="transaction.status === 'FAILED'" class="transaction-status-modal failed">Fallida</span>
+                    </div>
+                    
+                    <div class="transaction-amount-modal" [class]="transaction.type">
+                        <span class="amount-value-modal">
+                            {{transaction.type === 'income' ? '+' : '-'}}{{formatAmount(transaction.amount)}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

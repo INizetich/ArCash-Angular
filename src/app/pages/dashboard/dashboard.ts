@@ -22,6 +22,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Suscripciones
   private subscriptions: Subscription[] = [];
 
+  // Propiedades para cleanup
+  private mouseListener?: (e: MouseEvent) => void;
+
   // Estados de carga y visibilidad
   isLoading = true;
   balanceVisible = true;
@@ -49,6 +52,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showTaxModal = false;
   showProfileModal = false;
   showTransactionModal = false;
+  showAllTransactionsModal = false;
 
   // Estados del proceso de transferencia
   transferStep = 1; // 1: buscar, 2: confirmar, 3: monto
@@ -86,41 +90,70 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.checkAuthentication();
     this.setupSubscriptions();
     
+    // Cargar transacciones inmediatamente
+    this.loadTransactionsOnInit();
+    
     // Simular carga elegante con progreso real
     this.startElegantLoading();
   }
 
   private setupMouseTracking(): void {
-    const updateMousePosition = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth) * 100;
-      const y = (e.clientY / window.innerHeight) * 100;
-      
-      document.documentElement.style.setProperty('--mouse-x', `${x}%`);
-      document.documentElement.style.setProperty('--mouse-y', `${y}%`);
+    let ticking = false;
+    
+    this.mouseListener = (e: MouseEvent) => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const x = (e.clientX / window.innerWidth) * 100;
+          const y = (e.clientY / window.innerHeight) * 100;
+          
+          document.documentElement.style.setProperty('--mouse-x', `${x}%`);
+          document.documentElement.style.setProperty('--mouse-y', `${y}%`);
+          
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    document.addEventListener('mousemove', updateMousePosition);
-    
-    // Cleanup en ngOnDestroy se manejará automáticamente
+    // Throttle usando requestAnimationFrame para mejor performance
+    document.addEventListener('mousemove', this.mouseListener, { passive: true });
   }
 
   private startElegantLoading(): void {
-    // Carga simple y rápida
+    // Reducir tiempo de carga para mejor UX
     setTimeout(() => {
       this.isLoading = false;
-    }, 1500); // 1.5 segundos total
+    }, 800); // Reducido a 0.8 segundos
 
-    // Cargar datos reales en paralelo
+    // Cargar datos reales en paralelo de forma más eficiente
     this.loadDataInBackground();
   }
 
+  private async loadTransactionsOnInit(): Promise<void> {
+    try {
+      console.log('💳 Cargando transacciones al iniciar...');
+      
+      // Verificar si ya hay transacciones cargadas
+      const currentTransactions = this.dataService.getCurrentTransactions();
+      if (!currentTransactions || currentTransactions.length === 0) {
+        console.log('📥 No hay transacciones en cache, cargando desde servidor...');
+        await this.dataService.loadTransactions();
+      } else {
+        console.log('✅ Transacciones ya disponibles en cache:', currentTransactions.length);
+        this.recentTransactions = currentTransactions;
+      }
+    } catch (error) {
+      console.error('❌ Error cargando transacciones:', error);
+    }
+  }
+
   private setupSubscriptions(): void {
-    console.log('� Configurando suscripciones...');
+   
     
     // Suscribirse a los datos del usuario
     const userDataSub = this.dataService.userData$.subscribe(userData => {
       if (userData) {
-        console.log('📊 Usuario recibido:', userData.username);
+       
         this.userData = userData;
       }
     });
@@ -128,7 +161,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     // Suscribirse a las transacciones
     const transactionsSub = this.dataService.transactions$.subscribe(transactions => {
-      console.log('💳 Transacciones recibidas:', transactions.length);
+    
       this.recentTransactions = transactions;
     });
     this.subscriptions.push(transactionsSub);
@@ -138,17 +171,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     try {
       console.log('🔄 Cargando datos en background...');
       
+      // Cargar datos en paralelo para mejor performance
+      const promises = [];
+      
       const currentUser = this.dataService.getCurrentUserData();
       if (!currentUser) {
         console.log('⏳ Cargando usuario...');
-        await this.dataService.loadUserData();
+        promises.push(this.dataService.loadUserData());
       }
       
       const currentTransactions = this.dataService.getCurrentTransactions();
       if (!currentTransactions || currentTransactions.length === 0) {
         console.log('⏳ Cargando transacciones...');
-        await this.dataService.loadTransactions();
+        promises.push(this.dataService.loadTransactions());
       }
+      
+      // Ejecutar todas las cargas en paralelo
+      await Promise.allSettled(promises);
       
       console.log('✅ Datos cargados correctamente');
     } catch (error) {
@@ -159,6 +198,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Limpiar suscripciones para evitar memory leaks
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    
+    // Limpiar event listener del mouse para mejor performance
+    if (this.mouseListener) {
+      document.removeEventListener('mousemove', this.mouseListener);
+    }
   }
 
   // --- AUTENTICACIÓN ---
@@ -178,7 +222,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     try {
-      await this.dataService.depositMoney(this.montoIngresar);
+      await this.dataService.ingresarDinero(this.montoIngresar);
       this.utilService.showToast(`Ingreso exitoso de $${this.montoIngresar}`, 'success');
       this.closeIngresarModal();
     } catch (error) {
@@ -194,7 +238,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.cuentaDestinoData = await this.dataService.searchAccount(this.destinatarioInput.trim());
+      this.cuentaDestinoData = await this.dataService.buscarCuenta(this.destinatarioInput.trim());
       
       const currentUser = this.dataService.getCurrentUserData();
       if (currentUser && this.cuentaDestinoData.idaccount === currentUser.idAccount) {
@@ -203,9 +247,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
 
       this.transferStep = 2;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error buscando cuenta:', error);
-      this.utilService.showToast('Cuenta no encontrada', 'error');
+      if (error.message) {
+        this.utilService.showToast(error.message, 'error');
+      } else {
+        this.utilService.showToast('Cuenta no encontrada', 'error');
+      }
     }
   }
 
@@ -227,7 +275,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     try {
-      await this.dataService.transferMoney(this.cuentaDestinoData.idaccount, this.montoTransfer);
+      await this.dataService.realizarTransferencia(this.cuentaDestinoData.idaccount, this.montoTransfer);
       this.utilService.showToast('Transferencia realizada con éxito', 'success');
       this.closeTransferModal();
     } catch (error) {
@@ -268,11 +316,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
         `;
       } else {
         result = `
-          <p><strong class="label">Monto sin impuestos:</strong> <span class="value">$${resultData.montoOriginal.toFixed(2)} ARS</span></p>
-          <p><strong class="label">IVA 21%:</strong> <span class="value">$${resultData.iva.toFixed(2)} ARS</span></p>
-          <p><strong class="label">Percepción Ganancias 30%:</strong> <span class="value">$${resultData.percepcionGanancias?.toFixed(2)} ARS</span></p>
+          <p><strong class="label">Monto original USD:</strong> <span class="value">$${this.taxMonto.toFixed(2)} USD</span></p>
           <p><strong class="label">Cotización dólar oficial:</strong> <span class="value">$${resultData.precioDolar?.toFixed(2)} ARS</span></p>
-          <p><strong class="label">Total con impuestos:</strong> <span class="value strong">$${resultData.totalFinal.toFixed(2)} ARS</span></p>
+          <p><strong class="label">Monto en ARS:</strong> <span class="value">$${resultData.montoOriginal.toFixed(2)} ARS</span></p>
+          <p><strong class="label">IVA 21%:</strong> <span class="value">$${resultData.iva.toFixed(2)} ARS</span></p>
+          <p><strong class="label">Total final:</strong> <span class="value strong">$${resultData.totalFinal.toFixed(2)} ARS</span></p>
         `;
       }
       this.taxResult = result;
@@ -345,11 +393,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
   openTransactionModal(transaction: Transaction): void {
     this.selectedTransaction = transaction;
     this.showTransactionModal = true;
+    console.log('📄 Abriendo modal de transacción:', transaction);
   }
 
   closeTransactionModal(): void {
     this.showTransactionModal = false;
     this.selectedTransaction = null;
+  }
+
+  openAllTransactionsModal(): void {
+    this.showAllTransactionsModal = true;
+  }
+
+  closeAllTransactionsModal(): void {
+    this.showAllTransactionsModal = false;
   }
 
   // --- MÉTODOS DE NAVEGACIÓN ENTRE PASOS ---
@@ -379,8 +436,58 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    localStorage.clear();
+    
+    
+    // Obtener el token JWT del localStorage
+    const jwt = localStorage.getItem('JWT');
+    
+    if (!jwt) {
+      
+      this.performLocalLogout();
+      return;
+    }
+
+    // Llamar al endpoint de logout del backend
+    this.authService.logoutUser(jwt).subscribe({
+      next: (response) => {
+       
+        this.performLocalLogout();
+      },
+      error: (error) => {
+       
+        // Aunque falle el backend, limpiar la sesión local
+        this.performLocalLogout();
+      }
+    });
+  }
+
+  private performLocalLogout(): void {
+   
+    
+    // Limpiar localStorage usando el método del AuthService
+    this.authService.clearLocalSession();
+    
+    // Limpiar cualquier otro dato local si es necesario
+    this.userData = {
+      name: 'Cargando...',
+      lastName: '',
+      dni: '',
+      email: '',
+      alias: '',
+      cvu: '',
+      username: '',
+      balance: 0,
+      idAccount: ''
+    };
+    
+    this.recentTransactions = [];
+    
+    // Mostrar mensaje de éxito
     this.utilService.showToast('Sesión cerrada exitosamente', 'success');
+    
+  
+    
+    // Redireccionar al login
     this.router.navigate(['/login']);
   }
 
@@ -462,16 +569,65 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   formatDate(date: Date): string {
-    return date.toLocaleDateString('es-AR', {
+    return new Intl.DateTimeFormat('es-AR', {
       day: '2-digit',
       month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).format(new Date(date));
+  }
+
+  formatDateDetailed(date: Date): string {
+    const dateObj = new Date(date);
+    const dateStr = dateObj.toLocaleDateString('es-AR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
       year: 'numeric'
     });
+    
+    const timeStr = dateObj.toLocaleTimeString('es-AR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+    
+    return `${dateStr} a las ${timeStr}`;
   }
 
   getTransactionClass(transaction: Transaction): string {
     if (transaction.status === 'FAILED') return 'monto fallida';
     return transaction.type === 'income' ? 'monto positivo' : 'monto negativo';
+  }
+
+  getTransactionOrigin(transaction: Transaction): string {
+    const currentUser = this.dataService.getCurrentUserData();
+    if (!currentUser) return 'Desconocido';
+    
+    // Si la transacción es de entrada (income), el origen no es nuestra cuenta
+    if (transaction.type === 'income') {
+      return transaction.from || 'Cuenta externa';
+    } else {
+      // Si es de salida (expense), el origen es nuestra cuenta
+      return 'Mi cuenta';
+    }
+  }
+
+  getTransactionDestination(transaction: Transaction): string {
+    const currentUser = this.dataService.getCurrentUserData();
+    if (!currentUser) return 'Desconocido';
+    
+    // Si la transacción es de entrada (income), el destino es nuestra cuenta
+    if (transaction.type === 'income') {
+      return 'Mi cuenta';
+    } else {
+      // Si es de salida (expense), el destino no es nuestra cuenta
+      return transaction.to || 'Cuenta externa';
+    }
   }
 
   onModalBackdropClick(event: MouseEvent, modalType: string): void {
@@ -495,11 +651,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         case 'transaction':
           this.closeTransactionModal();
           break;
+        case 'allTransactions':
+          this.closeAllTransactionsModal();
+          break;
       }
     }
   }
 
-  
-}
+  trackTransaction(index: number, transaction: Transaction): number {
+    return transaction.id;
+  }
 
-  
+}

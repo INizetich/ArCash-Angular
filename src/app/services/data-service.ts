@@ -19,7 +19,6 @@ interface AccountSearchResult {
 interface TaxCalculationResult {
   montoOriginal: number;
   iva: number;
-  percepcionGanancias?: number;
   precioDolar?: number;
   totalFinal: number;
 }
@@ -40,46 +39,30 @@ export class DataService {
   public transactions$ = this.transactionsSubject.asObservable();
 
   constructor(private http: HttpClient) {
-  
     this.loadUserDataFromStorage();
-    
   }
 
   // --- GESTIÓN DE DATOS DE USUARIO ---
-  
- 
+
   async loadUserData(): Promise<UserData> {
     try {
-      console.log('🔄 DataService: Cargando datos del usuario...');
-      
       const accountId = localStorage.getItem('accountId');
-      const jwt = localStorage.getItem('JWT'); // ✅ Corregido: usar 'JWT' como está en localStorage
-      
-      console.log('🔐 Debug Auth Info:');
-      console.log('- Account ID:', accountId);
-      console.log('- JWT presente:', !!jwt);
-      console.log('- JWT length:', jwt?.length);
+      const jwt = localStorage.getItem('JWT');
       
       if (!accountId || !jwt) {
         throw new Error('No hay información de sesión válida');
       }
 
       const headers = {
-        'Authorization': `Bearer ${jwt}`, // ✅ Usando jwt
+        'Authorization': `Bearer ${jwt}`,
         'Content-Type': 'application/json'
       };
 
-      // Intentar obtener datos del usuario autenticado
-      console.log('🔄 Intentando endpoint: /api/user/data');
-      console.log('🔑 Headers enviados:', headers);
-      
       try {
         const response = await this.http.get<any>(`${this.baseUrl}/user/data`, { 
           headers,
-          withCredentials: true // ✅ Incluir cookies en la petición
+          withCredentials: true
         }).toPromise();
-        
-        console.log('✅ Respuesta de /api/user/data:', response);
         
         if (response) {
           const userData: UserData = {
@@ -87,126 +70,98 @@ export class DataService {
             lastName: response.lastName || '',
             dni: response.dni || '',
             email: response.email || '',
-            alias: response.alias || 'usuario.alias', // ✅ Este es el alias de la cuenta
+            alias: response.alias || 'usuario.alias',
             cvu: response.cvu || '0000000000000000000000',
-            username: response.username || 'usuario', // ✅ Este es el username del usuario
+            username: response.username || 'usuario',
             balance: response.balance || 0,
             idAccount: response.idAccount?.toString() || accountId
           };
           
-          console.log('✅ UserData mapeado desde /api/user/data:', userData);
           this.userDataSubject.next(userData);
           this.saveUserDataToStorage(userData);
           return userData;
         }
       } catch (userDataError: any) {
-        console.log('❌ Error con endpoint /api/user/data:', userDataError);
-        console.log('📋 Status del error:', userDataError.status);
-        console.log('📋 Mensaje del error:', userDataError.message);
+        console.warn('Error obteniendo datos del usuario desde backend:', userDataError);
         
-        // ⚠️ Si el endpoint principal falla, intentar showBalance como fallback
-        console.log('🔄 Intentando endpoint de cuenta: /api/accounts/' + accountId + '/showBalance');
-        
-        try {
-          const accountResponse = await this.http.get<any>(`${this.baseUrl}/accounts/${accountId}/showBalance`, { headers }).toPromise();
-          console.log('✅ Respuesta de showBalance:', accountResponse);
-          
-          if (accountResponse) {
-            const userData: UserData = {
-              name: 'Usuario', // ⚠️ Datos genéricos porque showBalance no devuelve info personal
-              lastName: 'ArCash',
-              dni: '12345678',
-              email: 'usuario@arcash.com',
-              alias: accountResponse.alias || 'usuario.arcash',
-              cvu: accountResponse.cvu || '0000003100010000000001',
-              username: 'usuario123',
-              balance: accountResponse.balance || 0,
-              idAccount: accountId
-            };
-            
-            console.log('✅ UserData desde showBalance (fallback):', userData);
-            this.userDataSubject.next(userData);
-            this.saveUserDataToStorage(userData);
-            return userData;
-          }
-        } catch (accountError: any) {
-          console.log('❌ Error también con endpoint showBalance:', accountError);
-          console.log('📋 Status del error de cuenta:', accountError.status);
+        // Fallback a datos locales
+        const localData = this.loadUserDataFromStorage();
+        if (localData) {
+          return localData;
         }
         
-        // ❌ Si todo falla, lanzar el error
-        throw new Error(`Error cargando datos: ${userDataError.status} - ${userDataError.message}`);
+        // Fallback con datos mínimos
+        const fallbackData: UserData = {
+          name: 'Usuario',
+          lastName: '',
+          dni: '',
+          email: '',
+          alias: 'usuario.alias',
+          cvu: '0000000000000000000000',
+          username: 'usuario',
+          balance: 0,
+          idAccount: accountId
+        };
+        
+        this.userDataSubject.next(fallbackData);
+        return fallbackData;
       }
       
-      throw new Error('No se pudo obtener respuesta del servidor');
+      throw new Error('No se pudieron cargar los datos del usuario');
     } catch (error) {
-      console.error('❌ DataService: Error loading user data:', error);
+      console.error('Error en loadUserData:', error);
       throw error;
     }
   }
 
-  /**
-   * Obtiene los datos del usuario actual
-   */
+  private loadUserDataFromStorage(): UserData | null {
+    try {
+      const storedData = localStorage.getItem('userData');
+      if (storedData) {
+        const userData = JSON.parse(storedData) as UserData;
+        this.userDataSubject.next(userData);
+        return userData;
+      }
+    } catch (error) {
+      console.error('Error loading user data from storage:', error);
+    }
+    return null;
+  }
+
+  private saveUserDataToStorage(userData: UserData): void {
+    try {
+      localStorage.setItem('userData', JSON.stringify(userData));
+    } catch (error) {
+      console.error('Error saving user data to storage:', error);
+    }
+  }
+
   getCurrentUserData(): UserData | null {
     return this.userDataSubject.value;
-  }
-
-  /**
-   * Obtiene las transacciones actuales
-   */
-  getCurrentTransactions(): Transaction[] {
-    return this.transactionsSubject.value;
-  }
-
-  /**
-   * Actualiza el saldo del usuario
-   */
-  async updateBalance(): Promise<number> {
-    try {
-      const accountId = localStorage.getItem("accountId");
-      const jwt = localStorage.getItem('JWT');
-      
-      if (!accountId || !jwt) throw new Error('No hay información de sesión válida');
-      
-      const headers = {
-        'Authorization': `Bearer ${jwt}`,
-        'Content-Type': 'application/json'
-      };
-      
-      const response = await this.http.get<any>(`${this.baseUrl}/accounts/${accountId}/showBalance`, { headers }).toPromise();
-      
-      if (!response) {
-        throw new Error('No se pudo obtener el saldo');
-      }
-      
-      const newBalance = parseFloat(response.balance);
-      
-      // Actualizar el saldo en el estado local
-      const currentUser = this.getCurrentUserData();
-      if (currentUser) {
-        const updatedUser = { ...currentUser, balance: newBalance };
-        this.userDataSubject.next(updatedUser);
-        this.saveUserDataToStorage(updatedUser);
-      }
-      
-      return newBalance;
-    } catch (error) {
-      console.error('Error updating balance:', error);
-      throw error;
-    }
   }
 
   /**
    * Actualiza el alias del usuario
    */
   async updateAlias(newAlias: string): Promise<void> {
+    const jwt = localStorage.getItem('JWT');
+    const accountId = localStorage.getItem('accountId');
+    
+    if (!jwt || !accountId) {
+      throw new Error('No hay sesión activa');
+    }
+
     try {
-      const accountId = localStorage.getItem("accountId");
-      if (!accountId) throw new Error('No account ID found');
-      
-      // TODO: Reemplazar con llamada real al backend
-      // const response = await this.http.put(`${this.baseUrl}/accounts/${accountId}/changeAlias`, { newAlias }).toPromise();
+      await this.http.put(
+        `${this.baseUrl}/accounts/${accountId}/alias`,
+        { alias: newAlias },
+        {
+          headers: {
+            'Authorization': `Bearer ${jwt}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      ).toPromise();
       
       // Actualizar estado local
       const currentUser = this.getCurrentUserData();
@@ -224,18 +179,29 @@ export class DataService {
   /**
    * Actualiza el nombre de usuario
    */
-  async updateUsername(newUsername: string): Promise<void> {
+  async updateUsername(newUsername: string): Promise<any> {
+    const jwt = localStorage.getItem('JWT');
+    
+    if (!jwt) {
+      throw new Error('No hay sesión activa');
+    }
+
     try {
-      // TODO: Reemplazar con llamada real al backend
-      // const response = await this.http.put(`${this.baseUrl}/auth/changeUsername`, { newUsername }).toPromise();
+      const response = await this.http.put(
+        `${this.baseUrl}/auth/changeUsername`,
+        { newUsername: newUsername },
+        {
+          headers: {
+            'Authorization': `Bearer ${jwt}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      ).toPromise();
+
+      // Actualizar los datos del usuario después del cambio
+      await this.loadUserData();
       
-      // Actualizar estado local
-      const currentUser = this.getCurrentUserData();
-      if (currentUser) {
-        const updatedUser = { ...currentUser, username: newUsername };
-        this.userDataSubject.next(updatedUser);
-        this.saveUserDataToStorage(updatedUser);
-      }
+      return response;
     } catch (error) {
       console.error('Error updating username:', error);
       throw error;
@@ -249,319 +215,254 @@ export class DataService {
    */
   async loadTransactions(): Promise<Transaction[]> {
     try {
-      console.log('🔄 DataService: Cargando transacciones...');
-      
       const accountId = localStorage.getItem('accountId');
-      const jwt = localStorage.getItem('JWT'); // ✅ Corregido: usar 'JWT'
+      const jwt = localStorage.getItem('JWT');
       
       if (!accountId || !jwt) {
         throw new Error('No hay información de sesión válida');
       }
 
       const headers = {
-        'Authorization': `Bearer ${jwt}`, // ✅ Usando jwt
+        'Authorization': `Bearer ${jwt}`,
         'Content-Type': 'application/json'
       };
 
       try {
-        // Intentar obtener transacciones del backend
-        console.log('🔄 Intentando endpoint: /api/transactions/' + accountId + '/getTransactions');
-        console.log('🔑 Headers:', headers);
         const response = await this.http.get<any[]>(`${this.baseUrl}/transactions/${accountId}/getTransactions`, { 
           headers,
-          withCredentials: true // ✅ Incluir cookies en la petición
+          withCredentials: true
         }).toPromise();
         
         if (!response || !Array.isArray(response)) {
-          console.log('🔄 DataService: No hay transacciones disponibles en el backend');
           this.transactionsSubject.next([]);
           return [];
         }
         
-        const transactions: Transaction[] = response.map((tx: any) => ({
-          id: tx.idTransaction,
-          type: tx.idOrigin === parseInt(accountId) ? 'expense' : 'income',
-          description: tx.idOrigin === parseInt(accountId) ? 
-            `Transferencia a ${tx.destinationAlias || tx.destinationUsername}` : 
-            `Transferencia de ${tx.originAlias || tx.originUsername}`,
-          amount: parseFloat(tx.amount),
-          date: new Date(tx.date),
-          from: tx.idOrigin !== parseInt(accountId) ? tx.originAlias || tx.originUsername : undefined,
-          to: tx.idOrigin === parseInt(accountId) ? tx.destinationAlias || tx.destinationUsername : undefined,
-          status: tx.state || 'COMPLETED'
-        }));
+        const transactions: Transaction[] = response.map((tx: any) => {
+          const isIncoming = tx.idOrigin !== parseInt(accountId);
+          const isOutgoing = tx.idOrigin === parseInt(accountId);
+          
+          return {
+            id: tx.idTransaction,
+            type: isIncoming ? 'income' : 'expense',
+            description: isIncoming ? 
+              `Transferencia de ${tx.originAlias || tx.originUsername}` : 
+              `Transferencia a ${tx.destinationAlias || tx.destinationUsername}`,
+            amount: parseFloat(tx.amount),
+            date: new Date(tx.date),
+            from: tx.originAlias || tx.originUsername,
+            to: tx.destinationAlias || tx.destinationUsername,
+            originId: tx.idOrigin,
+            destinationId: tx.idDestination,
+            status: tx.state || 'COMPLETED'
+          };
+        });
         
-        console.log('✅ DataService: Transacciones cargadas exitosamente -', transactions.length, 'transacciones');
         this.transactionsSubject.next(transactions);
         return transactions;
         
       } catch (endpointError) {
-        console.log('❌ Error con endpoint de transacciones:', endpointError);
-        
-        // ❌ Si falla, lanzar error en lugar de usar datos fake
-        throw new Error(`Error cargando transacciones: ${endpointError}`);
+        console.warn('Error obteniendo transacciones desde backend:', endpointError);
+        throw new Error('No se pudieron cargar las transacciones desde el servidor');
       }
-      
     } catch (error) {
-      console.error('❌ DataService: Error loading transactions:', error);
-      // En caso de error, devolver array vacío en lugar de fallar
+      console.error('Error en loadTransactions:', error);
       this.transactionsSubject.next([]);
-      return [];
-    }
-  }
-
-  /**
-   * Agrega una nueva transacción a la lista
-   */
-  addTransaction(transaction: Transaction): void {
-    const currentTransactions = this.transactionsSubject.value;
-    const updatedTransactions = [transaction, ...currentTransactions];
-    this.transactionsSubject.next(updatedTransactions);
-  }
-
-  /**
-   * Obtiene el balance actualizado de la cuenta usando el endpoint showBalance
-   */
-  async refreshBalance(): Promise<number | null> {
-    try {
-      const accountId = localStorage.getItem('accountId');
-      const jwt = localStorage.getItem('JWT'); // ✅ Corregido: usar 'JWT'
-      
-      if (!accountId || !jwt) {
-        console.log('❌ No hay información de sesión para actualizar balance');
-        return null;
-      }
-
-      const headers = {
-        'Authorization': `Bearer ${jwt}`, // ✅ Usando jwt
-        'Content-Type': 'application/json'
-      };
-
-      console.log('🔄 Actualizando balance desde /api/accounts/' + accountId + '/showBalance');
-      
-      const response = await this.http.get<any>(`${this.baseUrl}/accounts/${accountId}/showBalance`, { 
-        headers,
-        withCredentials: true // ✅ Incluir cookies en la petición
-      }).toPromise();
-      
-      if (response && response.balance !== undefined) {
-        const newBalance = response.balance;
-        console.log('✅ Balance actualizado:', newBalance);
-        
-        // Actualizar el userData con el nuevo balance
-        const currentUser = this.getCurrentUserData();
-        if (currentUser) {
-          const updatedUser = { ...currentUser, balance: newBalance };
-          this.userDataSubject.next(updatedUser);
-          this.saveUserDataToStorage(updatedUser);
-        }
-        
-        return newBalance;
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('❌ Error actualizando balance:', error);
-      return null;
-    }
-  }
-
-  // --- OPERACIONES FINANCIERAS ---
-  
-  /**
-   * Ingresa dinero a la cuenta del usuario
-   */
-  async depositMoney(amount: number): Promise<void> {
-    try {
-      const accountId = localStorage.getItem("accountId");
-      if (!accountId) throw new Error('No account ID found');
-      
-      // TODO: Reemplazar con llamada real al backend
-      // const response = await this.http.put(`${this.baseUrl}/accounts/${accountId}/balance`, { balance: amount }).toPromise();
-      
-      // Actualizar saldo local
-      const currentUser = this.getCurrentUserData();
-      if (currentUser) {
-        const updatedUser = { ...currentUser, balance: currentUser.balance + amount };
-        this.userDataSubject.next(updatedUser);
-        this.saveUserDataToStorage(updatedUser);
-        
-        // Agregar transacción
-        const transaction: Transaction = {
-          id: Date.now(),
-          type: 'income',
-          description: 'Depósito de dinero',
-          amount: amount,
-          date: new Date(),
-          status: 'COMPLETED'
-        };
-        this.addTransaction(transaction);
-      }
-    } catch (error) {
-      console.error('Error depositing money:', error);
       throw error;
     }
   }
 
   /**
-   * Busca una cuenta por alias o CVU
+   * Obtiene las transacciones actuales
    */
-  async searchAccount(aliasOrCvu: string): Promise<AccountSearchResult> {
-    try {
-      // TODO: Reemplazar con llamada real al backend
-      // const response = await this.http.get<AccountSearchResult>(`${this.baseUrl}/transactions/search/${aliasOrCvu}`).toPromise();
-      
-      // Mock response
-      const mockAccount: AccountSearchResult = {
-        idaccount: '2',
-        alias: 'destino.ejemplo',
-        cvu: '0000003100010000000002',
-        user: {
-          nombre: 'María',
-          apellido: 'García',
-          dni: '87654321'
-        }
-      };
-      
-      return mockAccount;
-    } catch (error) {
-      console.error('Error searching account:', error);
-      throw error;
-    }
+  getCurrentTransactions(): Transaction[] {
+    return this.transactionsSubject.value;
   }
 
-  /**
-   * Realiza una transferencia de dinero
-   */
-  async transferMoney(destinationAccountId: string, amount: number): Promise<void> {
-    try {
-      const sourceAccountId = localStorage.getItem("accountId");
-      if (!sourceAccountId) throw new Error('No source account ID found');
-      
-      // TODO: Reemplazar con llamada real al backend
-      // const response = await this.http.post(`${this.baseUrl}/transactions/${sourceAccountId}/transfer/${destinationAccountId}`, { balance: amount }).toPromise();
-      
-      // Actualizar saldo local
-      const currentUser = this.getCurrentUserData();
-      if (currentUser) {
-        if (currentUser.balance < amount) {
-          throw new Error('Saldo insuficiente');
-        }
-        
-        const updatedUser = { ...currentUser, balance: currentUser.balance - amount };
-        this.userDataSubject.next(updatedUser);
-        this.saveUserDataToStorage(updatedUser);
-        
-        // Agregar transacción
-        const transaction: Transaction = {
-          id: Date.now(),
-          type: 'expense',
-          description: 'Transferencia enviada',
-          amount: amount,
-          date: new Date(),
-          to: destinationAccountId,
-          status: 'COMPLETED'
-        };
-        this.addTransaction(transaction);
-      }
-    } catch (error) {
-      console.error('Error transferring money:', error);
-      throw error;
-    }
-  }
+  // --- CÁLCULOS FINANCIEROS ---
 
-  // --- CALCULADORA DE IMPUESTOS ---
-  
   /**
-   * Calcula impuestos para pesos argentinos
+   * Calcula los impuestos en ARS usando el backend
    */
   async calculateTaxesARS(amount: number): Promise<TaxCalculationResult> {
     try {
-      // TODO: Reemplazar con llamada real al backend
-      // const response = await this.http.get<TaxCalculationResult>(`${this.baseUrl}/impuestos/calculateARS?montoARS=${amount}`).toPromise();
-      
-      // Mock calculation
-      const iva = amount * 0.21;
-      const result: TaxCalculationResult = {
-        montoOriginal: amount,
-        iva: iva,
-        totalFinal: amount + iva
+      const response = await this.http.get<any>(
+        `${this.baseUrl}/impuestos/calculateARS?montoARS=${amount}`
+      ).toPromise();
+
+      if (!response) {
+        throw new Error('No se recibió respuesta del servidor');
+      }
+
+      return {
+        montoOriginal: response.montoOriginal,
+        iva: response.iva,
+        precioDolar: undefined,
+        totalFinal: response.totalFinal
       };
-      
-      return result;
     } catch (error) {
-      console.error('Error calculating taxes ARS:', error);
-      throw error;
+      console.error('Error calculando impuestos ARS:', error);
+      throw new Error('Error al calcular impuestos en ARS');
     }
   }
 
   /**
-   * Calcula impuestos para dólares estadounidenses
+   * Calcula los impuestos en USD usando el backend
    */
   async calculateTaxesUSD(amount: number): Promise<TaxCalculationResult> {
     try {
-      // TODO: Reemplazar con llamada real al backend
-      // const response = await this.http.get<TaxCalculationResult>(`${this.baseUrl}/impuestos/calculateUSD?montoUSD=${amount}`).toPromise();
-      
-      // Mock calculation
-      const precioDolar = 1000; // Cotización mock
-      const montoARS = amount * precioDolar;
-      const iva = montoARS * 0.21;
-      const percepcionGanancias = montoARS * 0.30;
-      
-      const result: TaxCalculationResult = {
-        montoOriginal: montoARS,
-        iva: iva,
-        percepcionGanancias: percepcionGanancias,
-        precioDolar: precioDolar,
-        totalFinal: montoARS + iva + percepcionGanancias
+      const response = await this.http.get<any>(
+        `${this.baseUrl}/impuestos/calculateUSD?montoUSD=${amount}`
+      ).toPromise();
+
+      if (!response) {
+        throw new Error('No se recibió respuesta del servidor');
+      }
+
+      return {
+        montoOriginal: response.montoOriginal,
+        iva: response.iva,
+        precioDolar: response.precioDolar,
+        totalFinal: response.totalFinal
       };
-      
-      return result;
     } catch (error) {
-      console.error('Error calculating taxes USD:', error);
+      console.error('Error calculando impuestos USD:', error);
+      throw new Error('Error al calcular impuestos en USD');
+    }
+  }
+
+  // --- NUEVOS MÉTODOS PARA BACKEND ---
+
+  /**
+   * Ingresar dinero a la cuenta
+   */
+  async ingresarDinero(balance: number): Promise<any> {
+    const accountId = localStorage.getItem('accountId');
+    const jwt = localStorage.getItem('JWT');
+    
+    if (!accountId || !jwt) {
+      throw new Error('No hay sesión activa');
+    }
+
+    try {
+      const response = await this.http.put(
+        `${this.baseUrl}/accounts/${accountId}/balance`,
+        { balance: balance },
+        {
+          headers: {
+            'Authorization': `Bearer ${jwt}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      ).toPromise();
+
+      // Actualizar los datos después del ingreso
+      await this.loadUserData();
+      
+      return response;
+    } catch (error) {
+      console.error('Error ingresando dinero:', error);
       throw error;
     }
   }
 
-  // --- MÉTODOS PRIVADOS ---
-  
   /**
-   * Carga los datos del usuario desde localStorage
+   * Buscar cuenta por alias o CVU
    */
-  private loadUserDataFromStorage(): void {
-    console.log('📂 DataService: Cargando datos desde localStorage...');
-    const storedUserData = localStorage.getItem('userData');
-    if (storedUserData) {
-      try {
-        const userData = JSON.parse(storedUserData);
-        console.log('✅ DataService: Datos encontrados en localStorage');
-        this.userDataSubject.next(userData);
-      } catch (error) {
-        console.error('❌ DataService: Error parsing stored user data:', error);
+  async buscarCuenta(input: string): Promise<AccountSearchResult> {
+    const jwt = localStorage.getItem('JWT');
+    
+    if (!jwt) {
+      throw new Error('No hay sesión activa');
+    }
+
+    try {
+      const response = await this.http.get<AccountSearchResult>(
+        `${this.baseUrl}/transactions/search/${encodeURIComponent(input)}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${jwt}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      ).toPromise();
+      
+      if (!response) {
+        throw new Error('Cuenta no encontrada');
       }
-    } else {
-      console.log('📂 DataService: No hay datos en localStorage');
+      
+      return response;
+    } catch (error: any) {
+      console.error('Error buscando cuenta:', error);
+      if (error.status === 404) {
+        throw new Error('Cuenta no encontrada');
+      } else if (error.status === 401) {
+        throw new Error('Sesión expirada');
+      } else {
+        throw new Error('Error al buscar la cuenta');
+      }
     }
   }
 
   /**
-   * Guarda los datos del usuario en localStorage
+   * Realizar transferencia entre cuentas
    */
-  private saveUserDataToStorage(userData: UserData): void {
-    localStorage.setItem('userData', JSON.stringify(userData));
-    localStorage.setItem('accountId', userData.idAccount);
+  async realizarTransferencia(idDestino: string, monto: number): Promise<any> {
+    const accountId = localStorage.getItem('accountId');
+    const jwt = localStorage.getItem('JWT');
+    
+    if (!accountId || !jwt) {
+      throw new Error('No hay sesión activa');
+    }
+
+    try {
+      const response = await this.http.post(
+        `${this.baseUrl}/transactions/${accountId}/transfer/${idDestino}`,
+        { balance: monto },
+        {
+          headers: {
+            'Authorization': `Bearer ${jwt}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      ).toPromise();
+
+      // Actualizar los datos después de la transferencia
+      await this.loadUserData();
+      await this.loadTransactions();
+      
+      return response;
+    } catch (error) {
+      console.error('Error realizando transferencia:', error);
+      throw error;
+    }
   }
 
   /**
-   * Limpia todos los datos almacenados
+   * Verificar si la sesión está activa
    */
-  clearAllData(): void {
-    this.userDataSubject.next(null);
-    this.transactionsSubject.next([]);
-    localStorage.removeItem('userData');
-    localStorage.removeItem('accountId');
-    localStorage.removeItem('JWT');
-    localStorage.removeItem('role');
+  async checkSession(): Promise<boolean> {
+    const jwt = localStorage.getItem('JWT');
+    
+    if (!jwt) {
+      return false;
+    }
+
+    try {
+      const response = await this.http.get(
+        `${this.baseUrl}/auth/check-session`,
+        {
+          headers: {
+            'Authorization': `Bearer ${jwt}`
+          }
+        }
+      ).toPromise() as any;
+
+      return response?.status === 'ACTIVE';
+    } catch (error) {
+      console.error('Error verificando sesión:', error);
+      return false;
+    }
   }
+
 }
