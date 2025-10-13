@@ -44,11 +44,23 @@
                                maxlength="50">
                         <span class="focus-border"></span>
                     </div>
-                    <div *ngIf="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched" class="error-container">
-                        <small class="error-message" *ngIf="registerForm.get('nombre')?.hasError('required')">El nombre es requerido.</small>
-                        <small class="error-message" *ngIf="registerForm.get('nombre')?.hasError('pattern')">El nombre solo puede contener letras y espacios.</small>
-                        <small class="error-message" *ngIf="registerForm.get('nombre')?.hasError('minlength')">El nombre debe tener al menos 2 caracteres.</small>
-                        <small class="error-message" *ngIf="registerForm.get('nombre')?.hasError('maxlength')">El nombre no puede tener más de 50 caracteres.</small>
+                    <div>
+                        @if (registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched) {
+                            <div class="error-container">
+                                @if (registerForm.get('nombre')?.hasError('required')) {
+                                    <small class="error-message">El nombre es requerido.</small>
+                                }
+                                @if (registerForm.get('nombre')?.hasError('pattern')) {
+                                    <small class="error-message">El nombre solo puede contener letras y espacios.</small>
+                                }
+                                @if (registerForm.get('nombre')?.hasError('minlength')) {
+                                    <small class="error-message">El nombre debe tener al menos 2 caracteres.</small>
+                                }
+                                @if (registerForm.get('nombre')?.hasError('maxlength')) {
+                                    <small class="error-message">El nombre no puede tener más de 50 caracteres.</small>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -62,11 +74,23 @@
                                maxlength="50">
                         <span class="focus-border"></span>
                     </div>
-                    <div *ngIf="registerForm.get('apellido')?.invalid && registerForm.get('apellido')?.touched" class="error-container">
-                        <small class="error-message" *ngIf="registerForm.get('apellido')?.hasError('required')">El apellido es requerido.</small>
-                        <small class="error-message" *ngIf="registerForm.get('apellido')?.hasError('pattern')">El apellido solo puede contener letras y espacios.</small>
-                        <small class="error-message" *ngIf="registerForm.get('apellido')?.hasError('minlength')">El apellido debe tener al menos 2 caracteres.</small>
-                        <small class="error-message" *ngIf="registerForm.get('apellido')?.hasError('maxlength')">El apellido no puede tener más de 50 caracteres.</small>
+                    <div>
+                        @if (registerForm.get('apellido')?.invalid && registerForm.get('apellido')?.touched) {
+                            <div class="error-container">
+                                @if (registerForm.get('apellido')?.hasError('required')) {
+                                    <small class="error-message">El apellido es requerido.</small>
+                                }
+                                @if (registerForm.get('apellido')?.hasError('pattern')) {
+                                    <small class="error-message">El apellido solo puede contener letras y espacios.</small>
+                                }
+                                @if (registerForm.get('apellido')?.hasError('minlength')) {
+                                    <small class="error-message">El apellido debe tener al menos 2 caracteres.</small>
+                                }
+                                @if (registerForm.get('apellido')?.hasError('maxlength')) {
+                                    <small class="error-message">El apellido no puede tener más de 50 caracteres.</small>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -81,11 +105,23 @@
                                (input)="onDniInput($event)">
                         <span class="focus-border"></span>
                     </div>
-                    <div *ngIf="registerForm.get('dni')?.invalid && registerForm.get('dni')?.touched" class="error-container">
-                        <small class="error-message" *ngIf="registerForm.get('dni')?.hasError('required')">El DNI es requerido.</small>
-                        <small class="error-message" *ngIf="registerForm.get('dni')?.hasError('pattern')">Debe ser un DNI de 8 dígitos sin puntos.</small>
-                        <small class="error-message" *ngIf="registerForm.get('dni')?.hasError('minlength')">El DNI debe tener exactamente 8 dígitos.</small>
-                        <small class="error-message" *ngIf="registerForm.get('dni')?.hasError('maxlength')">El DNI debe tener exactamente 8 dígitos.</small>
+                    <div>
+                        @if (registerForm.get('dni')?.invalid && registerForm.get('dni')?.touched) {
+                            <div class="error-container">
+                                @if (registerForm.get('dni')?.hasError('required')) {
+                                    <small class="error-message">El DNI es requerido.</small>
+                                }
+                                @if (registerForm.get('dni')?.hasError('pattern')) {
+                                    <small class="error-message">Debe ser un DNI de 8 dígitos sin puntos.</small>
+                                }
+                                @if (registerForm.get('dni')?.hasError('minlength')) {
+                                    <small class="error-message">El DNI debe tener exactamente 8 dígitos.</small>
+                                }
+                                @if (registerForm.get('dni')?.hasError('maxlength')) {
+                                    <small class="error-message">El DNI debe tener exactamente 8 dígitos.</small>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -99,10 +135,20 @@
                                maxlength="100">
                         <span class="focus-border"></span>
                     </div>
-                    <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-container">
-                        <small class="error-message" *ngIf="registerForm.get('email')?.hasError('required')">El email es requerido.</small>
-                        <small class="error-message" *ngIf="registerForm.get('email')?.hasError('email')">Ingrese un formato de email válido.</small>
-                        <small class="error-message" *ngIf="registerForm.get('email')?.hasError('pattern')">El formato del email no es válido.</small>
+                    <div>
+                        @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                            <div class="error-container">
+                                @if (registerForm.get('email')?.hasError('required')) {
+                                    <small class="error-message">El email es requerido.</small>
+                                }
+                                @if (registerForm.get('email')?.hasError('email')) {
+                                    <small class="error-message">Ingrese un formato de email válido.</small>
+                                }
+                                @if (registerForm.get('email')?.hasError('pattern')) {
+                                    <small class="error-message">El formato del email no es válido.</small>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -116,23 +162,43 @@
                                    placeholder="8+ caracteres: mayúscula, minúscula, número, especial">
                             <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path *ngIf="!showPassword" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    <circle *ngIf="!showPassword" cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                                    <path *ngIf="showPassword" d="m1 1 22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    <path *ngIf="showPassword" d="M6.71 6.71C4.03 8.75 2 12 2 12s3 6 10 6c1.35 0 2.6-.3 3.71-.9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    <path *ngIf="showPassword" d="M14 14.12c-.55.19-1.14.29-1.76.29-2.48 0-4.5-2.02-4.5-4.5 0-.62.1-1.21.29-1.76" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    <path *ngIf="showPassword" d="M12 7c2.76 0 5 2.24 5 5 0 .28-.02.56-.07.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    @if (!showPassword) {
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                    }
+                                    @if (showPassword) {
+                                        <path d="m1 1 22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M6.71 6.71C4.03 8.75 2 12 2 12s3 6 10 6c1.35 0 2.6-.3 3.71-.9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M14 14.12c-.55.19-1.14.29-1.76.29-2.48 0-4.5-2.02-4.5-4.5 0-.62.1-1.21.29-1.76" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M12 7c2.76 0 5 2.24 5 5 0 .28-.02.56-.07.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    }
                                 </svg>
                             </button>
                             <span class="focus-border"></span>
                         </div>
-                        <div *ngIf="registerForm.get('passwords.password')?.invalid && registerForm.get('passwords.password')?.touched" class="error-container">
-                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('required')">La contraseña es requerida.</small>
-                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('minLength')">Debe tener al menos 8 caracteres.</small>
-                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('lowercase')">Debe contener al menos una letra minúscula.</small>
-                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('uppercase')">Debe contener al menos una letra mayúscula.</small>
-                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('number')">Debe contener al menos un número.</small>
-                            <small class="error-message" *ngIf="registerForm.get('passwords.password')?.hasError('specialChar')">Debe contener al menos un carácter especial (!@#$%^&*...).</small>
+                        <div>
+                            @if (registerForm.get('passwords.password')?.invalid && registerForm.get('passwords.password')?.touched) {
+                                <div class="error-container">
+                                    @if (registerForm.get('passwords.password')?.hasError('required')) {
+                                        <small class="error-message">La contraseña es requerida.</small>
+                                    }
+                                    @if (registerForm.get('passwords.password')?.hasError('minLength')) {
+                                        <small class="error-message">Debe tener al menos 8 caracteres.</small>
+                                    }
+                                    @if (registerForm.get('passwords.password')?.hasError('lowercase')) {
+                                        <small class="error-message">Debe contener al menos una letra minúscula.</small>
+                                    }
+                                    @if (registerForm.get('passwords.password')?.hasError('uppercase')) {
+                                        <small class="error-message">Debe contener al menos una letra mayúscula.</small>
+                                    }
+                                    @if (registerForm.get('passwords.password')?.hasError('number')) {
+                                        <small class="error-message">Debe contener al menos un número.</small>
+                                    }
+                                    @if (registerForm.get('passwords.password')?.hasError('specialChar')) {
+                                        <small class="error-message">Debe contener al menos un carácter especial (!@#$%^&*...).</small>
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
 
@@ -145,18 +211,26 @@
                                    placeholder="Repita su contraseña">
                             <button type="button" class="password-toggle" (click)="toggleConfirmPasswordVisibility()" [attr.aria-label]="showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path *ngIf="!showConfirmPassword" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    <circle *ngIf="!showConfirmPassword" cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                                    <path *ngIf="showConfirmPassword" d="m1 1 22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    <path *ngIf="showConfirmPassword" d="M6.71 6.71C4.03 8.75 2 12 2 12s3 6 10 6c1.35 0 2.6-.3 3.71-.9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    <path *ngIf="showConfirmPassword" d="M14 14.12c-.55.19-1.14.29-1.76.29-2.48 0-4.5-2.02-4.5-4.5 0-.62.1-1.21.29-1.76" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    <path *ngIf="showConfirmPassword" d="M12 7c2.76 0 5 2.24 5 5 0 .28-.02.56-.07.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    @if (!showConfirmPassword) {
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                    }
+                                    @if (showConfirmPassword) {
+                                        <path d="m1 1 22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M6.71 6.71C4.03 8.75 2 12 2 12s3 6 10 6c1.35 0 2.6-.3 3.71-.9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M14 14.12c-.55.19-1.14.29-1.76.29-2.48 0-4.5-2.02-4.5-4.5 0-.62.1-1.21.29-1.76" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M12 7c2.76 0 5 2.24 5 5 0 .28-.02.56-.07.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    }
                                 </svg>
                             </button>
                             <span class="focus-border"></span>
                         </div>
-                        <div *ngIf="registerForm.get('passwords')?.hasError('passwordMismatch') && registerForm.get('passwords.confirmPassword')?.touched" class="error-container">
-                            <small class="error-message">Las contraseñas no coinciden.</small>
+                        <div>
+                            @if (registerForm.get('passwords')?.hasError('passwordMismatch') && registerForm.get('passwords.confirmPassword')?.touched) {
+                                <div class="error-container">
+                                    <small class="error-message">Las contraseñas no coinciden.</small>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -171,11 +245,23 @@
                                maxlength="10">
                         <span class="focus-border"></span>
                     </div>
-                    <div *ngIf="registerForm.get('alias')?.invalid && registerForm.get('alias')?.touched" class="error-container">
-                        <small class="error-message" *ngIf="registerForm.get('alias')?.hasError('required')">El alias es requerido.</small>
-                        <small class="error-message" *ngIf="registerForm.get('alias')?.hasError('minlength')">El alias debe tener al menos 3 caracteres.</small>
-                        <small class="error-message" *ngIf="registerForm.get('alias')?.hasError('maxlength')">El alias no puede tener más de 10 caracteres.</small>
-                        <small class="error-message" *ngIf="registerForm.get('alias')?.hasError('pattern')">Solo se permiten letras, números, guiones y guiones bajos.</small>
+                    <div>
+                        @if (registerForm.get('alias')?.invalid && registerForm.get('alias')?.touched) {
+                            <div class="error-container">
+                                @if (registerForm.get('alias')?.hasError('required')) {
+                                    <small class="error-message">El alias es requerido.</small>
+                                }
+                                @if (registerForm.get('alias')?.hasError('minlength')) {
+                                    <small class="error-message">El alias debe tener al menos 3 caracteres.</small>
+                                }
+                                @if (registerForm.get('alias')?.hasError('maxlength')) {
+                                    <small class="error-message">El alias no puede tener más de 10 caracteres.</small>
+                                }
+                                @if (registerForm.get('alias')?.hasError('pattern')) {
+                                    <small class="error-message">Solo se permiten letras, números, guiones y guiones bajos.</small>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
 

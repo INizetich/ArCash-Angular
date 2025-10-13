@@ -2,15 +2,20 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import Transaction from '../models/transaction';
 import { DataService } from './data-service';
+import { CacheService } from './cache.service';
+import { CacheConfig } from '../models/cache.interface';
+import { PaginationConfig } from '../models/common.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransactionService {
-  // Constantes para caché
-  private readonly TRANSACTIONS_CACHE_KEY = 'arcash_transactions_cache';
-  private readonly CACHE_TIMESTAMP_KEY = 'arcash_transactions_cache_timestamp';
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutos en milisegundos
+  // Cache configuration
+  private readonly cacheConfig: CacheConfig = {
+    key: 'arcash_transactions_cache',
+    expiryKey: 'arcash_transactions_cache_expiry',
+    duration: 5 * 60 * 1000 // 5 minutos
+  };
 
   private recentTransactionsSubject = new BehaviorSubject<Transaction[]>([]);
   public recentTransactions$ = this.recentTransactionsSubject.asObservable();
@@ -18,84 +23,36 @@ export class TransactionService {
   private allTransactionsSubject = new BehaviorSubject<Transaction[]>([]);
   public allTransactions$ = this.allTransactionsSubject.asObservable();
 
-  // Paginación
-  private pageSize = 20;
-  private currentPage = 0;
+  // Paginación optimizada
+  private pagination: PaginationConfig = {
+    page: 0,
+    size: 20,
+    totalPages: 0,
+    hasMore: false
+  };
+  
   private displayedTransactionsSubject = new BehaviorSubject<Transaction[]>([]);
   public displayedTransactions$ = this.displayedTransactionsSubject.asObservable();
 
-  constructor(private dataService: DataService) {
-    // Suscribirse a las transacciones del DataService
+  constructor(
+    private dataService: DataService,
+    private cacheService: CacheService
+  ) {
+    this.initializeSubscriptions();
+  }
+
+  private initializeSubscriptions(): void {
     this.dataService.transactions$.subscribe(transactions => {
       this.allTransactionsSubject.next(transactions);
-      this.recentTransactionsSubject.next(transactions.slice(0, 3)); // Solo las últimas 3
+      this.recentTransactionsSubject.next(transactions.slice(0, 3));
       this.resetPagination();
     });
   }
 
-  // Métodos de caché
-  private saveTransactionsToCache(transactions: Transaction[]): void {
-    try {
-      localStorage.setItem(this.TRANSACTIONS_CACHE_KEY, JSON.stringify(transactions));
-      localStorage.setItem(this.CACHE_TIMESTAMP_KEY, Date.now().toString());
-      console.log('Transacciones guardadas en caché:', transactions.length);
-    } catch (error) {
-      console.warn('Error guardando transacciones en caché:', error);
-    }
-  }
-
-  private getTransactionsFromCache(): Transaction[] | null {
-    try {
-      // Verificar si el caché es válido
-      const timestamp = localStorage.getItem(this.CACHE_TIMESTAMP_KEY);
-      const cached = localStorage.getItem(this.TRANSACTIONS_CACHE_KEY);
-      
-      console.log('🔍 Verificando caché de transacciones:', {
-        tieneCache: !!cached,
-        tieneTimestamp: !!timestamp,
-        ahora: Date.now(),
-        timestamp: timestamp ? parseInt(timestamp) : null,
-        diferencia: timestamp ? Date.now() - parseInt(timestamp) : null,
-        duracionCache: this.CACHE_DURATION,
-        esValido: timestamp ? (Date.now() - parseInt(timestamp)) < this.CACHE_DURATION : false
-      });
-      
-      if (!timestamp || !cached) {
-        console.log('❌ Caché no encontrado o incompleto');
-        return null;
-      }
-      
-      const cacheTime = parseInt(timestamp);
-      const now = Date.now();
-      if ((now - cacheTime) >= this.CACHE_DURATION) {
-        // Cache expirado
-        console.log('⏰ Caché expirado, limpiando...');
-        this.clearTransactionsCache();
-        return null;
-      }
-
-      // Cache válido, obtener datos
-      const transactions = JSON.parse(cached);
-      console.log('✅ Caché válido encontrado con', transactions.length, 'elementos');
-      return transactions;
-    } catch (error) {
-      console.warn('Error cargando transacciones desde caché:', error);
-      this.clearTransactionsCache();
-    }
-    return null;
-  }
-
-  private clearTransactionsCache(): void {
-    localStorage.removeItem(this.TRANSACTIONS_CACHE_KEY);
-    localStorage.removeItem(this.CACHE_TIMESTAMP_KEY);
-    console.log('Caché de transacciones limpiado');
-  }
-
   async loadAllTransactions(forceReload: boolean = false): Promise<void> {
     try {
-      // Si no forzamos recarga, intentar usar caché
       if (!forceReload) {
-        const cachedTransactions = this.getTransactionsFromCache();
+        const cachedTransactions = this.cacheService.getCache<Transaction[]>(this.cacheConfig);
         if (cachedTransactions) {
           this.allTransactionsSubject.next(cachedTransactions);
           this.recentTransactionsSubject.next(cachedTransactions.slice(0, 3));
@@ -104,15 +61,12 @@ export class TransactionService {
         }
       }
 
-      // Cargar desde servidor
       console.log('🌐 Cargando transacciones desde servidor...');
       await this.dataService.loadTransactions();
       
-      // Guardar en caché después de cargar desde servidor
       const transactions = this.allTransactionsSubject.value;
       if (transactions.length > 0) {
-        this.saveTransactionsToCache(transactions);
-        console.log('💾 Transacciones guardadas en caché (' + transactions.length + ' elementos)');
+        this.cacheService.setCache(this.cacheConfig, transactions);
       }
     } catch (error) {
       console.error('Error cargando transacciones:', error);
@@ -120,6 +74,7 @@ export class TransactionService {
     }
   }
 
+  // Métodos de acceso a datos
   getRecentTransactions(): Transaction[] {
     return this.recentTransactionsSubject.value;
   }
@@ -132,39 +87,47 @@ export class TransactionService {
     return this.displayedTransactionsSubject.value;
   }
 
+  // Paginación optimizada
   resetPagination(): void {
-    this.currentPage = 0;
+    this.pagination.page = 0;
+    this.updatePagination();
     this.updateDisplayedTransactions();
   }
 
   loadMoreTransactions(): void {
     const allTransactions = this.allTransactionsSubject.value;
-    const totalPages = Math.ceil(allTransactions.length / this.pageSize);
+    this.updatePagination();
     
-    if (this.currentPage < totalPages - 1) {
-      this.currentPage++;
-      const startIndex = this.currentPage * this.pageSize;
-      const endIndex = startIndex + this.pageSize;
+    if (this.pagination.hasMore) {
+      this.pagination.page++;
+      const startIndex = this.pagination.page * this.pagination.size;
+      const endIndex = startIndex + this.pagination.size;
       const newTransactions = allTransactions.slice(startIndex, endIndex);
       
       const currentDisplayed = this.displayedTransactionsSubject.value;
       this.displayedTransactionsSubject.next([...currentDisplayed, ...newTransactions]);
+      this.updatePagination();
     }
   }
 
   hasMoreTransactions(): boolean {
+    return this.pagination.hasMore;
+  }
+
+  private updatePagination(): void {
     const allTransactions = this.allTransactionsSubject.value;
-    const totalPages = Math.ceil(allTransactions.length / this.pageSize);
-    return this.currentPage < totalPages - 1;
+    this.pagination.totalPages = Math.ceil(allTransactions.length / this.pagination.size);
+    this.pagination.hasMore = this.pagination.page < this.pagination.totalPages - 1;
   }
 
   private updateDisplayedTransactions(): void {
     const allTransactions = this.allTransactionsSubject.value;
-    const startIndex = this.currentPage * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
+    const startIndex = this.pagination.page * this.pagination.size;
+    const endIndex = startIndex + this.pagination.size;
     this.displayedTransactionsSubject.next(allTransactions.slice(startIndex, endIndex));
   }
 
+  // Métodos de formateo
   formatAmount(amount: number): string {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -208,9 +171,9 @@ export class TransactionService {
     return transaction.type === 'income' ? 'monto positivo' : 'monto negativo';
   }
 
-  // Método para invalidar caché manualmente
+  // Cache management
   invalidateCache(): void {
-    this.clearTransactionsCache();
+    this.cacheService.clearCache(this.cacheConfig);
     console.log('🧹 Caché de transacciones invalidado manualmente');
   }
 }

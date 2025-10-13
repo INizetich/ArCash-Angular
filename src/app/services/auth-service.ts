@@ -57,10 +57,18 @@ export class AuthService {
 
   ///METODO PARA LIMPIAR SESIÓN LOCAL
   clearLocalSession(): void {
+    // Limpiar datos de autenticación
     localStorage.removeItem('JWT');
     localStorage.removeItem('accountId');
     localStorage.removeItem('role');
     localStorage.removeItem('userData');
+    
+    // Limpiar también todos los cachés de ArCash
+    const keys = Object.keys(localStorage);
+    const arcashKeys = keys.filter(key => key.startsWith('arcash_'));
+    arcashKeys.forEach(key => localStorage.removeItem(key));
+    
+    console.log('🧹 Sesión local limpiada completamente');
   }
 
   

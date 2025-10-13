@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
+
+// Services
 import { themeService } from '../../services/theme-service';
 import { UtilService } from '../../services/util-service';
 import { AuthService } from '../../services/auth-service';
@@ -10,8 +12,13 @@ import { DataService } from '../../services/data-service';
 import { ModalService } from '../../services/modal-service';
 import { TransactionService } from '../../services/transaction-service';
 import { FavoriteService } from '../../services/favorite-service';
+import { DeviceService } from '../../services/device.service';
+import { CacheService } from '../../services/cache.service';
+
+// Models
 import Transaction from '../../models/transaction';
 import UserData from '../../models/user-data';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -109,29 +116,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private dataService: DataService,
     private modalService: ModalService,
     private transactionService: TransactionService,
-    private favoriteService: FavoriteService
+    private favoriteService: FavoriteService,
+    private deviceService: DeviceService,
+    private cacheService: CacheService
   ) {
-    // Detectar dispositivos de baja potencia para optimizaciones
-    this.detectLowPowerDevice();
+    // Configurar optimizaciones de rendimiento basadas en el dispositivo
+    this.deviceService.configurePerformanceOptimizations();
   }
   
-  private detectLowPowerDevice(): void {
-    // Detectar si el dispositivo puede tener problemas de performance
-    const isLowPower = navigator.hardwareConcurrency <= 2 || 
-                      (navigator as any).deviceMemory <= 2 ||
-                      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (isLowPower) {
-      // Agregar clase para reducir animaciones en dispositivos lentos
-      document.body.classList.add('reduce-motion');
-      
-      // Reducir aún más los tiempos de animación
-      document.documentElement.style.setProperty('--animation-speed', '0.1s');
-    }
-  }
-
   ngOnInit(): void {
-    console.log('🚀 Dashboard component initialized');
+    
     this.checkAuthentication();
     this.setupSubscriptions();
     
@@ -228,17 +222,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subscriptions.push(userDataSub);
 
     // Suscribirse a las transacciones usando el service
-    const recentTransactionsSub = this.transactionService.recentTransactions$.subscribe(transactions => {
+    const recentTransactionsSub = this.transactionService.recentTransactions$.subscribe((transactions: Transaction[]) => {
       this.recentTransactions = transactions;
     });
     this.subscriptions.push(recentTransactionsSub);
 
-    const allTransactionsSub = this.transactionService.allTransactions$.subscribe(transactions => {
+    const allTransactionsSub = this.transactionService.allTransactions$.subscribe((transactions: Transaction[]) => {
       this.allTransactions = transactions;
     });
     this.subscriptions.push(allTransactionsSub);
 
-    const displayedTransactionsSub = this.transactionService.displayedTransactions$.subscribe(transactions => {
+    const displayedTransactionsSub = this.transactionService.displayedTransactions$.subscribe((transactions: Transaction[]) => {
       this.displayedTransactions = transactions;
     });
     this.subscriptions.push(displayedTransactionsSub);
@@ -884,16 +878,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.favoriteService.invalidateCache();
       this.transactionService.invalidateCache();
       
-      // Limpiar cualquier otro caché de ArCash que pueda existir
-      const keys = Object.keys(localStorage);
-      const arcashKeys = keys.filter(key => key.startsWith('arcash_'));
+      // Limpiar todos los cachés de ArCash usando el CacheService centralizado
+      const clearedCount = this.cacheService.clearCachesByPrefix('arcash_');
       
-      arcashKeys.forEach(key => {
-        localStorage.removeItem(key);
-        console.log('🗑️ Removed cache key:', key);
+      // Limpiar también cachés específicos que pueden haber quedado
+      const additionalCaches = [
+        'arcash_favorites_cache',
+        'arcash_favorites_cache_expiry', 
+        'arcash_transactions_cache',
+        'arcash_transactions_cache_expiry',
+        'arcash_user_cache',
+        'arcash_user_cache_expiry'
+      ];
+      
+      additionalCaches.forEach(cacheKey => {
+        localStorage.removeItem(cacheKey);
       });
       
       console.log('🧹 Todos los cachés de ArCash limpiados durante el logout');
+      console.log(`🧹 Cachés eliminados por prefijo: ${clearedCount}`);
     } catch (error) {
       console.error('Error limpiando cachés:', error);
     }

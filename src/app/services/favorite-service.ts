@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { DataService } from './data-service';
 import { UtilService } from './util-service';
+import { CacheService } from './cache.service';
+import { CacheConfig } from '../models/cache.interface';
+import { TransferData } from '../models/transfer.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -13,22 +16,24 @@ export class FavoriteService {
   private selectedFavoriteSubject = new BehaviorSubject<any | null>(null);
   public selectedFavorite$ = this.selectedFavoriteSubject.asObservable();
 
-  private readonly CACHE_KEY = 'ArCash_FavoriteContacts';
-  private readonly CACHE_EXPIRY_KEY = 'ArCash_FavoriteContacts_Expiry';
-  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+  private readonly cacheConfig: CacheConfig = {
+    key: 'arcash_favorites_cache',
+    expiryKey: 'arcash_favorites_cache_expiry',
+    duration: 5 * 60 * 1000 // 5 minutos
+  };
 
   constructor(
     private dataService: DataService,
-    private utilService: UtilService
+    private utilService: UtilService,
+    private cacheService: CacheService
   ) {}
 
   async loadFavoriteContacts(forceReload: boolean = false): Promise<void> {
     try {
       // Verificar si tenemos datos en caché válidos (solo si no forzamos recarga)
       if (!forceReload) {
-        const cachedData = this.getCachedFavorites();
+        const cachedData = this.cacheService.getCache<any[]>(this.cacheConfig);
         if (cachedData) {
-          console.log('📋 Favoritos cargados desde caché (' + cachedData.length + ' elementos)');
           this.favoriteContactsSubject.next(cachedData);
           return;
         }
@@ -38,8 +43,7 @@ export class FavoriteService {
       const favorites = await this.dataService.getFavoriteContacts();
       
       // Guardar en caché después de cargar desde servidor
-      this.setCachedFavorites(favorites);
-      console.log('💾 Favoritos guardados en caché (' + favorites.length + ' elementos)');
+      this.cacheService.setCache(this.cacheConfig, favorites);
       
       this.favoriteContactsSubject.next(favorites);
     } catch (error) {
@@ -47,58 +51,6 @@ export class FavoriteService {
       this.utilService.showToast('Error al cargar contactos favoritos', 'error');
       throw error;
     }
-  }
-
-  private getCachedFavorites(): any[] | null {
-    try {
-      const cached = localStorage.getItem(this.CACHE_KEY);
-      const expiry = localStorage.getItem(this.CACHE_EXPIRY_KEY);
-      
-      console.log('🔍 Verificando caché de favoritos:', {
-        tieneCache: !!cached,
-        tieneExpiry: !!expiry,
-        ahora: Date.now(),
-        expiry: expiry ? parseInt(expiry) : null,
-        esValido: expiry ? Date.now() <= parseInt(expiry) : false
-      });
-      
-      if (!cached || !expiry) {
-        console.log('❌ Caché no encontrado o incompleto');
-        return null;
-      }
-
-      const expiryTime = parseInt(expiry);
-      if (Date.now() > expiryTime) {
-        // Cache expirado
-        console.log('⏰ Caché expirado, limpiando...');
-        this.clearFavoritesCache();
-        return null;
-      }
-
-      const data = JSON.parse(cached);
-      console.log('✅ Caché válido encontrado con', data.length, 'elementos');
-      return data;
-    } catch (error) {
-      console.error('Error leyendo caché de favoritos:', error);
-      this.clearFavoritesCache();
-      return null;
-    }
-  }
-
-  private setCachedFavorites(favorites: any[]): void {
-    try {
-      const expiry = Date.now() + this.CACHE_DURATION;
-      localStorage.setItem(this.CACHE_KEY, JSON.stringify(favorites));
-      localStorage.setItem(this.CACHE_EXPIRY_KEY, expiry.toString());
-    } catch (error) {
-      console.error('Error guardando caché de favoritos:', error);
-    }
-  }
-
-  private clearFavoritesCache(): void {
-    localStorage.removeItem(this.CACHE_KEY);
-    localStorage.removeItem(this.CACHE_EXPIRY_KEY);
-    console.log('🗑️ Caché de favoritos limpiado');
   }
 
   async loadFavoriteContactsOrdered(): Promise<void> {
@@ -219,11 +171,11 @@ export class FavoriteService {
 
   // Método para invalidar caché manualmente
   invalidateCache(): void {
-    this.clearFavoritesCache();
+    this.cacheService.clearCache(this.cacheConfig);
     console.log('🧹 Caché de favoritos invalidado manualmente');
   }
 
-  createTransferDataFromFavorite(favorite: any): any {
+  createTransferDataFromFavorite(favorite: any): TransferData {
     // Según el backend, el favorito tiene:
     // - id (del favorito)
     // - accountCbu (CBU de la cuenta favorita)

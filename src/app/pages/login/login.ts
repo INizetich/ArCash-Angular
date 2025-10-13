@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { themeService } from '../../services/theme-service';
 import { AuthService } from '../../services/auth-service';
 import { UtilService } from '../../services/util-service';
+import { CacheService } from '../../services/cache.service';
 import { DataService } from '../../services/data-service';
 
 @Component({
@@ -25,6 +26,7 @@ export class Login implements OnInit {
     private authService: AuthService,
     private utilService: UtilService,
     private dataService: DataService,
+    private cacheService: CacheService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.loginForm = this.fb.group({
@@ -50,15 +52,11 @@ export class Login implements OnInit {
 
   private clearAllCaches(): void {
     try {
-      // Limpiar cualquier caché de ArCash que pueda existir
-      const keys = Object.keys(localStorage);
-      const arcashKeys = keys.filter(key => key.startsWith('arcash_'));
+      // Limpiar todos los cachés de ArCash usando el CacheService centralizado
+      const clearedCount = this.cacheService.clearCachesByPrefix('arcash_');
       
-      if (arcashKeys.length > 0) {
-        arcashKeys.forEach(key => {
-          localStorage.removeItem(key);
-        });
-        console.log('🧹 Cachés residuales limpiados en login:', arcashKeys.length, 'elementos');
+      if (clearedCount > 0) {
+        console.log('🧹 Cachés residuales limpiados en login:', clearedCount, 'elementos');
       }
     } catch (error) {
       console.error('Error limpiando cachés residuales:', error);
