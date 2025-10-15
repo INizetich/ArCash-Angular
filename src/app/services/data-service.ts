@@ -516,11 +516,8 @@ export class DataService {
     }
 
     try {
-      // Primero, verificar que el token funcione haciendo una solicitud que sabemos que funciona
-      console.log('Verificando token con solicitud de prueba...');
       try {
         await this.getFavoriteContacts();
-        console.log('✅ Token válido - la solicitud de obtener favoritos funcionó');
       } catch (tokenError) {
         console.error('❌ Token inválido - la solicitud de prueba falló:', tokenError);
         throw new Error('Token de autenticación inválido');
@@ -532,28 +529,14 @@ export class DataService {
         contactAlias: contactAlias,
         description: description || ''
       };
-
-      console.log('Enviando solicitud para agregar favorito:', body);
-      console.log('Tipos de datos:', {
-        accountId: typeof body.accountId,
-        contactAlias: typeof body.contactAlias,
-        description: typeof body.description
-      });
-      console.log('Token JWT:', jwt ? 'Presente (longitud: ' + jwt.length + ')' : 'Ausente');
-
       const headers = {
         'Authorization': `Bearer ${jwt}`,
         'Content-Type': 'application/json'
       };
 
-      console.log('Headers que se enviarán:', headers);
-      console.log('URL completa:', `${this.baseUrl}/favorites/add`);
-
       const response = await this.http.post<any>(`${this.baseUrl}/favorites/add`, body, {
         headers: headers
       }).toPromise();
-
-      console.log('Respuesta del servidor:', response);
       
       if (response?.status === 'SUCCESS') {
         return true;

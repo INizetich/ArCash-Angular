@@ -259,27 +259,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private async loadDataInBackground(): Promise<void> {
     try {
-      console.log('🔄 Cargando datos en background...');
-      
+     
       // Cargar datos en paralelo para mejor performance
       const promises = [];
       
       const currentUser = this.dataService.getCurrentUserData();
       if (!currentUser) {
-        console.log('⏳ Cargando usuario...');
+
         promises.push(this.dataService.loadUserData());
       }
       
       const currentTransactions = this.dataService.getCurrentTransactions();
       if (!currentTransactions || currentTransactions.length === 0) {
-        console.log('⏳ Cargando transacciones...');
+    
         promises.push(this.dataService.loadTransactions());
       }
       
       // Ejecutar todas las cargas en paralelo
       await Promise.allSettled(promises);
       
-      console.log('✅ Datos cargados correctamente');
+     
     } catch (error) {
       console.error('❌ Error cargando datos:', error);
     }
@@ -364,9 +363,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       // Si viene de un favorito, necesitamos convertir el CBU a ID numérico
       if (this.cuentaDestinoData.isFromFavorite) {
-        console.log('Transferencia a favorito detectada, convirtiendo CBU a ID numérico...');
-        console.log('CBU:', this.cuentaDestinoData.cvu);
-        
+ 
         try {
           // Buscar la cuenta usando el CBU para obtener el ID real
           const accountData = await this.dataService.buscarCuenta(this.cuentaDestinoData.cvu);
@@ -378,7 +375,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             return;
           }
           
-          console.log('ID numérico obtenido:', accountIdForTransfer);
+        
         } catch (searchError) {
           console.error('Error buscando cuenta para transferencia:', searchError);
           this.utilService.showToast('Error al buscar información de la cuenta', 'error');
@@ -386,7 +383,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       }
 
-      console.log('Realizando transferencia con ID:', accountIdForTransfer, 'Monto:', this.montoTransfer);
+      
       await this.dataService.realizarTransferencia(accountIdForTransfer, this.montoTransfer);
       
       // Guardar datos para posible agregado a favoritos
@@ -534,7 +531,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   openTransactionModal(transaction: Transaction): void {
     this.selectedTransaction = transaction;
     this.openModal('transaction');
-    console.log('📄 Abriendo modal de transacción:', transaction);
+  
   }
 
   closeTransactionModal(): void {
@@ -668,29 +665,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       fav.accountCbu === this.transferCompletedData.cvu
     );
 
-    // También verificar si podemos comparar por accountId
-    console.log('Verificación de duplicados:', {
-      cvu: this.transferCompletedData.cvu,
-      accountId: accountId,
-      favoriteContacts: this.favoriteContacts.map(fav => ({
-        id: fav.id,
-        alias: fav.contactAlias,
-        accountCbu: fav.accountCbu,
-        accountAlias: fav.accountAlias
-      })),
-      isAlreadyFavoriteByCbu: isAlreadyFavoriteByCbu
-    });
-
     // Verificar si estás intentando agregarte a ti mismo
     const currentUser = this.dataService.getCurrentUserData();
-    console.log('Verificación de usuario actual:', {
-      currentUserIdAccount: currentUser?.idAccount,
-      currentUserIdAccountType: typeof currentUser?.idAccount,
-      targetAccountId: accountId,
-      targetAccountIdType: typeof accountId,
-      isAddingSelf: currentUser?.idAccount === accountId.toString() || parseInt(currentUser?.idAccount || '0') === accountId
-    });
-
+  
     // Verificar ambas formas de comparación (string vs number)
     const isSelfAsString = currentUser?.idAccount === accountId.toString();
     const isSelfAsNumber = parseInt(currentUser?.idAccount || '0') === accountId;
@@ -704,22 +681,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.utilService.showToast('Esta cuenta ya está en tus favoritos', 'error');
       return;
     }
-
-    console.log('Agregando a favoritos:', {
-      accountId: accountId,
-      alias: this.favoriteContactAlias.trim(),
-      description: this.favoriteContactDescription.trim() || undefined,
-      originalData: this.transferCompletedData,
-      favoriteContacts: this.favoriteContacts
-    });
-
-    // Verificar que el token JWT esté presente
-    const jwt = localStorage.getItem('JWT');
-    console.log('Estado del token JWT:', {
-      presente: !!jwt,
-      longitud: jwt ? jwt.length : 0,
-      primeros10Chars: jwt ? jwt.substring(0, 10) + '...' : 'N/A'
-    });
 
     const success = await this.favoriteService.addFavoriteContact(
       accountId, 
@@ -894,9 +855,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       additionalCaches.forEach(cacheKey => {
         localStorage.removeItem(cacheKey);
       });
-      
-      console.log('🧹 Todos los cachés de ArCash limpiados durante el logout');
-      console.log(`🧹 Cachés eliminados por prefijo: ${clearedCount}`);
+    
     } catch (error) {
       console.error('Error limpiando cachés:', error);
     }

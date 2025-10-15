@@ -60,8 +60,6 @@ export class TransactionService {
           return;
         }
       }
-
-      console.log('🌐 Cargando transacciones desde servidor...');
       await this.dataService.loadTransactions();
       
       const transactions = this.allTransactionsSubject.value;
@@ -174,6 +172,5 @@ export class TransactionService {
   // Cache management
   invalidateCache(): void {
     this.cacheService.clearCache(this.cacheConfig);
-    console.log('🧹 Caché de transacciones invalidado manualmente');
   }
 }

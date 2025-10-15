@@ -67,8 +67,7 @@ export class AuthService {
     const keys = Object.keys(localStorage);
     const arcashKeys = keys.filter(key => key.startsWith('arcash_'));
     arcashKeys.forEach(key => localStorage.removeItem(key));
-    
-    console.log('🧹 Sesión local limpiada completamente');
+
   }
 
   

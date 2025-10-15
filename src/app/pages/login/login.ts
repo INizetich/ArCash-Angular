@@ -53,11 +53,7 @@ export class Login implements OnInit {
   private clearAllCaches(): void {
     try {
       // Limpiar todos los cachés de ArCash usando el CacheService centralizado
-      const clearedCount = this.cacheService.clearCachesByPrefix('arcash_');
-      
-      if (clearedCount > 0) {
-        console.log('🧹 Cachés residuales limpiados en login:', clearedCount, 'elementos');
-      }
+       this.cacheService.clearCachesByPrefix('arcash_');
     } catch (error) {
       console.error('Error limpiando cachés residuales:', error);
     }
@@ -97,7 +93,7 @@ export class Login implements OnInit {
             try {
               // Cargar los datos del usuario desde el backend
               await this.dataService.loadUserData();
-              console.log('✅ Login: Datos del usuario cargados exitosamente');
+
             } catch (error) {
               console.error('❌ Login: Error cargando datos del usuario:', error);
               // Aún así redirigir al dashboard, se intentará cargar ahí

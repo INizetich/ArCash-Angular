@@ -39,7 +39,6 @@ export class FavoriteService {
         }
       }
 
-      console.log('🌐 Cargando favoritos desde servidor...');
       const favorites = await this.dataService.getFavoriteContacts();
       
       // Guardar en caché después de cargar desde servidor
@@ -172,7 +171,6 @@ export class FavoriteService {
   // Método para invalidar caché manualmente
   invalidateCache(): void {
     this.cacheService.clearCache(this.cacheConfig);
-    console.log('🧹 Caché de favoritos invalidado manualmente');
   }
 
   createTransferDataFromFavorite(favorite: any): TransferData {

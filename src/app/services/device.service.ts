@@ -43,8 +43,6 @@ export class DeviceService {
       
       // Reducir velocidad de animaciones
       document.documentElement.style.setProperty('--animation-speed', '0.1s');
-      
-      console.log('⚡ Optimizaciones de rendimiento aplicadas para dispositivo de baja potencia');
     }
   }
 
