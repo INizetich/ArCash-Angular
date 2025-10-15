@@ -65,7 +65,7 @@ export class Login implements OnInit {
 
   goBack() {
     if (isPlatformBrowser(this.platformId)) {
-      window.history.back();
+      this.router.navigate([''])
     }
   }
 

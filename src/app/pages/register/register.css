@@ -190,12 +190,14 @@ body {
     margin-top: 10px;
 }
 
-/* Los campos de contraseña ocupan toda la fila para mantener consistencia */
+/* Los campos de email mantienen el flujo normal del grid */
+.email-group {
+    display: contents; /* Permite que los hijos se distribuyan en el grid padre */
+}
+
+/* Los campos de contraseña mantienen el flujo normal del grid */
 .password-group {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    display: contents; /* Permite que los hijos se distribuyan en el grid padre */
 }
 
 label {
@@ -542,10 +544,12 @@ button[type="submit"]:active {
         gap: 20px;
     }
 
+    .email-group {
+        display: contents; /* Mantiene el flujo normal en móviles también */
+    }
+
     .password-group {
-        grid-column: 1;
-        grid-template-columns: 1fr;
-        gap: 20px;
+        display: contents; /* Mantiene el flujo normal en móviles también */
     }
 
     .formulario button[type="submit"] {

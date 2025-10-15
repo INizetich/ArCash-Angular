@@ -125,30 +125,61 @@
                     </div>
                 </div>
 
-                <div class="input-container">
-                    <label>Email</label>
-                    <div class="input-wrapper">
-                        <input class="effect-1" 
-                               type="email" 
-                               formControlName="email" 
-                               placeholder="ejemplo@correo.com"
-                               maxlength="100">
-                        <span class="focus-border"></span>
+                <div formGroupName="emails" class="email-group">
+                    <div class="input-container">
+                        <label>Email</label>
+                        <div class="input-wrapper">
+                            <input class="effect-1" 
+                                   type="email" 
+                                   formControlName="email" 
+                                   placeholder="ejemplo@correo.com"
+                                   maxlength="100">
+                            <span class="focus-border"></span>
+                        </div>
+                        <div>
+                            @if (registerForm.get('emails.email')?.invalid && registerForm.get('emails.email')?.touched) {
+                                <div class="error-container">
+                                    @if (registerForm.get('emails.email')?.hasError('required')) {
+                                        <small class="error-message">El email es requerido.</small>
+                                    }
+                                    @if (registerForm.get('emails.email')?.hasError('email')) {
+                                        <small class="error-message">Ingrese un formato de email válido.</small>
+                                    }
+                                    @if (registerForm.get('emails.email')?.hasError('pattern')) {
+                                        <small class="error-message">El formato del email no es válido.</small>
+                                    }
+                                </div>
+                            }
+                        </div>
                     </div>
-                    <div>
-                        @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
-                            <div class="error-container">
-                                @if (registerForm.get('email')?.hasError('required')) {
-                                    <small class="error-message">El email es requerido.</small>
-                                }
-                                @if (registerForm.get('email')?.hasError('email')) {
-                                    <small class="error-message">Ingrese un formato de email válido.</small>
-                                }
-                                @if (registerForm.get('email')?.hasError('pattern')) {
-                                    <small class="error-message">El formato del email no es válido.</small>
-                                }
-                            </div>
-                        }
+
+                    <div class="input-container">
+                        <label>Confirmar Email</label>
+                        <div class="input-wrapper">
+                            <input class="effect-1" 
+                                   type="email" 
+                                   formControlName="confirmEmail" 
+                                   placeholder="Confirme su email"
+                                   maxlength="100">
+                            <span class="focus-border"></span>
+                        </div>
+                        <div>
+                            @if (registerForm.get('emails.confirmEmail')?.invalid && registerForm.get('emails.confirmEmail')?.touched) {
+                                <div class="error-container">
+                                    @if (registerForm.get('emails.confirmEmail')?.hasError('required')) {
+                                        <small class="error-message">La confirmación del email es requerida.</small>
+                                    }
+                                    @if (registerForm.get('emails.confirmEmail')?.hasError('email')) {
+                                        <small class="error-message">Ingrese un formato de email válido.</small>
+                                    }
+                                </div>
+                            }
+                            @if (registerForm.get('emails')?.hasError('emailMismatch') && registerForm.get('emails.confirmEmail')?.touched) {
+                                <div class="error-container">
+                                    <small class="error-message">Los emails no coinciden.</small>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
 

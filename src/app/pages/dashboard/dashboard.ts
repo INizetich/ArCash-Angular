@@ -841,27 +841,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    
+    // Activar loading como en el login
+    this.isLoading = true;
     
     // Obtener el token JWT del localStorage
     const jwt = localStorage.getItem('JWT');
     
     if (!jwt) {
-      
-      this.performLocalLogout();
+      // Simular un pequeño delay incluso si no hay JWT
+      setTimeout(() => {
+        this.performLocalLogout();
+      }, 1500);
       return;
     }
 
     // Llamar al endpoint de logout del backend
     this.authService.logoutUser(jwt).subscribe({
       next: (response) => {
-       
-        this.performLocalLogout();
+        // Simular un delay mínimo para mostrar el loading
+        setTimeout(() => {
+          this.performLocalLogout();
+        }, 1500);
       },
       error: (error) => {
-       
-        // Aunque falle el backend, limpiar la sesión local
-        this.performLocalLogout();
+        // Aunque falle el backend, limpiar la sesión local después del delay
+        setTimeout(() => {
+          this.performLocalLogout();
+        }, 1500);
       }
     });
   }
@@ -893,7 +899,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Mostrar mensaje de éxito
     this.utilService.showToast('Sesión cerrada exitosamente', 'success');
     
-  
+    // Desactivar loading como en el login
+    this.isLoading = false;
     
     // Redireccionar al login
     this.router.navigate(['/login']);

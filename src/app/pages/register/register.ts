@@ -13,15 +13,23 @@ import { AuthService } from '../../services/auth-service';
 import { themeService } from '../../services/theme-service';
 import { UtilService } from '../../services/util-service';
 
-// --- VALIDADOR PERSONALIZADO ---
+// --- VALIDADORES PERSONALIZADOS ---
 // Esta función comprueba que las dos contraseñas coincidan.
-// La definimos fuera de la clase porque no necesita acceder a las propiedades del componente.
 export function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
   const confirmPassword = control.get('confirmPassword')?.value;
 
   // Si las contraseñas no coinciden, retornamos un objeto de error. Si coinciden, retornamos null.
   return password === confirmPassword ? null : { passwordMismatch: true };
+}
+
+// Esta función comprueba que los dos emails coincidan.
+export function emailMatchValidator(control: AbstractControl): ValidationErrors | null {
+  const email = control.get('email')?.value;
+  const confirmEmail = control.get('confirmEmail')?.value;
+
+  // Si los emails no coinciden, retornamos un objeto de error. Si coinciden, retornamos null.
+  return email === confirmEmail ? null : { emailMismatch: true };
 }
 
 // Validador personalizado para contraseña segura
@@ -97,8 +105,15 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
       nombre: ['', [Validators.required, Validators.pattern('[A-Za-zÁÉÍÓÚáéíóúÑñ\\s]{2,50}'), Validators.minLength(2), Validators.maxLength(50)]],
       apellido: ['', [Validators.required, Validators.pattern('[A-Za-zÁÉÍÓÚáéíóúÑñ\\s]{2,50}'), Validators.minLength(2), Validators.maxLength(50)]],
       dni: ['', [Validators.required, Validators.pattern('^\\d{8}$'), Validators.minLength(8), Validators.maxLength(8)]],
-      email: ['', [Validators.required, Validators.email, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')]],
       alias: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(10), Validators.pattern('^[a-zA-Z0-9_-]+$')]],
+      
+      // Creamos un grupo anidado para los emails para poder aplicarles un validador conjunto.
+      emails: this.fb.group({
+        email: ['', [Validators.required, Validators.email, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')]],
+        confirmEmail: ['', [Validators.required, Validators.email]]
+      }, { 
+        validators: emailMatchValidator // Aplicamos nuestro validador personalizado a este grupo.
+      }),
       
       // Creamos un grupo anidado para las contraseñas para poder aplicarles un validador conjunto.
       passwords: this.fb.group({
@@ -133,7 +148,7 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
       name: formData.nombre,
       lastName: formData.apellido,
       dni: formData.dni,
-      email: formData.email,
+      email: formData.emails.email,
       password: formData.passwords.password,
       alias: formData.alias
     };
