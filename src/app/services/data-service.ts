@@ -481,6 +481,9 @@ export class DataService {
         }
       }).toPromise();
 
+      console.log('Respuesta del backend - favoritos:', response);
+      console.log('Array de favoritos:', response?.favorites);
+      
       return response?.favorites || [];
     } catch (error) {
       console.error('Error obteniendo contactos favoritos:', error);

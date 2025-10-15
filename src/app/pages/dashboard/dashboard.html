@@ -77,7 +77,9 @@
 
         <!-- Balance Card -->
         <section class="balance-section">
-            <div class="balance-card">
+            <div class="balance-card" 
+                 [class.balance-updated]="isBalanceUpdating"
+                 [class.balance-decreased]="isBalanceDecreasing">
                 <div class="balance-header">
                     <h2>Saldo Disponible</h2>
                     <button class="balance-toggle" (click)="toggleBalance()" [title]="balanceVisible ? 'Ocultar saldo' : 'Mostrar saldo'">
@@ -95,7 +97,9 @@
                 <div class="balance-amount">
                     <span class="currency">$</span>
                     @if (balanceVisible) {
-                        <span class="amount">{{userData.balance | number:'1.2-2'}}</span>
+                        <span class="amount" 
+                              [class.updating]="isBalanceUpdating"
+                              [class.decreasing]="isBalanceDecreasing">{{userData.balance | number:'1.2-2'}}</span>
                     } @else {
                         <span class="amount-hidden">•••••••</span>
                     }
@@ -242,8 +246,19 @@
                     placeholder="Monto a ingresar" 
                     required 
                     min="1" 
-                    step="0.01">
-                <button type="submit"[disabled]="!ingresarForm.valid">Confirmar</button>
+                    step="0.01"
+                    [disabled]="isIngresandoDinero">
+                <button 
+                    type="submit" 
+                    [disabled]="!ingresarForm.valid || isIngresandoDinero"
+                    [class.loading]="isIngresandoDinero">
+                    <span class="button-text">
+                        {{ isIngresandoDinero ? 'Procesando...' : 'Confirmar' }}
+                    </span>
+                    @if (isIngresandoDinero) {
+                        <div class="progress-bar"></div>
+                    }
+                </button>
             </form>
         </div>
     </div>
@@ -253,6 +268,16 @@
 @if (showTransferModal) {
     <div class="modal" (click)="onModalBackdropClick($event, 'transfer')">
         <div class="modal-content">
+            <!-- Overlay de carga translúcido -->
+            @if (isBuscandoCuenta) {
+                <div class="search-loading-overlay">
+                    <div class="search-loading-content">
+                        <div class="search-spinner"></div>
+                        <p>Buscando cuenta...</p>
+                    </div>
+                </div>
+            }
+            
             <span class="close-button" (click)="closeTransferModal()">&times;</span>
             <h2>Transferir Dinero</h2>
 
@@ -267,7 +292,17 @@
                             required>
                         <label>Alias o CVU</label>
                     </div>
-                    <button (click)="buscarCuenta()">Buscar cuenta</button>
+                    <button 
+                        (click)="buscarCuenta()" 
+                        [disabled]="!destinatarioInput.trim() || isBuscandoCuenta"
+                        [class.loading]="isBuscandoCuenta">
+                        <span class="button-text">
+                            {{ isBuscandoCuenta ? 'Buscando...' : 'Buscar cuenta' }}
+                        </span>
+                        @if (isBuscandoCuenta) {
+                            <div class="progress-bar"></div>
+                        }
+                    </button>
                 </div>
             }
 
@@ -298,7 +333,17 @@
                         step="1" 
                         placeholder="$" 
                         required>
-                    <button (click)="realizarTransferencia()">Transferir</button>
+                    <button 
+                        (click)="realizarTransferencia()" 
+                        [disabled]="!montoTransfer || montoTransfer <= 0 || isTransfiriendo"
+                        [class.loading]="isTransfiriendo">
+                        <span class="button-text">
+                            {{ isTransfiriendo ? 'Procesando...' : 'Transferir' }}
+                        </span>
+                        @if (isTransfiriendo) {
+                            <div class="progress-bar"></div>
+                        }
+                    </button>
                     <button (click)="volverBusqueda()" class="secondary">Volver</button>
                 </div>
             }

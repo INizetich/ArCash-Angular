@@ -86,6 +86,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   cuentaDestinoData: any = null;
   transferCompletedData: any = null; // Para guardar datos después de transferencia exitosa
 
+  // Estados de carga para botones
+  isIngresandoDinero = false; // Estado de carga para el botón de ingresar dinero
+  isBalanceUpdating = false; // Estado para la animación del saldo (ingreso - verde)
+  isBalanceDecreasing = false; // Estado para la animación del saldo (transferencia - rojo)
+  isBuscandoCuenta = false; // Estado de carga para buscar cuenta
+  isTransfiriendo = false; // Estado de carga para el botón de transferir
+
   // Estados de contactos favoritos
   favoriteContacts: any[] = [];
   selectedFavoriteContact: any = null;
@@ -305,13 +312,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Activar estado de carga
+    this.isIngresandoDinero = true;
+
     try {
       await this.dataService.ingresarDinero(this.montoIngresar);
+      
       this.utilService.showToast(`Ingreso exitoso de $${this.montoIngresar}`, 'success');
+      
+      // Cerrar el modal primero
       this.closeIngresarModal();
+      
+      // Luego activar la animación del saldo (con un pequeño delay para que se vea el saldo actualizado)
+      setTimeout(() => {
+        this.isBalanceUpdating = true;
+        
+        // Desactivar la animación después de que termine
+        setTimeout(() => {
+          this.isBalanceUpdating = false;
+        }, 1500); // 1.5 segundos, igual que la duración de la animación
+      }, 100);
+      
     } catch (error) {
       console.error('Error ingresando dinero:', error);
       this.utilService.showToast('Error al ingresar dinero', 'error');
+    } finally {
+      // Desactivar estado de carga
+      this.isIngresandoDinero = false;
     }
   }
 
@@ -320,6 +347,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.utilService.showToast('Por favor ingrese un Alias o CVU', 'error');
       return;
     }
+
+    // Activar estado de carga
+    this.isBuscandoCuenta = true;
 
     try {
       this.cuentaDestinoData = await this.dataService.buscarCuenta(this.destinatarioInput.trim());
@@ -338,6 +368,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       } else {
         this.utilService.showToast('Cuenta no encontrada', 'error');
       }
+    } finally {
+      // Desactivar estado de carga
+      this.isBuscandoCuenta = false;
     }
   }
 
@@ -358,33 +391,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    try {
-      let accountIdForTransfer = this.cuentaDestinoData.idaccount;
+    // Activar estado de carga
+    this.isTransfiriendo = true;
 
-      // Si viene de un favorito, necesitamos convertir el CBU a ID numérico
+    try {
+      let accountIdForTransfer: string;
+
+      // Si viene de un favorito, necesitamos buscar el ID real de la cuenta
       if (this.cuentaDestinoData.isFromFavorite) {
- 
         try {
           // Buscar la cuenta usando el CBU para obtener el ID real
           const accountData = await this.dataService.buscarCuenta(this.cuentaDestinoData.cvu);
-          accountIdForTransfer = parseInt(accountData.idaccount);
-          
-          if (isNaN(accountIdForTransfer)) {
-            console.error('Error: No se pudo obtener un ID válido de la búsqueda:', accountData);
-            this.utilService.showToast('Error: No se pudo obtener el ID de cuenta para la transferencia', 'error');
-            return;
-          }
-          
-        
+          accountIdForTransfer = accountData.idaccount.toString();
         } catch (searchError) {
           console.error('Error buscando cuenta para transferencia:', searchError);
           this.utilService.showToast('Error al buscar información de la cuenta', 'error');
           return;
         }
+      } else {
+        // Para búsquedas normales, usamos el ID numérico como string
+        accountIdForTransfer = this.cuentaDestinoData.idaccount.toString();
       }
 
       
       await this.dataService.realizarTransferencia(accountIdForTransfer, this.montoTransfer);
+      
+      // Activar inmediatamente el efecto del saldo después de la transferencia
+      setTimeout(() => {
+        this.isBalanceDecreasing = true;
+        
+        setTimeout(() => {
+          this.isBalanceDecreasing = false;
+        }, 1500);
+      }, 50); // Efecto inmediato después de la transferencia
       
       // Guardar datos para posible agregado a favoritos
       this.transferCompletedData = { ...this.cuentaDestinoData };
@@ -398,6 +437,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Mostrar opción para agregar a favoritos
         this.transferStep = 4;
         this.showAddToFavoritesOption = true;
+        
       } else {
         // Si ya es favorito, actualizar el orden y cerrar
         await this.favoriteService.loadFavoriteContacts(true); // Forzar recarga
@@ -410,6 +450,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error realizando transferencia:', error);
       this.utilService.showToast('Error al realizar la transferencia', 'error');
+    } finally {
+      // Desactivar estado de carga
+      this.isTransfiriendo = false;
     }
   }
 
@@ -471,19 +514,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   openIngresarModal(): void {
     this.montoIngresar = 0;
+    this.isIngresandoDinero = false; // Resetear estado de carga
     this.openModal('ingresar');
   }
 
   closeIngresarModal(): void {
     this.closeAllModals();
     this.montoIngresar = 0;
+    this.isIngresandoDinero = false; // Resetear estado de carga
+    this.isBalanceUpdating = false; // Resetear animación del saldo
+    this.isBalanceDecreasing = false; // Resetear animación de transferencia
   }
 
-  openTransferModal(): void {
+  async openTransferModal(): Promise<void> {
     this.transferStep = 1;
     this.destinatarioInput = '';
     this.montoTransfer = 0;
     this.cuentaDestinoData = null;
+    this.isBuscandoCuenta = false; // Resetear estado de búsqueda
+    this.isTransfiriendo = false; // Resetear estado de transferencia
+    this.isBalanceDecreasing = false; // Resetear animación de transferencia
+    
+    // Cargar favoritos al abrir el modal
+    console.log('Abriendo modal de transferencia, cargando favoritos...');
+    try {
+      await this.favoriteService.loadFavoriteContacts(true); // Forzar recarga desde servidor
+      console.log('Favoritos cargados correctamente desde servidor');
+    } catch (error) {
+      console.error('Error cargando favoritos:', error);
+    }
+    
     this.openModal('transfer');
   }
 
@@ -493,6 +553,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.destinatarioInput = '';
     this.montoTransfer = 0;
     this.cuentaDestinoData = null;
+    this.isBuscandoCuenta = false; // Resetear estado de búsqueda
+    this.isTransfiriendo = false; // Resetear estado de transferencia
+    this.isBalanceDecreasing = false; // Resetear animación de transferencia
   }
 
   openAliasModal(): void {
@@ -985,8 +1048,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return transaction.id;
   }
   
-  trackFavorite(index: number, favorite: any): number {
-    return favorite.id;
+  trackFavorite(index: number, favorite: any): string {
+    // Usar índice + timestamp para garantizar unicidad
+    return `${index}_${favorite.id}_${favorite.contactAlias}_${Date.now()}`;
   }
 
 }
