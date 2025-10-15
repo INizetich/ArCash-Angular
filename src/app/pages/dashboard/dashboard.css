@@ -237,6 +237,42 @@ body {
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-menu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.4),
+        transparent);
+    transition: left 0.5s, opacity 0.3s;
+    z-index: 1;
+    opacity: 0;
+}
+
+.user-menu:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+}
+
+.user-menu:hover::before {
+    left: 50%;
+    opacity: 1;
+}
+
+.user-menu:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
 }
 
 /* Modo oscuro para user-menu */
@@ -245,12 +281,9 @@ body {
     border: 1px solid rgba(57, 255, 204, 0.25);
 }
 
-.user-menu:hover {
-    background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
-}
+
+
+
 
 .user-avatar {
     width: 36px;
@@ -263,11 +296,15 @@ body {
     color: white;
     font-weight: 600;
     font-size: 0.875rem;
+    position: relative;
+    z-index: 2;
 }
 
 .user-info {
     display: flex;
     flex-direction: column;
+    position: relative;
+    z-index: 2;
 }
 
 .user-name {
@@ -346,7 +383,6 @@ body {
 
 .balance-card {
     background: var(--glass-bg-light);
-    
     border: 1px solid var(--glass-border-light);
     border-radius: 20px;
     padding: 2rem;
@@ -485,11 +521,18 @@ body {
 
 .action-card {
     background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--glass-border-light);
     border-radius: 16px;
     padding: 1.5rem;
     cursor: pointer;
     /* Sin efectos complejos */
+}
+
+.action-card:hover{
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+     box-shadow: var(--glass-shadow-light);
+    
 }
 
 /* Modo oscuro para action-cards - simplificado */
@@ -764,6 +807,8 @@ body {
     /* Sin animaciones para mejor performance */
 }
 
+
+
 /* Keyframes removidos para mejor performance */
 
 .modal-content {
@@ -777,6 +822,10 @@ body {
     overflow-y: auto;
     position: relative;
     /* Sin sombras complejas ni animaciones */
+}
+
+.modal-content p > span{
+    color: var(--text-primary);
 }
 
 /* Keyframes removidos para mejor performance */
@@ -823,6 +872,90 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* Botón Volver Atrás */
+.back-button {
+    position: absolute;
+    top: 15px;
+    left: 20px !important;
+    width: 35px !important;
+    height: 35px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.back-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.5s;
+}
+
+.back-button:hover {
+    transform: translateX(-2px);
+      box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
+}
+
+.back-button:hover::before {
+    left: 100%;
+}
+
+.back-button:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+
+.back-button i {
+    font-size: 18px;
+    pointer-events: none;
+}
+
+/* Modal header para dar espacio al botón de volver */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    text-align: center;
+}
+
+.modal-header-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 20px;
+    padding: 0;
+    height: 35px;
+    width: 100%;
+}
+.modal-header-info button{
+     background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%) !important;
+}
+
 /* Sin efectos hover para mejor performance */
 
 /* Form Elements in Modals */
@@ -852,11 +985,11 @@ body {
     color: rgba(255, 255, 255, 0.5);
 }
 
-.modal-content button {
+.modal-content  button {
     width: 100%;
     padding: 15px;
-    background: linear-gradient(45deg, var(--cyber-blue), var(--electric-purple));
-    color: white;
+    background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%);
+    color: var(--text-primary);
     border: none;
     border-radius: 12px;
     font-size: 16px;
@@ -867,6 +1000,36 @@ body {
     position: relative;
     overflow: hidden;
 }
+
+.modal-content button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.5s;
+}
+
+.modal-content button:hover {
+    transform: translateX(-2px);
+      box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
+}
+
+.modal-content button:hover::before {
+    left: 100%;
+}
+
+modal-content button:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
 
 /* Sin efectos hover para mejor performance */
 
@@ -1183,6 +1346,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+
 .info-line {
     display: flex;
     align-items: center;
@@ -1206,6 +1370,7 @@ body {
 }
 
 .info-text span {
+     color: var(--text-primary);
     font-family: 'Courier New', monospace;
     background: rgba(255, 255, 255, 0.1);
     padding: 5px 10px;
@@ -1249,7 +1414,7 @@ body {
 .currency-button {
     width: 48% !important;
     margin: 0 1% !important;
-    background: linear-gradient(45deg, var(--electric-purple), var(--plasma-pink)) !important;
+     background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%) !important;
 }
 
 .currency-button:hover {
@@ -2122,20 +2287,19 @@ body {
 .favorites-list {
     max-height: 500px;
     overflow-y: auto;
-    padding-right: 10px;
+    padding: 8px 10px 0 0;
 }
 
 .favorite-card {
     display: flex;
     align-items: center;
     padding: 16px;
-    margin-bottom: 12px;
+    margin: 4px 0 12px 0;
     background: rgba(var(--platinum-rgb), 0.1);
     border: 1px solid var(--border-light);
     border-radius: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
-    
 }
 
 [data-theme="dark"] .favorite-card {
@@ -2351,15 +2515,40 @@ body {
 }
 
 .transfer-btn {
-    background: var(--tech-gradient-primary);
+     background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%) !important;
     color: white;
-    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+
+}
+.transfer-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.5s;
 }
 
 .transfer-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+    transform: translateY(-3px);
+     box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
 }
+
+.transfer-btn:hover::before {
+    left: 100%;
+}
+
+.transfer-btn:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+
 
 .edit-btn {
     background: rgba(var(--electric-purple), 0.1);
@@ -2367,23 +2556,75 @@ body {
     border: 1px solid rgba(var(--electric-purple), 0.3);
 }
 
-.edit-btn:hover {
-    background: rgba(var(--electric-purple), 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+.edit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.5s;
 }
 
+.edit-btn:hover {
+    transform: translateY(-3px);
+      box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
+}
+
+.edit-btn:hover::before {
+    left: 100%;
+}
+
+.edit-btn:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+
+
+
+
 .remove-btn {
-    background: rgba(var(--plasma-pink), 0.1);
+     background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%) !important;
     color: var(--plasma-pink);
     border: 1px solid rgba(var(--plasma-pink), 0.3);
 }
 
-.remove-btn:hover {
-    background: rgba(var(--plasma-pink), 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 0, 110, 0.3);
+.remove-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.5s;
 }
+
+.remove-btn:hover {
+    transform: translateY(-3px);
+      box-shadow: 0 4px 15px rgba(255, 0, 110, 0.3);
+    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
+}
+
+.remove-btn:hover::before {
+    left: 100%;
+}
+
+.remove-btn:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+
 
 /* Modales de agregar/editar favorito */
 .add-favorite-modal,

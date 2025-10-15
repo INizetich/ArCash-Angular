@@ -99,7 +99,7 @@
                     @if (balanceVisible) {
                         <span class="amount" 
                               [class.updating]="isBalanceUpdating"
-                              [class.decreasing]="isBalanceDecreasing">{{userData.balance | number:'1.2-2'}}</span>
+                              [class.decreasing]="isBalanceDecreasing">{{formatMoney(userData.balance)}}</span>
                     } @else {
                         <span class="amount-hidden">•••••••</span>
                     }
@@ -659,8 +659,11 @@
 @if (showFavoriteDetailsModal && selectedFavoriteContact) {
     <div class="modal" (click)="onModalBackdropClick($event, 'favoriteDetails')">
         <div class="modal-content favorite-details-modal">
-            <div class="modal-header">
-                <h2>{{selectedFavoriteContact.contactAlias}}</h2>
+            <div class="modal-header-info">
+                <button class="back-button" (click)="backToFavoritesList()" title="Volver a la lista">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+               
                 <span class="close-button" (click)="closeFavoriteDetailsModal()">&times;</span>
             </div>
 

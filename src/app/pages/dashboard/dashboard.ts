@@ -81,8 +81,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Estados del proceso de transferencia
   transferStep = 1; // 1: buscar, 2: confirmar, 3: monto, 4: agregar a favoritos
   destinatarioInput = '';
-  montoTransfer = 0;
-  montoIngresar = 0;
+  montoTransfer: number | null = null;
+  montoIngresar: number | null = null;
   cuentaDestinoData: any = null;
   transferCompletedData: any = null; // Para guardar datos después de transferencia exitosa
 
@@ -391,6 +391,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Activar efecto de disminución de saldo DESPUÉS de 7.8 segundos
+    setTimeout(() => {
+      this.isBalanceDecreasing = true;
+    }, 7800); // 7.8 segundos de delay
+    
     // Activar estado de carga
     this.isTransfiriendo = true;
 
@@ -406,6 +411,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         } catch (searchError) {
           console.error('Error buscando cuenta para transferencia:', searchError);
           this.utilService.showToast('Error al buscar información de la cuenta', 'error');
+          // Desactivar efecto si hay error
+          this.isBalanceDecreasing = false;
           return;
         }
       } else {
@@ -416,14 +423,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       
       await this.dataService.realizarTransferencia(accountIdForTransfer, this.montoTransfer);
       
-      // Activar inmediatamente el efecto del saldo después de la transferencia
+      // El efecto rojo se desactivará automáticamente después de 1.5 segundos de haberse activado
       setTimeout(() => {
-        this.isBalanceDecreasing = true;
-        
-        setTimeout(() => {
-          this.isBalanceDecreasing = false;
-        }, 1500);
-      }, 50); // Efecto inmediato después de la transferencia
+        this.isBalanceDecreasing = false;
+      }, 100); // 7.8s delay + 1.5s duración = 9.3s total
       
       // Guardar datos para posible agregado a favoritos
       this.transferCompletedData = { ...this.cuentaDestinoData };
@@ -439,8 +442,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.showAddToFavoritesOption = true;
         
       } else {
-        // Si ya es favorito, actualizar el orden y cerrar
-        await this.favoriteService.loadFavoriteContacts(true); // Forzar recarga
+        // Si ya es favorito, solo mostrar mensaje y cerrar (sin recargar favoritos)
         this.utilService.showToast('Transferencia realizada con éxito', 'success');
         this.closeTransferModal();
       }
@@ -450,6 +452,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error realizando transferencia:', error);
       this.utilService.showToast('Error al realizar la transferencia', 'error');
+      // Desactivar efecto de disminución si hay error
+      this.isBalanceDecreasing = false;
     } finally {
       // Desactivar estado de carga
       this.isTransfiriendo = false;
@@ -482,17 +486,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       let result = '';
       if (this.selectedCurrency === 'ARS') {
         result = `
-          <p><strong class="label">Monto sin impuestos:</strong> <span class="value">$${resultData.montoOriginal.toFixed(2)} ARS</span></p>
-          <p><strong class="label">IVA 21%:</strong> <span class="value">$${resultData.iva.toFixed(2)} ARS</span></p>
-          <p><strong class="label">Total con impuestos:</strong> <span class="value strong">$${resultData.totalFinal.toFixed(2)} ARS</span></p>
+          <p><strong class="label">Monto sin impuestos:</strong> <span class="value">$${this.formatMoney(resultData.montoOriginal)} ARS</span></p>
+          <p><strong class="label">IVA 21%:</strong> <span class="value">$${this.formatMoney(resultData.iva)} ARS</span></p>
+          <p><strong class="label">Total con impuestos:</strong> <span class="value strong">$${this.formatMoney(resultData.totalFinal)} ARS</span></p>
         `;
       } else {
         result = `
-          <p><strong class="label">Monto original USD:</strong> <span class="value">$${this.taxMonto.toFixed(2)} USD</span></p>
-          <p><strong class="label">Cotización dólar oficial:</strong> <span class="value">$${resultData.precioDolar?.toFixed(2)} ARS</span></p>
-          <p><strong class="label">Monto en ARS:</strong> <span class="value">$${resultData.montoOriginal.toFixed(2)} ARS</span></p>
-          <p><strong class="label">IVA 21%:</strong> <span class="value">$${resultData.iva.toFixed(2)} ARS</span></p>
-          <p><strong class="label">Total final:</strong> <span class="value strong">$${resultData.totalFinal.toFixed(2)} ARS</span></p>
+          <p><strong class="label">Monto original USD:</strong> <span class="value">$${this.formatMoney(this.taxMonto)} USD</span></p>
+          <p><strong class="label">Cotización dólar oficial:</strong> <span class="value">$${this.formatMoney(resultData.precioDolar || 0)} ARS</span></p>
+          <p><strong class="label">Monto en ARS:</strong> <span class="value">$${this.formatMoney(resultData.montoOriginal)} ARS</span></p>
+          <p><strong class="label">IVA 21%:</strong> <span class="value">$${this.formatMoney(resultData.iva)} ARS</span></p>
+          <p><strong class="label">Total final:</strong> <span class="value strong">$${this.formatMoney(resultData.totalFinal)} ARS</span></p>
         `;
       }
       this.taxResult = result;
@@ -513,36 +517,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   openIngresarModal(): void {
-    this.montoIngresar = 0;
+    this.montoIngresar = null;
     this.isIngresandoDinero = false; // Resetear estado de carga
     this.openModal('ingresar');
   }
 
   closeIngresarModal(): void {
     this.closeAllModals();
-    this.montoIngresar = 0;
+    this.montoIngresar = null;
     this.isIngresandoDinero = false; // Resetear estado de carga
     this.isBalanceUpdating = false; // Resetear animación del saldo
     this.isBalanceDecreasing = false; // Resetear animación de transferencia
   }
 
-  async openTransferModal(): Promise<void> {
+  openTransferModal(): void {
     this.transferStep = 1;
     this.destinatarioInput = '';
-    this.montoTransfer = 0;
+    this.montoTransfer = null;
     this.cuentaDestinoData = null;
     this.isBuscandoCuenta = false; // Resetear estado de búsqueda
     this.isTransfiriendo = false; // Resetear estado de transferencia
     this.isBalanceDecreasing = false; // Resetear animación de transferencia
-    
-    // Cargar favoritos al abrir el modal
-    console.log('Abriendo modal de transferencia, cargando favoritos...');
-    try {
-      await this.favoriteService.loadFavoriteContacts(true); // Forzar recarga desde servidor
-      console.log('Favoritos cargados correctamente desde servidor');
-    } catch (error) {
-      console.error('Error cargando favoritos:', error);
-    }
     
     this.openModal('transfer');
   }
@@ -646,6 +641,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   closeFavoriteDetailsModal(): void {
     this.closeAllModals();
     this.favoriteService.clearSelectedFavorite();
+  }
+
+  backToFavoritesList(): void {
+    // Cerrar modal de detalles y volver a mostrar la lista de favoritos
+    this.showFavoriteDetailsModal = false;
+    this.selectedFavoriteContact = null;
+    this.favoriteService.clearSelectedFavorite();
+    this.showFavoritesModal = true;
   }
 
   async transferToFavorite(favorite: any): Promise<void> {
@@ -995,7 +998,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   formatAmount(amount: number): string {
-    return this.transactionService.formatAmount(amount);
+    return this.formatMoney(amount);
   }
 
   formatDate(date: Date): string {
@@ -1047,10 +1050,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
   trackTransaction(index: number, transaction: Transaction): number {
     return transaction.id;
   }
-  
+
+  // Método para formatear números de manera más legible
+  formatNumber(value: number): string {
+    if (value >= 1000000) {
+      return (value / 1000000).toFixed(1) + 'M';
+    } else if (value >= 1000) {
+      return (value / 1000).toFixed(1) + 'K';
+    } else {
+      return value.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+
   trackFavorite(index: number, favorite: any): string {
     // Usar índice + timestamp para garantizar unicidad
     return `${index}_${favorite.id}_${favorite.contactAlias}_${Date.now()}`;
+  }
+
+  // Método para formatear números estilo MercadoPago
+  formatMoney(value: number): string {
+    if (value == null || isNaN(value)) return '0';
+    
+    // Si es un número entero, no mostrar decimales
+    if (value % 1 === 0) {
+      return value.toLocaleString('es-AR');
+    }
+    
+    // Si tiene decimales, mostrar máximo 2 decimales pero sin ceros innecesarios
+    const formatted = value.toLocaleString('es-AR', { 
+      minimumFractionDigits: 0, 
+      maximumFractionDigits: 2 
+    });
+    
+    return formatted;
   }
 
 }
