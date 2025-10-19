@@ -62,6 +62,7 @@ export class AuthService {
     localStorage.removeItem('accountId');
     localStorage.removeItem('role');
     localStorage.removeItem('userData');
+    localStorage.removeItem('usuariosAdmin')
     
     // Limpiar también todos los cachés de ArCash
     const keys = Object.keys(localStorage);
