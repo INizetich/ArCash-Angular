@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Location, isPlatformBrowser } from '@angular/common';
-import { AuthService } from '../../services/auth-service';
-import { themeService } from '../../services/theme-service';
-import { UtilService } from '../../services/util-service';
+import { AuthService } from '../../services/auth-service/auth-service';
+import { themeService } from '../../services/theme-service/theme-service';
+import { UtilService } from '../../services/util-service/util-service';
 
 @Component({
   selector: 'app-forgot',

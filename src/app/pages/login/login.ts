@@ -2,11 +2,11 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { themeService } from '../../services/theme-service';
-import { AuthService } from '../../services/auth-service';
-import { UtilService } from '../../services/util-service';
-import { CacheService } from '../../services/cache.service';
-import { DataService } from '../../services/data-service';
+import { themeService } from '../../services/theme-service/theme-service';
+import { AuthService } from '../../services/auth-service/auth-service';
+import { UtilService } from '../../services/util-service/util-service';
+import { CacheService } from '../../services/cache-service/cache.service';
+import { DataService } from '../../services/data-service/data-service';
 
 @Component({
   selector: 'app-login',

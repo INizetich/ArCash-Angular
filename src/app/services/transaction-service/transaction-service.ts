@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import Transaction from '../models/transaction';
-import { DataService } from './data-service';
-import { CacheService } from './cache.service';
-import { CacheConfig } from '../models/cache.interface';
-import { PaginationConfig } from '../models/common.interface';
+import Transaction from '../../models/transaction';
+import { DataService } from '../data-service/data-service';
+import { CacheService } from '../cache-service/cache.service';
+import { CacheConfig } from '../../models/cache.interface';
+import { PaginationConfig } from '../../models/common.interface';
 
 @Injectable({
   providedIn: 'root'

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CacheConfig, CacheData, CacheValidation } from '../models/cache.interface';
+import { CacheData, CacheConfig, CacheValidation } from '../../models/cache.interface';
 
 @Injectable({
   providedIn: 'root'

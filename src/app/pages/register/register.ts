@@ -9,9 +9,9 @@ import {
   ValidationErrors       // El tipo de dato que retorna un validador con error
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth-service';
-import { themeService } from '../../services/theme-service';
-import { UtilService } from '../../services/util-service';
+import { AuthService } from '../../services/auth-service/auth-service';
+import { themeService } from '../../services/theme-service/theme-service';
+import { UtilService } from '../../services/util-service/util-service';
 
 // --- VALIDADORES PERSONALIZADOS ---
 // Esta función comprueba que las dos contraseñas coincidan.

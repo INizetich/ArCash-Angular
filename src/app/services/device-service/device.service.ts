@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DeviceInfo } from '../models/common.interface';
+import { DeviceInfo } from '../../models/common.interface';
 
 @Injectable({
   providedIn: 'root'

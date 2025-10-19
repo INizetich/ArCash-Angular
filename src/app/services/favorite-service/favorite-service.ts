@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { DataService } from './data-service/data-service';
-import { UtilService } from './util-service/util-service';
-import { CacheService } from './cache-service/cache.service';
-import { CacheConfig } from '../models/cache.interface';
-import { TransferData } from '../models/transfer.interface';
+import { DataService } from '../data-service/data-service';
+import { UtilService } from '../util-service/util-service';
+import { CacheService } from '../cache-service/cache.service';
+import { CacheConfig } from '../../models/cache.interface';
+import { TransferData } from '../../models/transfer.interface';
 
 @Injectable({
   providedIn: 'root'

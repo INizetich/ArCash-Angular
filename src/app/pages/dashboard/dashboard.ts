@@ -5,16 +5,16 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 // Services
-import { themeService } from '../../services/theme-service';
-import { UtilService } from '../../services/util-service';
-import { AuthService } from '../../services/auth-service';
-import { DataService } from '../../services/data-service';
-import { ModalService } from '../../services/modal-service';
-import { TransactionService } from '../../services/transaction-service';
-import { FavoriteService } from '../../services/favorite-service';
-import { DeviceService } from '../../services/device.service';
-import { CacheService } from '../../services/cache.service';
-
+import { themeService } from '../../services/theme-service/theme-service';
+import { UtilService } from '../../services/util-service/util-service';
+import { AuthService } from '../../services/auth-service/auth-service';
+import { DataService } from '../../services/data-service/data-service';
+import { ModalService } from '../../services/modal-service/modal-service';
+import { TransactionService } from '../../services/transaction-service/transaction-service';
+import { FavoriteService } from '../../services/favorite-service/favorite-service';
+import { DeviceService } from '../../services/device-service/device.service';
+import { CacheService } from '../../services/cache-service/cache.service';
+import { AdminService } from '../../services/admin-service/admin.service';
 // Models
 import Transaction from '../../models/transaction';
 import UserData from '../../models/user-data';
@@ -37,6 +37,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Estados de carga y visibilidad
   isLoading = true;
   balanceVisible = true;
+  
+  // Control de acceso de admin
+  isAdmin = false;
 
   // Datos del usuario
   userData: UserData = {
@@ -125,7 +128,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private transactionService: TransactionService,
     private favoriteService: FavoriteService,
     private deviceService: DeviceService,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private adminService: AdminService
   ) {
     // Configurar optimizaciones de rendimiento basadas en el dispositivo
     this.deviceService.configurePerformanceOptimizations();
@@ -134,6 +138,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     
     this.checkAuthentication();
+    this.checkAdminRole();
     this.setupSubscriptions();
     
     // Cargar datos usando los services
@@ -302,6 +307,42 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!token) {
       this.router.navigate(['/login']);
       return;
+    }
+  }
+
+  // --- CONTROL DE ACCESO DE ADMIN ---
+  checkAdminRole(): void {
+    this.isAdmin = this.adminService.isAdmin();
+  }
+
+  async goToAdminPanel(): Promise<void> {
+    // Verificar primero en localStorage antes de hacer la llamada
+    const role = localStorage.getItem('role');
+    if (role !== 'ADMIN') {
+      this.utilService.showToast('No tienes permisos para acceder al panel de administración', 'error');
+      return;
+    }
+
+    // Activar loading
+    this.isLoading = true;
+
+    try {
+      // Solo hacer la verificación del backend si el rol local es ADMIN
+      await this.adminService.checkAccess().toPromise();
+      this.router.navigate(['/admin']);
+    } catch (error: any) {
+      console.error('Error al verificar acceso de admin:', error);
+      
+      // Manejar diferentes tipos de errores
+      if (error.status === 403 || error.status === 401) {
+        this.utilService.showToast('No tienes permisos para acceder al panel de administración', 'error');
+      } else if (error.status === 0) {
+        this.utilService.showToast('No se puede conectar con el servidor. Verifica que el backend esté ejecutándose.', 'error');
+      } else {
+        this.utilService.showToast('Error del servidor. Intenta más tarde.', 'error');
+      }
+    } finally {
+      this.isLoading = false;
     }
   }
 
