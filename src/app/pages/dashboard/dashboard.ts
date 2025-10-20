@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { QRCodeComponent } from 'angularx-qrcode';
 
 // Services
 import { themeService } from '../../services/theme-service/theme-service';
@@ -18,12 +19,13 @@ import { AdminService } from '../../services/admin-service/admin.service';
 // Models
 import Transaction from '../../models/transaction';
 import UserData from '../../models/user-data';
+import qrData from '../../models/qrData';
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, QRCodeComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -54,6 +56,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     idAccount: ''
   };
 
+  ///DATOS DEL QR
+  qrCodeDataObject: qrData | null = null;
+  qrCodeDataString: string | null = null;
+
   // Transacciones recientes
   recentTransactions: Transaction[] = [];
   
@@ -80,6 +86,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showAddFavoriteModal = false;
   showFavoriteDetailsModal = false;
   showEditFavoriteModal = false;
+  showQrModal = false;
 
   // Estados del proceso de transferencia
   transferStep = 1; // 1: buscar, 2: confirmar, 3: monto, 4: agregar a favoritos
@@ -173,11 +180,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.showAddFavoriteModal = false;
     this.showFavoriteDetailsModal = false;
     this.showEditFavoriteModal = false;
+    this.showQrModal = false;
 
     // Activar el modal correspondiente
     switch (currentModal) {
       case 'ingresar':
         this.showIngresarModal = true;
+        break;
+        case 'myQr':
+        this.showQrModal = true;
         break;
       case 'transfer':
         this.showTransferModal = true;
@@ -557,6 +568,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.modalService.openModal(modalType);
   }
 
+  cerrarModalQr(): void{
+    this.modalService.closeModal()
+  }
+
   openIngresarModal(): void {
     this.montoIngresar = null;
     this.isIngresandoDinero = false; // Resetear estado de carga
@@ -610,6 +625,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.openModal('tax');
   }
 
+  openMyQrModal(): void{
+    const accountId = localStorage.getItem('accountId')
+
+    if(!accountId){
+      console.error("No se encontro el ID de la cuenta en el localStorage.")
+      return;
+    }
+    const accountIdNumber = parseInt(accountId,10)
+    this.modalService.setLoading(true)
+    this.modalService.openModal('myQr')
+
+    this.dataService.getMyQrData(accountIdNumber).subscribe({
+      next: (data) => {
+        this.qrCodeDataObject = data;
+        this.qrCodeDataString = JSON.stringify(data);
+        this.modalService.setLoading(false)
+      },
+      error: (err) => {
+        console.error("Error al obtener los datos del QR", err)
+        this.modalService.setLoading(false)
+        this.modalService.closeModal()
+      }
+    })
+  }
+
   closeTaxModal(): void {
     this.closeAllModals();
     this.showTaxForm = false;
@@ -659,6 +699,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   closeAllTransactionsModal(): void {
     this.closeAllModals();
   }
+
+
 
   // --- MÉTODOS DE CONTACTOS FAVORITOS ---
 

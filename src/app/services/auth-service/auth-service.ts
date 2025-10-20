@@ -19,7 +19,7 @@ export class AuthService {
 
   ///METODO POST PARA LOGIN DEL USUARIO
   loginUser(credentials: {username: string, password: string}) {
-    // ✅ Agregamos withCredentials para aceptar cookies
+    //  Agregamos withCredentials para aceptar cookies
     return this.http.post<any>(`${this.baseUrl}/auth/login`, credentials, {
       withCredentials: true // Esto permite recibir y enviar cookies
     })
@@ -32,7 +32,7 @@ export class AuthService {
 
   ///METODO POST PARA REFRESH TOKEN
   refreshToken(): Observable<any> {
-    // ✅ Endpoint para refrescar el token usando la cookie httpOnly
+    //  Endpoint para refrescar el token usando la cookie httpOnly
     return this.http.post<any>(`${this.baseUrl}/auth/refresh`, {}, {
       withCredentials: true // Incluye la cookie refreshToken automáticamente
     })
@@ -41,9 +41,7 @@ export class AuthService {
   ///METODO POST PARA LOGOUT
   logoutUser(accessToken: string): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/auth/logout`, {}, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      },
+    
       withCredentials: true // Para limpiar la cookie refreshToken
     })
   }

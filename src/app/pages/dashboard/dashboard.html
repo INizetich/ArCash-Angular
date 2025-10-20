@@ -146,6 +146,8 @@
                     <p>Agregar fondos a tu cuenta</p>
                 </div>
 
+               
+
                 <div class="action-card" (click)="openTransferModal()">
                     <div class="action-icon transfer">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -186,6 +188,22 @@
                     </div>
                     <h3>Calculadora</h3>
                     <p>Calcular impuestos</p>
+                </div>
+
+                 <div class="action-card" (click)="openMyQrModal()">
+                    <div class="action-icon QR">
+                       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="17" y="17" width="4" height="4" rx="1"/>
+                            <rect x="17" y="12" width="2" height="2" rx="1"/>
+                            <rect x="12" y="17" width="2" height="2" rx="1"/>
+                            <rect x="12" y="12" width="2" height="2" rx="1"/>
+                        </svg>
+                    </div>
+                    <h3>Mi QR</h3>
+                    <p>Recibir transferencia por QR</p>
                 </div>
 
             </div>
@@ -832,4 +850,38 @@
             </div>
         </div>
     </div>
+}
+
+@if (showQrModal) {
+  <div class="modal" (click)="onModalBackdropClick($event, 'myQr')">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <span class="close-button" (click)="cerrarModalQr()">&times;</span>
+      
+      @if (!qrCodeDataString) {
+        <div class="spinner">
+            Cargando QR...
+        </div>
+      }
+
+      @if (qrCodeDataString && qrCodeDataObject) {
+        <div class="qr-container">
+            <h2>Compartí tu QR para recibir dinero</h2>
+            
+            <qrcode 
+                [qrdata]="qrCodeDataString" 
+                [width]="256" 
+                [errorCorrectionLevel]="'M'">
+            </qrcode>
+            
+            <div class="qr-info">
+                <h3>{{ qrCodeDataObject.receiverName }}</h3>
+                <p>Alias: {{ qrCodeDataObject.accountAlias }}</p>
+                <p>DNI: {{ qrCodeDataObject.dni }}</p>
+            </div>
+            
+            <p class="qr-footer">Tu QR para recibir transferencias en {{ qrCodeDataObject.currency }}</p>
+        </div>
+      }
+    </div>
+  </div>
 }

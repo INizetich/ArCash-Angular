@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import Transaction from '../../models/transaction';
 import UserData from '../../models/user-data';
+import qrData from '../../models/qrData';
+
 
 interface AccountSearchResult {
   idaccount: string;
@@ -276,6 +278,10 @@ export class DataService {
    */
   getCurrentTransactions(): Transaction[] {
     return this.transactionsSubject.value;
+  }
+
+  getMyQrData(accountId : number){
+    return this.http.get<qrData>(`${this.baseUrl}/accounts/${accountId}/qr-data`)
   }
 
   // --- CÁLCULOS FINANCIEROS ---

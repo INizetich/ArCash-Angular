@@ -1,4 +1,4 @@
-export interface ApiResponse<T = any> {
+export default interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
   message?: string;

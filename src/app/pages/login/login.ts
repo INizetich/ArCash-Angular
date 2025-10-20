@@ -86,6 +86,9 @@ export class Login implements OnInit {
           
           if (isPlatformBrowser(this.platformId)) {
             // Guardar información de sesión en localStorage
+            // V--- AGREGA ESTA LÍNEA ---V
+     
+      // ^--------------------------^
             localStorage.setItem('JWT', response.accessToken);
             localStorage.setItem('accountId', response.accountId);
             localStorage.setItem('role', response.role);

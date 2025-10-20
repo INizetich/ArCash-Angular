@@ -1,4 +1,4 @@
-export interface FavoriteContact {
+export default interface FavoriteContact {
   id: number;
   contactAlias: string;
   description?: string;
