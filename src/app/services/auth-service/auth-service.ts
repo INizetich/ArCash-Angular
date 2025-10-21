@@ -39,7 +39,7 @@ export class AuthService {
   }
 
   ///METODO POST PARA LOGOUT
-  logoutUser(accessToken: string): Observable<any> {
+  logoutUser(): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/auth/logout`, {}, {
     
       withCredentials: true // Para limpiar la cookie refreshToken

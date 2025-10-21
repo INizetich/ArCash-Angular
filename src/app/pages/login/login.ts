@@ -25,7 +25,6 @@ export class Login implements OnInit {
     private themeService: themeService,
     private authService: AuthService,
     private utilService: UtilService,
-    private dataService: DataService,
     private cacheService: CacheService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
@@ -70,67 +69,48 @@ export class Login implements OnInit {
   }
 
   onSubmit() {
-    if (this.loginForm.valid && !this.isLoading) {
-      this.isLoading = true;
-      
-      const loginData = {
-        username: this.loginForm.get('username')?.value.trim(),
-        password: this.loginForm.get('password')?.value.trim()
-      };
+  if (this.loginForm.valid && !this.isLoading) {
+    this.isLoading = true;
 
-      this.authService.loginUser(loginData).subscribe({
-        next: async (response) => {
-          this.isLoading = false;
-          this.utilService.showToast("Inicio de sesión exitoso!", "success");
-          this.loginForm.reset();
-          
-          if (isPlatformBrowser(this.platformId)) {
-            // Guardar información de sesión en localStorage
-            // V--- AGREGA ESTA LÍNEA ---V
-     
-      // ^--------------------------^
-            localStorage.setItem('JWT', response.accessToken);
-            localStorage.setItem('accountId', response.accountId);
-            localStorage.setItem('role', response.role);
-            
-            try {
-              // Cargar los datos del usuario desde el backend
-              await this.dataService.loadUserData();
+    const loginData = {
+      username: this.loginForm.get('username')?.value.trim(),
+      password: this.loginForm.get('password')?.value.trim()
+    };
 
-            } catch (error) {
-              console.error('❌ Login: Error cargando datos del usuario:', error);
-              // Aún así redirigir al dashboard, se intentará cargar ahí
-            }
-          }
-          
-          setTimeout(() => {
-            this.router.navigate(['/dashboard']);
-          }, 2000);
-        },
-        error: (error) => {
-          this.isLoading = false;
-          
-          let errorMessage = "Error al iniciar sesión";
-          if (error.error?.message) {
-            if (error.error.message === "Usuario no encontrado") {
-              errorMessage = "Usuario no encontrado, por favor verifique la información.";
-            } else if (error.error.message === "Credenciales incorrectas") {
-              errorMessage = "Credenciales incorrectas, por favor verifique sus credenciales.";
-            } else {
-              errorMessage = error.error.message;
-            }
-          }
-          
-          this.utilService.showToast(errorMessage, "error");
+    this.authService.loginUser(loginData).subscribe({
+      // Ya no necesita ser 'async'
+      next: (response) => { 
+        this.isLoading = false;
+        this.utilService.showToast("Inicio de sesión exitoso!", "success");
+        this.loginForm.reset();
+
+        if (isPlatformBrowser(this.platformId)) {
+          // Guardar información de sesión en localStorage
+          localStorage.setItem('JWT', response.accessToken);
+          localStorage.setItem('accountId', response.accountId);
+          localStorage.setItem('role', response.role);
         }
-      });
-    } else {
-      // Marcar todos los campos como touched para mostrar errores
-      Object.keys(this.loginForm.controls).forEach(key => {
-        this.loginForm.get(key)?.markAsTouched();
-      });
-    }
+
+        // Redirige al dashboard después del delay
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 2500);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        let errorMessage = "Error al iniciar sesión";
+        if (error.error?.message) {
+        }
+        this.utilService.showToast(errorMessage, "error");
+      }
+    });
+  } else {
+    // Marcar campos como touched (sin cambios)
+    Object.keys(this.loginForm.controls).forEach(key => {
+      this.loginForm.get(key)?.markAsTouched();
+    });
   }
+}
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;

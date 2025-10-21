@@ -645,6 +645,8 @@ body {
     background: var(--tech-gradient-primary);
 }
 
+
+
 .action-icon.info {
     background: var(--tech-gradient-secondary);
 }
@@ -1348,7 +1350,7 @@ modal-content button:active {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    border-radius: 20px;
+    border-radius: 12px;
 }
 
 .search-loading-content {
@@ -2973,4 +2975,39 @@ modal-content button:active {
         transform: translateY(0);
     }
 }
+
+/* ====================================
+   ESTILOS PARA EL QR
+   ==================================== */
+
+/* Dale un tamaño mínimo al modal del QR SOLO cuando está cargando */
+.modal-content.loading-qr {
+  min-height: 300px; /* Ajusta este valor si querés más o menos espacio */
+  display: flex; /* Ayuda a centrar el overlay si es necesario */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Asegúrate de que el overlay siga funcionando bien dentro */
+.modal-content.loading-qr .search-loading-overlay {
+  /* Si ya tenías position: absolute, top:0, etc. no necesitas repetir */
+  /* Pero asegúrate de que cubra bien el espacio */
+  border-radius: 12px; /* Mantiene los bordes redondeados */
+}
+
+/* Cuando ya no está cargando, quita el min-height para que se ajuste al QR */
+.modal-content:not(.loading-qr) {
+  min-height: auto; /* O el valor por defecto que tuviera */
+}
+
+/* Estilos para el contenedor del QR (cuando ya cargó) */
+.qr-container {
+  text-align: center; /* Centra el QR y el texto */
+
+}
+
+.qr-footer{
+    margin-top: 1rem;
+}
+
 

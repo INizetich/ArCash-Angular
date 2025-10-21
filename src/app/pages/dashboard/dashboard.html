@@ -299,9 +299,7 @@
 @if (showTransferModal) {
     <div class="modal" (click)="onModalBackdropClick($event, 'transfer')">
         <div class="modal-content">
-            <!-- Overlay de carga translúcido -->
-            @if (isBuscandoCuenta) {
-                <div class="search-loading-overlay">
+            @if (isBuscandoCuenta && !isScanning) { <div class="search-loading-overlay">
                     <div class="search-loading-content">
                         <div class="search-spinner"></div>
                         <p>Buscando cuenta...</p>
@@ -312,88 +310,127 @@
             <span class="close-button" (click)="closeTransferModal()">&times;</span>
             <h2>Transferir Dinero</h2>
 
-            <!-- Paso 1: Buscar cuenta -->
             @if (transferStep === 1) {
+              
+              @if (!isScanning) {
                 <div id="search-account-step">
-                    <div class="form-group">
-                        <input 
-                            type="text" 
-                            [(ngModel)]="destinatarioInput"
-                            placeholder=" "
-                            required>
-                        <label>Alias o CVU</label>
-                    </div>
-                    <button 
-                        (click)="buscarCuenta()" 
-                        [disabled]="!destinatarioInput.trim() || isBuscandoCuenta"
-                        [class.loading]="isBuscandoCuenta">
-                        <span class="button-text">
-                            {{ isBuscandoCuenta ? 'Buscando...' : 'Buscar cuenta' }}
-                        </span>
-                        @if (isBuscandoCuenta) {
-                            <div class="progress-bar"></div>
-                        }
-                    </button>
+                  <div class="form-group"> <input 
+                      type="text" 
+                      [(ngModel)]="destinatarioInput"
+                      placeholder=" "
+                      required>
+                    <label>Alias o CVU</label>
+                  </div>
+
+                  <button 
+                    class="primary" (click)="buscarCuenta()" 
+                    [disabled]="!destinatarioInput.trim() || isBuscandoCuenta"
+                    [class.loading]="isBuscandoCuenta">
+                    <span class="button-text">
+                      {{ isBuscandoCuenta ? 'Buscando...' : 'Buscar cuenta' }}
+                    </span>
+                    @if (isBuscandoCuenta) {
+                      <div class="progress-bar"></div>
+                    }
+                  </button>
+
+                  <button class="secondary qr-scan-button" (click)="startScanning()" title="Escanear QR"> 
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M3 7V3h4M17 3h4v4M21 17v4h-4M7 21H3v-4"/>
+                      <path d="M7 12h10"/>
+                    </svg>
+                    Escanear QR
+                  </button>
                 </div>
+              }
+
+              @if (isScanning) {
+                <div class="scanner-view">
+                  <h2>Apuntá al código QR</h2>
+                  <zxing-scanner 
+                    (scanSuccess)="handleScanSuccess($event)"
+                    (scanError)="handleScanError($event)"
+                    (permissionResponse)="handlePermissionResponse($event)">
+                  </zxing-scanner>
+                  
+                  @if (hasPermission === false) {
+                    <div class="permission-denied">
+                      <p>⚠️ No diste permiso para usar la cámara.</p>
+                      <p>Revisá la configuración del navegador.</p>
+                    </div>
+                  }
+                  <button (click)="cancelScanning()" class="secondary">Ingresar Alias/CVU</button> 
+                </div>
+              }
             }
 
-            <!-- Paso 2: Confirmar cuenta -->
             @if (transferStep === 2) {
                 <div id="confirm-account-step">
                     <h3>Datos de la cuenta destino:</h3>
                     @if (cuentaDestinoData) {
                         <div id="account-details">
                             <p><strong>Alias:</strong> {{cuentaDestinoData.alias}}</p>
-                            <p><strong>CVU:</strong> {{cuentaDestinoData.cvu}}</p>
+                            @if(cuentaDestinoData.cvu !== 'Obtenido por QR') {
+                               <p><strong>CVU:</strong> {{cuentaDestinoData.cvu}}</p> 
+                            }
                             <p><strong>Titular:</strong> {{cuentaDestinoData.user.nombre}} {{cuentaDestinoData.user.apellido}}</p>
                             <p><strong>DNI:</strong> {{cuentaDestinoData.user.dni}}</p>
                         </div>
-                    }
-                    <button (click)="confirmarCuenta()">Confirmar cuenta</button>
-                    <button (click)="cancelarBusqueda()" class="secondary">Cancelar</button>
+                    } @else {
+                        <p>No se encontraron datos.</p> }
+                    <button class="primary" (click)="confirmarCuenta()">Confirmar cuenta</button>
+                    <button (click)="cancelarBusqueda()" class="secondary">Cancelar</button> 
                 </div>
             }
 
-            <!-- Paso 3: Ingresar monto -->
             @if (transferStep === 3) {
                 <div id="amount-step">
-                    <input 
-                        type="number" 
-                        [(ngModel)]="montoTransfer"
-                        min="0" 
-                        step="1" 
-                        placeholder="$" 
-                        required>
+                  <h3>¿Cuánto querés transferir?</h3>
+                  @if(cuentaDestinoData) {
+                    <p class="transfer-recipient-info">A: {{cuentaDestinoData.user.nombre}} {{cuentaDestinoData.user.apellido}} ({{cuentaDestinoData.alias}})</p>
+                  }
+                  <form (ngSubmit)="realizarTransferencia()" #transferForm="ngForm">
+                    <div class="form-group">
+                      <input 
+                          type="number" 
+                          [(ngModel)]="montoTransfer"
+                          name="montoTransfer"
+                          min="1" 
+                          step="1" 
+                          placeholder=" " 
+                          required>
+                      <label>Monto $</label>
+                    </div>
                     <button 
-                        (click)="realizarTransferencia()" 
-                        [disabled]="!montoTransfer || montoTransfer <= 0 || isTransfiriendo"
+                        class="primary"
+                        type="submit" 
+                        [disabled]="!transferForm.valid || montoTransfer === null || montoTransfer <= 0 || isTransfiriendo"
                         [class.loading]="isTransfiriendo">
                         <span class="button-text">
-                            {{ isTransfiriendo ? 'Procesando...' : 'Transferir' }}
+                            {{ isTransfiriendo ? 'Transfiriendo...' : 'Transferir' }}
                         </span>
                         @if (isTransfiriendo) {
                             <div class="progress-bar"></div>
                         }
                     </button>
-                    <button (click)="volverBusqueda()" class="secondary">Volver</button>
+                    <button type="button" (click)="volverAConfirmacion()" class="secondary">Volver</button> 
+                  </form>
                 </div>
             }
 
-            <!-- Paso 4: Agregar a favoritos -->
             @if (transferStep === 4) {
                 <div id="add-favorite-step">
                     <div class="transfer-success">
                         <div class="success-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
                                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </div>
                         <h3>¡Transferencia exitosa!</h3>
                         <p>¿Querés agregar este contacto a tus favoritos?</p>
-                        
                         <div class="favorite-option">
                             <button class="primary" (click)="openAddFavoriteModal()">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
                                 </svg>
                                 Agregar a favoritos
@@ -854,18 +891,19 @@
 
 @if (showQrModal) {
   <div class="modal" (click)="onModalBackdropClick($event, 'myQr')">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-content" [class.loading-qr]="isLoadingQr" (click)="$event.stopPropagation()">
       <span class="close-button" (click)="cerrarModalQr()">&times;</span>
       
-      @if (!qrCodeDataString) {
-        <div class="spinner">
-            Cargando QR...
+      @if (isLoadingQr) { <div class="search-loading-overlay"> 
+          <div class="search-loading-content">
+            <div class="search-spinner"></div> 
+            <p>Cargando QR...</p> 
+          </div>
         </div>
       }
-
-      @if (qrCodeDataString && qrCodeDataObject) {
+      @if (qrCodeDataString && qrCodeDataObject && !isLoadingQr) {
         <div class="qr-container">
-            <h2>Compartí tu QR para recibir dinero</h2>
+            <h2>Recibi dinero con tu QR</h2>
             
             <qrcode 
                 [qrdata]="qrCodeDataString" 
@@ -873,13 +911,7 @@
                 [errorCorrectionLevel]="'M'">
             </qrcode>
             
-            <div class="qr-info">
-                <h3>{{ qrCodeDataObject.receiverName }}</h3>
-                <p>Alias: {{ qrCodeDataObject.accountAlias }}</p>
-                <p>DNI: {{ qrCodeDataObject.dni }}</p>
-            </div>
-            
-            <p class="qr-footer">Tu QR para recibir transferencias en {{ qrCodeDataObject.currency }}</p>
+            <h5 class="qr-footer">Tu QR para recibir transferencias en {{ qrCodeDataObject.currency }}</h5>
         </div>
       }
     </div>
