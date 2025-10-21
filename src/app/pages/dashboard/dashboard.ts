@@ -788,7 +788,8 @@ handleScanSuccess(resultString: string): void {
           user: {
             nombre: qrData.receiverName.split(' ')[0],
             apellido: qrData.receiverName.split(' ').slice(1).join(' '),
-            dni: qrData.dni
+            dni: qrData.dni,
+            email: qrData.email
           },
           idaccount: qrData.accountId // Guardamos el ID numérico
         };

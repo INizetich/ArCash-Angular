@@ -342,6 +342,10 @@ button:disabled, .access-btn:disabled {
     z-index: 9999;
 }
 
+.info-user p{
+color: var(--text-primary);
+}
+
 #theme-switcher {
     background: none;
     border: none;

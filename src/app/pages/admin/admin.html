@@ -307,7 +307,7 @@
   <div class="modal-content" (click)="$event.stopPropagation()">
     <span class="close-modal" (click)="closeModal()">&times;</span>
     <h3>Información del Usuario</h3>
-    <div *ngIf="selectedUser">
+    <div *ngIf="selectedUser" class="info-user">
       <p><strong>Nombre:</strong> {{ selectedUser.name }}</p>
       <p><strong>Apellido:</strong> {{ selectedUser.lastName }}</p>
       <p><strong>DNI:</strong> {{ selectedUser.dni }}</p>

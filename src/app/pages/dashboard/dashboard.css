@@ -1491,7 +1491,7 @@ modal-content button:active {
 }
 
 #currency-selection p {
-    color: #ffffff;
+    color: var(--text-primary);
     margin-bottom: 25px;
     font-size: 18px;
 }
@@ -1513,6 +1513,33 @@ modal-content button:active {
     color: var(--cyber-blue);
     margin-bottom: 10px;
     font-weight: 600;
+}
+
+
+
+/* Estilos específicos para el input del monto en modo claro */
+#tax-form  input[type="number"] {
+  color: var(--obsidian); /* Asegura que el texto sea oscuro */
+  background-color: rgba(var(--platinum-rgb), 0.8); /* Fondo ligeramente transparente */
+  border: 1px solid var(--border-color); /* Borde sutil */
+  /* Puedes agregar otros estilos como padding, border-radius si querés */
+  padding: 12px 15px;
+  border-radius: 8px;
+  
+  width: 100%; /* Ocupar el ancho */
+  margin-bottom: 20px; /* Espacio abajo */
+}
+
+/* Estilos para el placeholder en modo claro (opcional) */
+#tax-form  input[type="number"]::placeholder {
+  color: rgba(var(--carbon-rgb), 0.4); /* Placeholder un poco más claro */
+}
+
+/* Estilos cuando el input está enfocado en modo claro */
+#tax-form  input[type="number"]:focus {
+  outline: none;
+  border-color: var(--cyber-blue);
+  box-shadow: 0 0 0 3px rgba(var(--cyber-blue-rgb), 0.3); /* Usa el RGB de --cyber-blue */
 }
 
 #tax-result {
@@ -1652,6 +1679,30 @@ modal-content button:active {
 #confirm-account-step,
 #amount-step {
     text-align: center;
+    
+}
+
+/* Estilos específicos para el input del monto en modo claro */
+#amount-step input[type="number"] {
+  color: var(--obsidian); /* Asegura que el texto sea oscuro */
+  background-color: rgba(var(--platinum-rgb), 0.8); /* Fondo ligeramente transparente */
+  border: 1px solid var(--border-color); /* Borde sutil */
+  padding: 12px 15px;
+  border-radius: 8px;
+  width: 100%; /* Ocupar el ancho */
+  margin-bottom: 20px; /* Espacio abajo */
+}
+
+/* Estilos para el placeholder en modo claro (opcional) */
+#amount-step input[type="number"]::placeholder {
+  color: rgba(var(--carbon-rgb), 0.4); /* Placeholder un poco más claro */
+}
+
+/* Estilos cuando el input está enfocado en modo claro */
+#amount-step input[type="number"]:focus {
+  outline: none;
+  border-color: var(--cyber-blue);
+  box-shadow: 0 0 0 3px rgba(var(--cyber-blue-rgb), 0.3); /* Usa el RGB de --cyber-blue */
 }
 
 #account-details {
@@ -1663,7 +1714,7 @@ modal-content button:active {
 }
 
 #account-details p {
-    color: #ffffff;
+    color: var(--text-primary);
     margin: 10px 0;
     text-align: left;
 }
@@ -2905,6 +2956,7 @@ modal-content button:active {
 }
 
 .favorite-option .secondary {
+    padding: 20px;
     background: rgba(var(--text-secondary), 0.1);
     color: var(--text-secondary);
     border: 1px solid rgba(var(--text-secondary), 0.3);

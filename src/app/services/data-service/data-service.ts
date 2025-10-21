@@ -161,13 +161,15 @@ export class DataService {
 
   // --- MÉTODOS DE ACTUALIZACIÓN (AJUSTADOS PARA LLAMAR A loadUserData(true).subscribe()) ---
    async updateAlias(newAlias: string): Promise<void> {
-    const accountId = localStorage.getItem('accountId');
-    if (!accountId) throw new Error('No hay sesión activa');
-    try {
-      await lastValueFrom( this.http.put(`${this.baseUrl}/accounts/${accountId}/changeAlias`, { alias: newAlias }) );
-      this.loadUserData(true).subscribe(); // Llama para actualizar
-    } catch (error) { console.error('Error updating alias:', error); throw error; }
-  }
+  const accountId = localStorage.getItem('accountId');
+  if (!accountId) throw new Error('No hay sesión activa');
+  try {
+    // V--- CAMBIA 'alias' por 'newAlias' ---V
+    await lastValueFrom( this.http.put(`${this.baseUrl}/accounts/${accountId}/changeAlias`, { newAlias: newAlias }) );
+    // ^------------------------------------^
+    this.loadUserData(true).subscribe();
+  } catch (error) { console.error('Error updating alias:', error); throw error; }
+}
 
   async updateUsername(newUsername: string): Promise<any> {
      if (!localStorage.getItem('JWT')) throw new Error('No hay sesión activa');
