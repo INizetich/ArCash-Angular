@@ -5,14 +5,16 @@ import { Login } from './pages/login/login';
 import { Forgot } from './pages/forgot/forgot';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { AdminComponent } from './pages/admin/admin';
+import { guestGuard } from './guards/guest.guard';
+import { authGuard } from './guards/auth.guard';
 
 
 export const routes: Routes = [
     {path: "", component:Home},
-    {path: "register", component:RegisterComponent},
-    {path: "login", component:Login},
+    {path: "register", component:RegisterComponent, canActivate: [guestGuard]},
+    {path: "login", component:Login, canActivate: [guestGuard]},
     {path: "forgot", component:Forgot},
-    {path: "dashboard", component:DashboardComponent},
+    {path: "dashboard", component:DashboardComponent, canActivate: [authGuard]},
     {path: "admin", component:AdminComponent}
 
 ];

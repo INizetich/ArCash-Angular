@@ -25,6 +25,10 @@ export class AuthService {
     })
   }
 
+  isLoggedIn() : boolean{
+    return !!localStorage.getItem("JWT")
+  }
+
   ///METODO POST PARA ENVIAR EMAIL DE RECUPERACION
   sendRecoverMail(email: string): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/auth/send-recover-mail`, { email })
