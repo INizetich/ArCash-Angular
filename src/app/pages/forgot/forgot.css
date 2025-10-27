@@ -14,14 +14,14 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
+    background:
         radial-gradient(circle at var(--mouse-x, 20%) var(--mouse-y, 20%), rgba(255, 0, 110, 0.08) 0%, transparent 50%),
         radial-gradient(circle at calc(100% - var(--mouse-x, 80%)) calc(100% - var(--mouse-y, 80%)), rgba(0, 212, 255, 0.06) 0%, transparent 50%),
         radial-gradient(circle at var(--mouse-x, 40%) var(--mouse-y, 60%), rgba(139, 95, 191, 0.04) 0%, transparent 50%),
-        conic-gradient(from 0deg at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-            rgba(255, 0, 111, 0.027) 0deg, 
-            rgba(0, 212, 255, 0.02) 120deg, 
-            rgba(139, 95, 191, 0.02) 240deg, 
+        conic-gradient(from 0deg at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(255, 0, 111, 0.027) 0deg,
+            rgba(0, 212, 255, 0.02) 120deg,
+            rgba(139, 95, 191, 0.02) 240deg,
             rgba(255, 0, 110, 0.02) 360deg);
     pointer-events: none;
     z-index: 0;
@@ -30,35 +30,35 @@
 }
 
 @keyframes rosePulse {
-    0%, 100% { 
-        opacity: 0.7; 
+    0%, 100% {
+        opacity: 0.7;
         filter: hue-rotate(0deg) saturate(1.1);
     }
-    50% { 
-        opacity: 0.8; 
+    50% {
+        opacity: 0.8;
         filter: hue-rotate(5deg) saturate(1.15);
     }
 }
 
 [data-theme="dark"] .main::before {
-    background: 
+    background:
         radial-gradient(circle at var(--mouse-x, 20%) var(--mouse-y, 20%), rgba(57, 255, 204, 0.15) 0%, transparent 50%),
         radial-gradient(circle at calc(100% - var(--mouse-x, 80%)) calc(100% - var(--mouse-y, 80%)), rgba(255, 0, 110, 0.12) 0%, transparent 50%),
         radial-gradient(circle at var(--mouse-x, 40%) var(--mouse-y, 60%), rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-        conic-gradient(from 180deg at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-            rgba(57, 255, 204, 0.08) 0deg, 
-            rgba(255, 0, 110, 0.06) 120deg, 
-            rgba(0, 212, 255, 0.04) 240deg, 
+        conic-gradient(from 180deg at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(57, 255, 204, 0.08) 0deg,
+            rgba(255, 0, 110, 0.06) 120deg,
+            rgba(0, 212, 255, 0.04) 240deg,
             rgba(57, 255, 204, 0.08) 360deg);
     animation: cyberpunkPulse 8s ease-in-out infinite;
 }
 
 @keyframes cyberpunkPulse {
-    0%, 100% { 
-        opacity: 0.8; 
+    0%, 100% {
+        opacity: 0.8;
     }
-    50% { 
-        opacity: 0.9; 
+    50% {
+        opacity: 0.9;
     }
 }
 
@@ -216,14 +216,14 @@
 
 .feature:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 
+    box-shadow:
         0 20px 40px rgba(var(--cyber-blue), 0.2),
         0 0 20px rgba(var(--cyber-blue), 0.1);
     border-color: var(--cyber-blue);
 }
 
 [data-theme="dark"] .feature:hover {
-    box-shadow: 
+    box-shadow:
         0 20px 40px rgba(57, 255, 204, 0.25),
         0 0 25px rgba(57, 255, 204, 0.15);
     border-color: var(--neon-green);
@@ -265,6 +265,11 @@
     opacity: 0.7;
     margin: 0;
     line-height: 1.4;
+}
+
+.feature-text:hover{
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }
 
 /* === RECOVERY CONTENT === */
@@ -478,7 +483,7 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 
+    box-shadow:
         0 2px 8px var(--shadow-primary),
         0 1px 4px rgba(0, 0, 0, 0.1);
     animation: slideInUp 0.4s ease-out 0.6s forwards;
@@ -494,16 +499,16 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.15), 
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
         transparent);
     transition: left 0.3s ease;
 }
 
 .recovery-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
         0 4px 12px var(--shadow-primary),
         0 2px 6px rgba(0, 0, 0, 0.2);
     background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
@@ -671,7 +676,7 @@
 #back-button:hover {
     background: var(--electric-purple);
     transform: translateX(0) scale(1.15);
-    box-shadow: 
+    box-shadow:
         0 12px 30px rgba(var(--electric-purple), 0.4),
         0 0 20px rgba(var(--electric-purple), 0.3);
     border-color: var(--electric-purple);
@@ -679,7 +684,7 @@
 
 [data-theme="dark"] #back-button:hover {
     background: var(--neon-green);
-    box-shadow: 
+    box-shadow:
         0 12px 30px rgba(57, 255, 204, 0.4),
         0 0 25px rgba(57, 255, 204, 0.2);
     border-color: var(--neon-green);
@@ -809,7 +814,7 @@
     transform: translateY(-2px) scale(1.05);
     background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
     border-color: var(--text-accent);
-    box-shadow: 
+    box-shadow:
         0 8px 25px rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.3),
         0 0 20px rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
     text-decoration: none;
@@ -819,7 +824,7 @@
 :not([data-theme="dark"]) .global-footer a.email-link:hover {
     background: rgba(52, 152, 219, 0.2);
     border-color: #3498db;
-    box-shadow: 
+    box-shadow:
         0 8px 25px rgba(52, 152, 219, 0.3),
         0 0 20px rgba(52, 152, 219, 0.2);
 }
@@ -901,28 +906,33 @@
     .main {
         flex-direction: column;
     }
-    
+
     .left-panel, .right-panel {
         flex: none;
         padding: 2rem 1rem;
     }
-    
+
     .left-panel {
         order: 1;
         min-height: auto;
     }
-    
+
     .right-panel {
         order: 2;
         min-height: 70vh;
     }
-    
+
     .recovery-features {
         display: flex;
         gap: 1rem;
         max-width: none;
     }
-    
+
+  .recovery-features:hover{
+    transform: translateY(-6px);
+    transition: all 0.3s ease;
+  }
+
     .feature {
         flex: 1;
         margin-bottom: 0;
@@ -933,36 +943,36 @@
     .theme-control, #back-button {
         top: 1rem;
     }
-    
+
     .theme-control {
         right: 1rem;
     }
-    
+
     #back-button {
         left: 1rem;
     }
-    
+
     .left-panel, .right-panel {
         padding: 1.5rem 1rem;
     }
-    
+
     .recovery-header h1 {
         font-size: 2rem;
     }
-    
+
     .logo h1 {
         font-size: 2.5rem;
     }
-    
+
     .brand-mark {
         width: 80px;
         height: 80px;
     }
-    
+
     .recovery-features {
         flex-direction: column;
     }
-    
+
     .toast-container {
         min-width: 300px;
         margin: 0 1rem;
@@ -973,15 +983,15 @@
     .recovery-content {
         max-width: none;
     }
-    
+
     .input-wrapper input {
         padding: 14px 45px 14px 16px;
     }
-    
+
     .recovery-btn {
         padding: 14px 20px;
     }
-    
+
     .global-footer {
         padding: 1rem;
         font-size: 0.85rem;
@@ -1070,8 +1080,9 @@
     border-radius: 12px;
     border: 1px solid var(--border-light);
     backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
+
 }
+
 
 [data-theme="dark"] .feature {
     background: rgba(var(--carbon-rgb), 0.3);
@@ -1275,7 +1286,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 
+    box-shadow:
         0 4px 20px var(--shadow-primary),
         0 2px 10px rgba(0, 0, 0, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -1287,7 +1298,7 @@
 
 .recovery-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 
+    box-shadow:
         0 8px 30px var(--shadow-primary),
         0 4px 15px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.3),
@@ -1302,9 +1313,9 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.2), 
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
         transparent);
     transition: left 0.5s;
 }
@@ -1551,28 +1562,28 @@
     .main {
         flex-direction: column;
     }
-    
+
     .left-panel, .right-panel {
         flex: none;
         padding: 2rem 1rem;
     }
-    
+
     .left-panel {
         order: 2;
         min-height: auto;
     }
-    
+
     .right-panel {
         order: 1;
         min-height: 70vh;
     }
-    
+
     .recovery-features {
         display: flex;
         gap: 1rem;
         max-width: none;
     }
-    
+
     .feature {
         flex: 1;
         margin-bottom: 0;
@@ -1583,36 +1594,36 @@
     .theme-control, #back-button {
         top: 1rem;
     }
-    
+
     .theme-control {
         right: 1rem;
     }
-    
+
     #back-button {
         left: 1rem;
     }
-    
+
     .left-panel, .right-panel {
         padding: 1.5rem 1rem;
     }
-    
+
     .recovery-header h1 {
         font-size: 2rem;
     }
-    
+
     .logo h1 {
         font-size: 2.5rem;
     }
-    
+
     .brand-mark {
         width: 80px;
         height: 80px;
     }
-    
+
     .recovery-features {
         flex-direction: column;
     }
-    
+
     .toast-container {
         min-width: 300px;
         margin: 0 1rem;
@@ -1623,15 +1634,15 @@
     .recovery-content {
         max-width: none;
     }
-    
+
     .input-wrapper input {
         padding: 14px 45px 14px 16px;
     }
-    
+
     .recovery-btn {
         padding: 14px 20px;
     }
-    
+
     .global-footer {
         padding: 1rem;
         font-size: 0.85rem;

@@ -1,11 +1,12 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, PLATFORM_ID, Inject } from '@angular/core'; // <-- AGREGA PLATFORM_ID, Inject
-import { isPlatformBrowser, CommonModule } from '@angular/common'; // <-- AGREGA isPlatformBrowser
+///Imports generales
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, PLATFORM_ID, Inject } from '@angular/core'; 
+import { isPlatformBrowser, CommonModule } from '@angular/common'; 
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subscription, interval } from 'rxjs'; // <-- AGREGA interval
+import { Subscription, interval } from 'rxjs'; 
 import { QRCodeComponent } from 'angularx-qrcode';
-import { ZXingScannerModule } from '@zxing/ngx-scanner'; // <-- Asegúrate que sea ZXingScannerModule
-import { switchMap } from 'rxjs/operators'; // <-- AGREGA switchMap
+import { ZXingScannerModule } from '@zxing/ngx-scanner'; 
+import { switchMap } from 'rxjs/operators'; 
 
 // Services
 import { themeService } from '../../services/theme-service/theme-service';
@@ -18,6 +19,8 @@ import { FavoriteService } from '../../services/favorite-service/favorite-servic
 import { DeviceService } from '../../services/device-service/device.service';
 import { CacheService } from '../../services/cache-service/cache.service';
 import { AdminService } from '../../services/admin-service/admin.service';
+
+
 // Models
 import Transaction from '../../models/transaction';
 import UserData from '../../models/user-data';
@@ -27,7 +30,6 @@ import qrData from '../../models/qrData';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  // Asegúrate que ZXingScannerModule esté aquí
   imports: [CommonModule, FormsModule, QRCodeComponent, ZXingScannerModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -37,7 +39,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Suscripciones generales
   private subscriptions: Subscription[] = [];
   // Suscripción específica para el polling del saldo
-  private balancePollingSubscription: Subscription | null = null; // <-- NUEVA VARIABLE
+  private balancePollingSubscription: Subscription | null = null; 
 
   // Estados de carga y visibilidad
   isLoading = true;

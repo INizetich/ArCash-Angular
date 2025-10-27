@@ -1,10 +1,10 @@
 // data-service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http'; // Quita HttpHeaders si el interceptor lo maneja todo
-import { BehaviorSubject, Observable, of, lastValueFrom } from 'rxjs'; // Importa lo necesario de RxJS
+import { HttpClient } from '@angular/common/http'; 
+import { BehaviorSubject, Observable, of, lastValueFrom } from 'rxjs'; 
 import { tap, catchError } from 'rxjs/operators';
-import Transaction from '../../models/transaction'; // Ajusta rutas si es necesario
+import Transaction from '../../models/transaction'; 
 import UserData from '../../models/user-data';
 import qrData from '../../models/qrData';
 
@@ -32,7 +32,7 @@ interface TaxCalculationResult {
 })
 export class DataService {
 
-  private baseUrl = 'http://localhost:8080/api'; // O tu URL base
+  private baseUrl = 'http://localhost:8080/api'; 
 
   private userDataSubject = new BehaviorSubject<UserData | null>(null);
   public userData$ = this.userDataSubject.asObservable();
@@ -42,10 +42,10 @@ export class DataService {
 
   constructor(private http: HttpClient) {
     
-    this.loadUserDataFromStorage(); // Llama a la versión actualizada
+    this.loadUserDataFromStorage(); 
   }
 
-  // --- GESTIÓN DE DATOS DE USUARIO (CON DEBUG LOGS) ---
+  // --- GESTIÓN DE DATOS DE USUARIO  ---
 
   /**
    * Carga los datos del usuario desde el backend o caché.
@@ -54,7 +54,7 @@ export class DataService {
    */
   loadUserData(forceRefresh: boolean = false): Observable<UserData | null> {
     const accountId = localStorage.getItem('accountId');
-    const jwt = localStorage.getItem('JWT'); // Confirma que sea 'JWT'
+    const jwt = localStorage.getItem('JWT'); 
 
     // 1. Verifica si hay sesión
     if (!accountId || !jwt) {
@@ -89,9 +89,9 @@ export class DataService {
             lastName: response.lastName || '',
             dni: response.dni || '',
             email: response.email || '',
-            alias: response.alias || 'usuario.alias', // Verifica que el backend devuelva 'alias'
+            alias: response.alias || 'usuario.alias', 
             cvu: response.cvu || '0000000000000000000000',
-            username: response.username || 'usuario', // Verifica que el backend devuelva 'username'
+            username: response.username || 'usuario', 
             balance: response.balance || 0,
             idAccount: response.idAccount?.toString() || accountId
           };
@@ -143,7 +143,7 @@ export class DataService {
     try {
       if (userData) {
         localStorage.setItem('userData', JSON.stringify(userData));
-        // V--- LOG PARA VERIFICAR LO GUARDADO ---V
+      
        
       } else {
         localStorage.removeItem('userData');

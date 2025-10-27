@@ -42,8 +42,7 @@ export class Login implements OnInit {
       // Verificar si hay una sesión activa
       const token = localStorage.getItem('JWT');
       if (token) {
-        // Si hay un token, redirigir al dashboard
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard'], { replaceUrl: true });
         return;
       }
     }
@@ -93,7 +92,7 @@ export class Login implements OnInit {
 
         // Redirige al dashboard después del delay
         setTimeout(() => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/dashboard'], { replaceUrl: true });
         }, 2500);
       },
       error: (error) => {

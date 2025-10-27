@@ -9,12 +9,16 @@ import { guestGuard } from './guards/guest.guard';
 import { authGuard } from './guards/auth.guard';
 
 
+import { adminGuard } from './guards/admin.guard';
+import { homeGuard } from './guards/home.guard';
+
+
 export const routes: Routes = [
-    {path: "", component:Home},
+    {path: "", component:Home, canActivate: [homeGuard]},
     {path: "register", component:RegisterComponent, canActivate: [guestGuard]},
     {path: "login", component:Login, canActivate: [guestGuard]},
     {path: "forgot", component:Forgot},
     {path: "dashboard", component:DashboardComponent, canActivate: [authGuard]},
-    {path: "admin", component:AdminComponent}
+    {path: "admin", component:AdminComponent, canActivate: [authGuard, adminGuard]}
 
 ];
