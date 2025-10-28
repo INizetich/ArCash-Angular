@@ -7,6 +7,25 @@ import { AdminRequest } from '../../models/admin.interface';
 import { themeService } from '../../services/theme-service/theme-service';
 import { UtilService } from '../../services/util-service/util-service';
 
+// --- VALIDADORES PERSONALIZADOS ---
+// Esta función comprueba que las dos contraseñas coincidan.
+export function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+  const password = control.get('password')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+
+  // Si las contraseñas no coinciden, retornamos un objeto de error. Si coinciden, retornamos null.
+  return password === confirmPassword ? null : { passwordMismatch: true };
+}
+
+// Esta función comprueba que los dos emails coincidan.
+export function emailMatchValidator(control: AbstractControl): ValidationErrors | null {
+  const email = control.get('email')?.value;
+  const confirmEmail = control.get('confirmEmail')?.value;
+
+  // Si los emails no coinciden, retornamos un objeto de error. Si coinciden, retornamos null.
+  return email === confirmEmail ? null : { emailMismatch: true };
+}
+
 // Validador personalizado para contraseña segura
 export function strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
   const value = control.value;
@@ -45,19 +64,6 @@ export function strongPasswordValidator(control: AbstractControl): ValidationErr
   return Object.keys(errors).length > 0 ? errors : null;
 }
 
-// Validador para confirmar que los emails coinciden
-export function emailMatchValidator(control: AbstractControl): ValidationErrors | null {
-  const email = control.get('email')?.value;
-  const confirmEmail = control.get('confirmEmail')?.value;
-  return email === confirmEmail ? null : { emailMismatch: true };
-}
-
-// Validador para confirmar que las contraseñas coinciden
-export function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
-  const password = control.get('password')?.value;
-  const confirmPassword = control.get('confirmPassword')?.value;
-  return password === confirmPassword ? null : { passwordMismatch: true };
-}
 
 @Component({
   selector: 'app-admin',
@@ -83,7 +89,7 @@ export class AdminComponent implements OnInit {
     this.adminForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern('[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}'), Validators.minLength(2), Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.pattern('[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}'), Validators.minLength(2), Validators.maxLength(50)]],
-      dni: ['', [Validators.required, Validators.pattern('^\d{8}$')]],
+      dni: ['', [Validators.required, Validators.pattern('^\\d{8}$'), Validators.minLength(8), Validators.maxLength(8)]],
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(10), Validators.pattern('^[a-zA-Z0-9_-]+$')]],
       emails: this.fb.group({
         email: ['', [Validators.required, Validators.email, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')]],
@@ -128,16 +134,24 @@ export class AdminComponent implements OnInit {
     });
   }
 
+   // Método para filtrar solo números en el input del DNI
   onDniInput(event: any): void {
     const input = event.target;
     let value = input.value;
+    
+    // Remover todo lo que no sea dígito
     value = value.replace(/\D/g, '');
+    
+    // Limitar a 8 dígitos
     if (value.length > 8) {
       value = value.substring(0, 8);
     }
+    
+    // Actualizar el valor del input y el control del formulario
     input.value = value;
     this.adminForm.get('dni')?.setValue(value);
   }
+
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
