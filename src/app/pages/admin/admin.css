@@ -4,6 +4,40 @@
     --neon-cyan-rgb: 57, 255, 204;
 }
 
+/* Modo claro específico para admin - paleta elegante */
+:root:not([data-theme="dark"]) {
+    --bg-primary: #F8F9FA;
+    --bg-secondary: #FFFFFF;
+    --text-primary: #2C3E50;
+    --text-accent: #667EEA;
+    --text-secondary: #FF6B6B;
+    --border-light: rgba(102, 126, 234, 0.15);
+    --border-color: rgba(102, 126, 234, 0.25);
+    --shadow-primary: rgba(102, 126, 234, 0.2);
+    --shadow-secondary: rgba(255, 107, 107, 0.15);
+    
+    --back-circle-fill: #FFFFFF;
+    --back-circle-stroke: #667EEA;
+    --back-arrow-color: #667EEA;
+    
+    --glass-bg-light: rgba(255, 255, 255, 0.85);
+    --glass-border-light: rgba(102, 126, 234, 0.2);
+    --glass-shadow-light: 0 8px 32px rgba(102, 126, 234, 0.12);
+}
+
+/* Arreglar color de texto en inputs para modo claro */
+:root:not([data-theme="dark"]) input[type="text"],
+:root:not([data-theme="dark"]) input[type="email"],
+:root:not([data-theme="dark"]) input[type="password"],
+:root:not([data-theme="dark"]) .effect-1 {
+    color: var(--text-primary) !important; /* Texto oscuro en modo claro */
+}
+
+:root:not([data-theme="dark"]) input::placeholder,
+:root:not([data-theme="dark"]) .effect-1::placeholder {
+    color: rgba(44, 62, 80, 0.6) !important; /* Placeholder más suave pero visible */
+}
+
 html, body {
     height: 100%;
     overflow-x: hidden;
@@ -241,8 +275,6 @@ button[type="submit"] {
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%);
-    color: white;
     position: relative;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -290,7 +322,6 @@ button[type="submit"]:hover {
         0 4px 15px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.3),
         0 0 20px var(--text-accent);
-    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
 }
 
 button[type="submit"]:hover::before {
@@ -586,6 +617,29 @@ button[type="submit"]:active {
         padding: 6px 10px;
         font-size: 13px;
     }
+
+    /* Lista de usuarios responsive */
+    .usuarios-container {
+        max-width: 100%;
+    }
+
+    .usuarios-lista {
+        max-height: 300px;
+        border-radius: 8px;
+    }
+    
+    .usuario-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .action-buttons {
+        align-self: flex-end;
+        margin-top: 0.5rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
 
 #back-button {
@@ -611,10 +665,6 @@ button[type="submit"]:active {
 #back-button svg {
     width: 100%;
     height: 100%;
-}
-
-#back-button:hover{
-      background: rgba(0, 0, 0, 0.300);
 }
 
 
@@ -921,4 +971,765 @@ button:disabled::before {
 [data-theme="dark"] .logo h4 {
     color: var(--text-primary);
     opacity: 0.9;
+}
+
+/* ===== NUEVOS ESTILOS PARA PANEL DE ADMIN REDISEÑADO ===== */
+
+/* Vista principal con botones de acceso */
+.admin-main-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrar horizontalmente */
+    gap: 1.5rem;
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto; /* Centrar el contenedor */
+}
+
+.admin-main-view h2 {
+    text-align: center;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* Botones de acceso base */
+.access-btn {
+    width: 100%;
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* Efectos globales desde styles.css */
+.access-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.access-btn:hover::before {
+    left: 100%;
+}
+
+/* Botón de usuarios */
+.users-btn {
+    background: linear-gradient(135deg, var(--text-accent) 0%, var(--quantum-violet) 100%);
+    color: white;
+    border-color: var(--text-accent);
+}
+
+.users-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 
+        0 8px 25px var(--shadow-primary),
+        0 4px 15px rgba(0, 0, 0, 0.2),
+        0 0 20px var(--text-accent);
+}
+
+/* Botón de admin */
+.admin-btn {
+    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--plasma-pink) 100%);
+    color: white;
+    border-color: var(--text-secondary);
+}
+
+.admin-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 
+        0 8px 25px var(--shadow-secondary),
+        0 4px 15px rgba(0, 0, 0, 0.2),
+        0 0 20px var(--text-secondary);
+}
+
+.access-btn:active {
+    transform: translateY(0) scale(1.01);
+    transition: transform 0.1s;
+}
+
+/* Estados de carga */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    border-radius: inherit;
+}
+
+[data-theme="dark"] .loading-overlay {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.loading-overlay .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-light);
+    border-top: 3px solid var(--text-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Lista de usuarios - más compacta y elegante */
+.usuarios-container {
+    position: relative;
+    max-width: 800px; /* Aumentado de 700px */
+    width: 100%;
+}
+
+.usuarios-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 350px; /* Reducido de 400px */
+    overflow-y: auto;
+    overflow-x: hidden; /* Evitar scroll horizontal */
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border: 1px solid var(--border-light);
+}
+
+.usuario-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-light);
+    padding: 0.75rem 1rem; /* Reducido padding */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-width: 0; /* Permite que flex items se contraigan */
+    word-wrap: break-word; /* Evita overflow horizontal */
+}
+
+.usuario-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(135deg, var(--text-accent), var(--text-secondary));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.usuario-item:hover {
+    background: var(--glass-bg-light);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateX(2px);
+}
+
+.usuario-item:hover::before {
+    opacity: 1;
+}
+
+.usuario-item:last-child {
+    border-bottom: none;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.usuario-item:first-child {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.usuario-datos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem; /* Reducido gap */
+    flex: 1;
+    min-width: 0; /* Permite contracción */
+    overflow: hidden; /* Evita overflow */
+}
+
+.usuario-datos strong {
+    color: var(--text-primary);
+    font-size: 0.95rem; /* Reducido font-size */
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.usuario-username {
+    color: var(--text-accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.9;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.usuario-username::before {
+    content: '@';
+    opacity: 0.7;
+}
+
+.usuario-dni,
+.usuario-email {
+    color: var(--text-primary);
+    font-size: 0.75rem; /* Reducido font-size */
+    opacity: 0.6;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Optimizar para mejor legibilidad en modo claro */
+:root:not([data-theme="dark"]) .usuario-dni,
+:root:not([data-theme="dark"]) .usuario-email {
+    opacity: 0.7;
+}
+
+/* Sin usuarios */
+.no-users {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-primary);
+    opacity: 0.6;
+}
+
+/* Botones de acción en la lista - con paleta de dashboard */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.inhabilitar-btn,
+.habilitar-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.3px;
+}
+
+.inhabilitar-btn::before,
+.habilitar-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.inhabilitar-btn {
+    background: linear-gradient(135deg, var(--plasma-pink) 0%, #e74c3c 100%);
+    color: white;
+    border-color: var(--plasma-pink);
+}
+
+.inhabilitar-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 
+        0 6px 20px rgba(255, 0, 110, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.inhabilitar-btn:hover::before {
+    left: 100%;
+}
+
+.habilitar-btn {
+    background: linear-gradient(135deg, var(--laser-green) 0%, #27ae60 100%);
+    color: white;
+    border-color: var(--laser-green);
+}
+
+.habilitar-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 
+        0 6px 20px rgba(0, 255, 136, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.habilitar-btn:hover::before {
+    left: 100%;
+}
+
+.inhabilitar-btn:active,
+.habilitar-btn:active {
+    transform: translateY(0) scale(1.02);
+    transition: transform 0.1s;
+}
+
+/* Modal unificado - diseño mejorado */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.modal.show {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 2.5rem;
+    border-radius: 16px;
+    min-width: 320px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 
+        0 20px 60px rgba(0,0,0,0.3),
+        0 8px 32px rgba(0,0,0,0.2);
+    position: relative;
+    transform: translateY(-30px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid var(--border-light);
+    backdrop-filter: blur(20px);
+}
+
+.modal.show .modal-content {
+    transform: translateY(0) scale(1);
+}
+
+/* Efecto glassmorphism en modal */
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--text-accent), transparent);
+    opacity: 0.6;
+}
+
+.close-modal {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    background: none;
+    border: none;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-modal:hover {
+    color: var(--text-accent);
+    background: var(--border-light);
+    transform: scale(1.1);
+}
+
+/* Estilos del modal de usuario - diseño elegante */
+.user-modal-content {
+    max-width: 500px;
+}
+
+.user-modal-content h3 {
+    color: var(--text-accent);
+    margin-bottom: 2rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(135deg, var(--text-accent), var(--text-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.user-info {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.user-info-item {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 0.8rem;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--glass-bg-light);
+    border-radius: 10px;
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+}
+
+.user-info-item:hover {
+    background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.05);
+    border-color: var(--text-accent);
+    transform: translateX(2px);
+}
+
+.user-info-label {
+    font-weight: 600;
+    color: var(--text-accent);
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+}
+
+.user-info-value {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.estado-si {
+    color: var(--laser-green);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.estado-si::before {
+    content: '✓';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: var(--laser-green);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 16px;
+    font-size: 10px;
+}
+
+.estado-no {
+    color: var(--plasma-pink);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.estado-no::before {
+    content: '✕';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: var(--plasma-pink);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 16px;
+    font-size: 10px;
+}
+
+/* Acciones del modal */
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.modal-actions .inhabilitar-btn,
+.modal-actions .habilitar-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    border-radius: 10px;
+}
+
+/* Modal de confirmación - diseño elegante */
+.confirmation-modal .modal-content {
+    text-align: center;
+    max-width: 420px;
+    padding: 3rem 2.5rem;
+}
+
+.confirmation-modal h3 {
+    color: var(--text-accent);
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--text-accent), var(--text-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.confirmation-modal p {
+    color: var(--text-primary);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.confirmation-modal p strong {
+    color: var(--text-accent);
+    font-weight: 600;
+}
+
+.confirmation-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.confirm-btn,
+.cancel-btn {
+    padding: 0.9rem 1.8rem;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    min-width: 120px;
+}
+
+.confirm-btn::before,
+.cancel-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.confirm-btn {
+    background: linear-gradient(135deg, var(--plasma-pink) 0%, #e74c3c 100%);
+    color: white;
+    border-color: var(--plasma-pink);
+}
+
+.confirm-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 
+        0 8px 25px rgba(255, 0, 110, 0.4),
+        0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-btn:hover::before {
+    left: 100%;
+}
+
+.cancel-btn {
+    background: var(--glass-bg-light);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.cancel-btn:hover {
+    background: linear-gradient(135deg, var(--text-accent) 0%, var(--quantum-violet) 100%);
+    color: white;
+    border-color: var(--text-accent);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 
+        0 8px 25px var(--shadow-primary),
+        0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cancel-btn:hover::before {
+    left: 100%;
+}
+
+.confirm-btn:active,
+.cancel-btn:active {
+    transform: translateY(0) scale(1.02);
+    transition: transform 0.1s;
+}
+
+/* Botón de navegación - estilo mejorado */
+.nav-button {
+    margin-bottom: 1.5rem;
+    padding: 0.7rem 1.2rem;
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.3px;
+}
+
+.nav-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.nav-button:hover {
+    border-color: var(--text-accent);
+    color: var(--text-accent);
+    background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.08);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px var(--shadow-primary);
+}
+
+.nav-button:hover::before {
+    left: 100%;
+}
+
+.nav-button:active {
+    transform: translateY(0) scale(1.01);
+    transition: transform 0.1s;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .access-btn {
+        font-size: 0.95rem;
+        padding: 0.8rem 0;
+        margin-bottom: 0.7rem;
+    }
+    
+    .usuarios-lista {
+        max-height: 300px;
+    }
+    
+    .usuario-item {
+        padding: 0.6rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .action-buttons {
+        align-self: flex-end;
+        margin-top: 0.5rem;
+    }
+    
+    .modal-content {
+        padding: 1.5rem;
+        margin: 1rem;
+        max-width: calc(100vw - 2rem);
+    }
+
+    .user-info-item {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+        text-align: left;
+    }
+
+    .confirmation-buttons {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .confirm-btn,
+    .cancel-btn {
+        width: 100%;
+    }
+}
+
+/* Estilos adicionales para el botón de retroceso */
+#back-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+#back-button svg {
+    width: 100%;
+    height: 100%;
+}
+
+.back-arrow {
+    stroke: var(--back-arrow-color);
+    transition: stroke 0.4s ease;
 }

@@ -6,6 +6,7 @@
         </svg>
     </button>
 </div>
+
 <div>
     <button id="back-button" aria-label="Volver" (click)="goBack()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -29,7 +30,36 @@
     </div>
 
     <div class="right-panel">
-        <div class="formulario">
+        <!-- Vista Principal con Botones de Acceso -->
+        <div class="formulario" *ngIf="currentView === 'main'">
+            <div class="admin-main-view">
+                <h2>Panel de Administración</h2>
+                
+                <button type="button" class="access-btn users-btn" (click)="showUsersListView()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;">
+                        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Ver Usuarios Autenticados
+                </button>
+                
+                <button type="button" class="access-btn admin-btn" (click)="showCreateAdminView()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;">
+                        <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Crear Nuevo Administrador
+                </button>
+            </div>
+        </div>
+
+        <!-- Vista: Crear Administrador -->
+        <div class="formulario" *ngIf="currentView === 'create-admin'">
+            <button type="button" class="nav-button" (click)="showUsersListView()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px;">
+                    <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Ver Usuarios Autenticados
+            </button>
+            
             <h2>Crear Nuevo Administrador</h2>
 
             <form [formGroup]="adminForm" (ngSubmit)="createAdmin()" novalidate>
@@ -299,6 +329,134 @@
                 <button type="submit" [disabled]="adminForm.invalid">Crear Administrador</button>
 
             </form>
+        </div>
+
+        <!-- Vista: Lista de Usuarios -->
+        <div class="formulario" *ngIf="currentView === 'users-list'">
+            <button type="button" class="nav-button" (click)="showCreateAdminView()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px;">
+                    <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Crear Nuevo Administrador
+            </button>
+            
+            <div class="usuarios-container">
+                <h2>Usuarios Autenticados</h2>
+                
+                <!-- Loading State -->
+                <div *ngIf="isLoadingUsers" class="loading-overlay">
+                    <div class="spinner"></div>
+                    <p>Cargando usuarios...</p>
+                </div>
+                
+                <!-- Lista de Usuarios -->
+                <ul class="usuarios-lista" *ngIf="!isLoadingUsers && users.length > 0">
+                    <li class="usuario-item" *ngFor="let user of users" (click)="openUserModal(user)">
+                        <div class="usuario-datos">
+                            <strong>{{user.name}} {{user.lastName}}</strong>
+                            <span class="usuario-username">{{user.username}}</span>
+                            <span class="usuario-dni">DNI: {{user.dni}}</span>
+                            <span class="usuario-email">{{user.email}}</span>
+                        </div>
+                        <div class="action-buttons" (click)="$event.stopPropagation()">
+                            <button 
+                                *ngIf="user.active" 
+                                class="inhabilitar-btn"
+                                (click)="openConfirmModal(user)">
+                                Deshabilitar
+                            </button>
+                            <button 
+                                *ngIf="!user.active" 
+                                class="habilitar-btn"
+                                (click)="openConfirmModal(user)">
+                                Habilitar
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+                
+                <!-- Sin Usuarios -->
+                <div *ngIf="!isLoadingUsers && users.length === 0" class="no-users">
+                    <p>No hay usuarios autenticados para mostrar.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Información de Usuario -->
+<div class="modal user-modal" [class.show]="showUserModal" *ngIf="selectedUser">
+    <div class="modal-content user-modal-content">
+        <button class="close-modal" (click)="closeUserModal()">×</button>
+        <h3>Información del Usuario</h3>
+        
+        <div class="user-info">
+            <div class="user-info-item">
+                <span class="user-info-label">Nombre Completo:</span>
+                <span class="user-info-value">{{selectedUser.name}} {{selectedUser.lastName}}</span>
+            </div>
+            <div class="user-info-item">
+                <span class="user-info-label">Nombre de Usuario:</span>
+                <span class="user-info-value">{{selectedUser.username}}</span>
+            </div>
+            <div class="user-info-item">
+                <span class="user-info-label">DNI:</span>
+                <span class="user-info-value">{{selectedUser.dni}}</span>
+            </div>
+            <div class="user-info-item">
+                <span class="user-info-label">Email:</span>
+                <span class="user-info-value">{{selectedUser.email}}</span>
+            </div>
+            <div class="user-info-item">
+                <span class="user-info-label">ID de Cuenta:</span>
+                <span class="user-info-value">{{selectedUser.idAccount || 'No asignado'}}</span>
+            </div>
+            <div class="user-info-item">
+                <span class="user-info-label">Estado:</span>
+                <span class="user-info-value" [class]="selectedUser.active ? 'estado-si' : 'estado-no'">
+                    {{selectedUser.active ? 'Activo' : 'Inactivo'}}
+                </span>
+            </div>
+            <div class="user-info-item">
+                <span class="user-info-label">Habilitado:</span>
+                <span class="user-info-value" [class]="selectedUser.enabled ? 'estado-si' : 'estado-no'">
+                    {{selectedUser.enabled ? 'Sí' : 'No'}}
+                </span>
+            </div>
+        </div>
+        
+        <div class="modal-actions">
+            <button 
+                *ngIf="selectedUser.active" 
+                class="inhabilitar-btn"
+                (click)="openConfirmModal(selectedUser)">
+                Deshabilitar Usuario
+            </button>
+            <button 
+                *ngIf="!selectedUser.active" 
+                class="habilitar-btn"
+                (click)="openConfirmModal(selectedUser)">
+                Habilitar Usuario
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación Personalizado -->
+<div class="modal confirmation-modal" [class.show]="showConfirmModal" *ngIf="userToToggle">
+    <div class="modal-content">
+        <h3>Confirmar Acción</h3>
+        <p>
+            ¿Está seguro que desea {{userToToggle.active ? 'deshabilitar' : 'habilitar'}} 
+            al usuario <strong>{{userToToggle.name}} {{userToToggle.lastName}}</strong>?
+        </p>
+        <div class="confirmation-buttons">
+            <button class="confirm-btn" (click)="confirmToggleUser()">
+                {{userToToggle.active ? 'Deshabilitar' : 'Habilitar'}}
+            </button>
+            <button class="cancel-btn" (click)="closeConfirmModal()">
+                Cancelar
+            </button>
         </div>
     </div>
 </div>

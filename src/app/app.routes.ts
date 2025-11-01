@@ -5,12 +5,13 @@ import { Login } from './pages/login/login';
 import { Forgot } from './pages/forgot/forgot';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { AdminComponent } from './pages/admin/admin';
+
+//GUARDS
 import { guestGuard } from './guards/guest.guard';
 import { authGuard } from './guards/auth.guard';
-
-
 import { adminGuard } from './guards/admin.guard';
 import { homeGuard } from './guards/home.guard';
+
 
 
 export const routes: Routes = [

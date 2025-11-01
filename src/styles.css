@@ -276,17 +276,80 @@ button, input, .access-btn {
     }
 }
 
-/* Estilos específicos para botones SOLO en modo claro */
-:root:not([data-theme="dark"]) button {
-    color: #667EEA !important; /* Indigo Soft - color violeta inicial */
-    background: transparent !important; /* Sin fondo inicialmente */
-    border: 1px solid rgba(102, 126, 234, 0.3) !important; /* Borde sutil */
+/* Estilos de botones en modo claro - excluye botón de cerrar sesión */
+:root:not([data-theme="dark"]) button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]) {
+    color: var(--text-primary) !important; /* Color oscuro en modo claro */
+    background: transparent !important; /* Fondo transparente por defecto */
+    border: 1px solid rgba(44, 62, 80, 0.2) !important; /* Borde sutil oscuro */
+    transition: all 0.3s ease !important;
 }
 
-:root:not([data-theme="dark"]) button:hover {
+:root:not([data-theme="dark"]) button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover {
     color: #FFFFFF !important; /* Blanco en hover */
     background: linear-gradient(135deg, #667EEA 0%, #FF6B6B 100%) !important; /* Gradiente indigo-coral en hover */
     border: none !important; /* Sin borde en hover */
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
+
+/* Estilos específicos para inputs tipo button y submit - excluye logout */
+:root:not([data-theme="dark"]) input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]),
+:root:not([data-theme="dark"]) input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]) {
+    color: var(--text-primary) !important;
+    background: transparent !important;
+    border: 1px solid rgba(44, 62, 80, 0.2) !important;
+}
+
+:root:not([data-theme="dark"]) input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover,
+:root:not([data-theme="dark"]) input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover {
+    color: #FFFFFF !important;
+    background: linear-gradient(135deg, #667EEA 0%, #FF6B6B 100%) !important;
+    border: none !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Estilos de botones en modo oscuro - mismo comportamiento con paleta cyberpunk */
+[data-theme="dark"] button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]) {
+    color: #39FFCC !important; /* Neon verde/cyan en estado normal */
+    background: transparent !important; /* Fondo transparente por defecto */
+    border: 1px solid rgba(57, 255, 204, 0.2) !important; /* Borde sutil neon cyan */
+    transition: all 0.3s ease !important;
+}
+
+[data-theme="dark"] button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover {
+    color: #FFFFFF !important; /* Blanco en hover */
+    background: linear-gradient(135deg, #39FFCC 0%, #FF006E 100%) !important; /* Gradiente neon cyan-plasma pink en hover */
+    border: none !important; /* Sin borde en hover */
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(57, 255, 204, 0.4);
+}
+
+/* Estilos específicos para inputs tipo button y submit en modo oscuro - excluye logout */
+[data-theme="dark"] input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]),
+[data-theme="dark"] input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]) {
+    color: #39FFCC !important; /* Neon verde/cyan en estado normal */
+    background: transparent !important;
+    border: 1px solid rgba(57, 255, 204, 0.2) !important;
+}
+
+[data-theme="dark"] input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover,
+[data-theme="dark"] input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover {
+    color: #FFFFFF !important; /* Blanco en hover */
+    background: linear-gradient(135deg, #39FFCC 0%, #FF006E 100%) !important;
+    border: none !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(57, 255, 204, 0.4);
+}
+
+/* Estilos para el logo QR según el tema */
+/* Modo claro - logo QR negro */
+:root:not([data-theme="dark"]) .action-icon.QR {
+    color: #000000 !important; /* Negro en modo claro */
+}
+
+/* Modo oscuro - logo QR blanco */
+[data-theme="dark"] .action-icon.QR {
+    color: #FFFFFF !important; /* Blanco en modo oscuro */
+}
+

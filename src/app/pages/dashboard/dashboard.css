@@ -231,14 +231,12 @@ body {
 }
 
 .admin-panel-btn {
-  background: var(--glass-bg-light);
   border: 2px solid var(--border-color);
   border-radius: 25px;
   padding: 0.75rem 1.5rem;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  color: var(--text-accent);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -261,8 +259,6 @@ body {
 }
 
 .admin-panel-btn:hover {
-  background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%);
-  color: white;
   border: transparent;
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 25px var(--shadow-primary);
@@ -674,19 +670,12 @@ body {
 }
 
 .view-all-btn {
-  background: none;
   border: 2px solid var(--cyber-blue);
-  color: var(--cyber-blue);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.view-all-btn:hover {
-  background: var(--cyber-blue);
-  color: white;
 }
 
 .transactions-container {
@@ -957,9 +946,6 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   transition: all 0.3s ease;
   padding: 0;
@@ -973,14 +959,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: left 0.5s;
 }
 
 .back-button:hover {
   transform: translateX(-2px);
   box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
-  background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
 }
 
 .back-button:hover::before {
@@ -993,6 +977,51 @@ body {
 }
 
 .back-button i {
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.back-button-list {
+  position: absolute;
+  top: 15px;
+  left: 20px !important;
+  width: 35px !important;
+  height: 35px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.back-button-list::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  transition: left 0.5s;
+}
+
+.back-button-list:hover {
+  transform: translateX(-2px);
+  box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+}
+
+.back-button:hover::before {
+  left: 100%;
+}
+
+.back-button-list:active {
+  transform: translateY(0);
+  transition: transform 0.1s;
+}
+
+.back-button-list i {
   font-size: 18px;
   pointer-events: none;
 }

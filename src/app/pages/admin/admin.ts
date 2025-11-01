@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin-service/admin.service';
-import { AdminRequest } from '../../models/admin.interface';
+import { AdminRequest, UserResponse } from '../../models/admin.interface';
 import { themeService } from '../../services/theme-service/theme-service';
 import { UtilService } from '../../services/util-service/util-service';
 
@@ -76,6 +76,16 @@ export class AdminComponent implements OnInit {
   adminForm!: FormGroup;
   showPassword = false;
   showConfirmPassword = false;
+  
+  // Nueva lógica para vistas
+  currentView: 'main' | 'create-admin' | 'users-list' = 'main';
+  users: UserResponse[] = [];
+  isLoadingUsers = false;
+  selectedUser: UserResponse | null = null;
+  showUserModal = false;
+  showConfirmModal = false;
+  userToToggle: UserResponse | null = null;
+  currentUserId: number = 0;
 
   constructor(
     private adminService: AdminService,
@@ -100,6 +110,23 @@ export class AdminComponent implements OnInit {
         confirmPassword: ['', [Validators.required]]
       }, { validators: passwordMatchValidator })
     });
+
+    // Obtener el ID del usuario actual desde localStorage - múltiples fuentes
+    const userDataString = localStorage.getItem('userData');
+    const userIdString = localStorage.getItem('userId');
+    
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        this.currentUserId = userData.id || userData.userId || 0;
+      } catch (e) {
+        console.warn('Error parsing userData from localStorage');
+      }
+    } else if (userIdString) {
+      this.currentUserId = parseInt(userIdString, 10) || 0;
+    }
+    
+    console.log('Current User ID:', this.currentUserId); // Para debug
   }
 
   createAdmin(): void {
@@ -167,5 +194,110 @@ export class AdminComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/dashboard']);
+  }
+
+  // ===== NUEVOS MÉTODOS PARA LA FUNCIONALIDAD ADMIN =====
+
+  // Navegación entre vistas
+  showCreateAdminView(): void {
+    this.currentView = 'create-admin';
+  }
+
+  showUsersListView(): void {
+    this.currentView = 'users-list';
+    this.loadUsers();
+  }
+
+  showMainView(): void {
+    this.currentView = 'main';
+    this.selectedUser = null;
+    this.showUserModal = false;
+  }
+
+  // Cargar usuarios autenticados
+  loadUsers(): void {
+    this.isLoadingUsers = true;
+    
+    this.adminService.getAuthenticatedUsers().subscribe({
+      next: (users) => {
+        console.log('Usuarios recibidos:', users);
+        console.log('ID usuario actual:', this.currentUserId);
+        
+        // Filtrar para excluir al usuario actual
+        this.users = users.filter(user => user.id !== this.currentUserId);
+        console.log('Usuarios después del filtro:', this.users);
+        
+        this.adminService.cacheUsers(this.users);
+        this.isLoadingUsers = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar usuarios:', error);
+        this.utilService.showToast("Error al cargar usuarios", "error");
+        this.isLoadingUsers = false;
+        
+        // Intentar cargar desde cache si hay error
+        const cachedUsers = this.adminService.getCachedUsers();
+        if (cachedUsers) {
+          this.users = cachedUsers.filter(user => user.id !== this.currentUserId);
+        }
+      }
+    });
+  }
+
+  // Modal de usuario
+  openUserModal(user: UserResponse): void {
+    this.selectedUser = user;
+    this.showUserModal = true;
+  }
+
+  closeUserModal(): void {
+    this.selectedUser = null;
+    this.showUserModal = false;
+  }
+
+  // Modal de confirmación personalizado
+  openConfirmModal(user: UserResponse): void {
+    this.userToToggle = user;
+    this.showConfirmModal = true;
+  }
+
+  closeConfirmModal(): void {
+    this.userToToggle = null;
+    this.showConfirmModal = false;
+  }
+
+  // Confirmar cambio de estado
+  confirmToggleUser(): void {
+    if (!this.userToToggle) return;
+
+    const user = this.userToToggle;
+    const action = user.active ? 'deshabilitar' : 'habilitar';
+    
+    const serviceCall = user.active 
+      ? this.adminService.disableUser(user.id)
+      : this.adminService.enableUser(user.id);
+
+    serviceCall.subscribe({
+      next: () => {
+        // Actualizar estado local
+        user.active = !user.active;
+        
+        // Actualizar cache
+        this.adminService.updateUserInCache(user.id, user.active);
+        
+        this.utilService.showToast(
+          `Usuario ${action === 'deshabilitar' ? 'deshabilitado' : 'habilitado'} exitosamente`, 
+          "success"
+        );
+        
+        this.closeConfirmModal();
+        this.closeUserModal();
+      },
+      error: (error) => {
+        console.error(`Error al ${action} usuario:`, error);
+        this.utilService.showToast(`Error al ${action} usuario`, "error");
+        this.closeConfirmModal();
+      }
+    });
   }
 }
