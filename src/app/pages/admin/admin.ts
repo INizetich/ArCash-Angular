@@ -81,6 +81,7 @@ export class AdminComponent implements OnInit {
   currentView: 'main' | 'create-admin' | 'users-list' = 'main';
   users: UserResponse[] = [];
   isLoadingUsers = false;
+  usersAlreadyLoaded = false; // Nueva variable para controlar si ya se cargaron los usuarios
   selectedUser: UserResponse | null = null;
   showUserModal = false;
   showConfirmModal = false;
@@ -111,22 +112,58 @@ export class AdminComponent implements OnInit {
       }, { validators: passwordMatchValidator })
     });
 
-    // Obtener el ID del usuario actual desde localStorage - múltiples fuentes
+    // Obtener el ID del usuario actual - múltiples fuentes y métodos
+    this.getCurrentUserId();
+  }
+
+  // Método para obtener el ID del usuario actual
+  private getCurrentUserId(): void {
+    console.log('=== DEBUG: Obteniendo ID del usuario actual ===');
+    
+    // Verificar todas las fuentes posibles
     const userDataString = localStorage.getItem('userData');
     const userIdString = localStorage.getItem('userId');
+    const accountIdString = localStorage.getItem('accountId');
     
+    console.log('userData en localStorage:', userDataString);
+    console.log('userId en localStorage:', userIdString);
+    console.log('accountId en localStorage:', accountIdString);
+    
+    // Intentar desde userData
     if (userDataString) {
       try {
         const userData = JSON.parse(userDataString);
-        this.currentUserId = userData.id || userData.userId || 0;
+        console.log('userData parseado:', userData);
+        this.currentUserId = userData.id || userData.userId || userData.accountId || 0;
+        if (this.currentUserId > 0) {
+          console.log('ID obtenido desde userData:', this.currentUserId);
+          return;
+        }
       } catch (e) {
-        console.warn('Error parsing userData from localStorage');
+        console.warn('Error parsing userData from localStorage:', e);
       }
-    } else if (userIdString) {
-      this.currentUserId = parseInt(userIdString, 10) || 0;
     }
     
-    console.log('Current User ID:', this.currentUserId); // Para debug
+    // Intentar desde userId directo
+    if (userIdString) {
+      this.currentUserId = parseInt(userIdString, 10) || 0;
+      if (this.currentUserId > 0) {
+        console.log('ID obtenido desde userId:', this.currentUserId);
+        return;
+      }
+    }
+    
+    // Intentar desde accountId como fallback
+    if (accountIdString) {
+      this.currentUserId = parseInt(accountIdString, 10) || 0;
+      if (this.currentUserId > 0) {
+        console.log('ID obtenido desde accountId:', this.currentUserId);
+        return;
+      }
+    }
+    
+    console.warn('No se pudo obtener el ID del usuario actual');
+    this.currentUserId = 0;
   }
 
   createAdmin(): void {
@@ -205,7 +242,11 @@ export class AdminComponent implements OnInit {
 
   showUsersListView(): void {
     this.currentView = 'users-list';
-    this.loadUsers();
+    
+    // Solo cargar usuarios si es la primera vez
+    if (!this.usersAlreadyLoaded) {
+      this.loadUsers();
+    }
   }
 
   showMainView(): void {
@@ -215,19 +256,53 @@ export class AdminComponent implements OnInit {
   }
 
   // Cargar usuarios autenticados
-  loadUsers(): void {
+  loadUsers(forceReload: boolean = false): void {
+    // Si ya se cargaron y no es forzado, usar timeout corto para mejor UX
+    if (this.usersAlreadyLoaded && !forceReload) {
+      this.isLoadingUsers = true;
+      
+      // Timeout corto solo para mostrar feedback visual mínimo
+      setTimeout(() => {
+        this.isLoadingUsers = false;
+      }, 150);
+      return;
+    }
+
     this.isLoadingUsers = true;
+    
+    // Verificar que tenemos el ID del usuario actual
+    if (this.currentUserId === 0) {
+      this.getCurrentUserId();
+    }
     
     this.adminService.getAuthenticatedUsers().subscribe({
       next: (users) => {
-        console.log('Usuarios recibidos:', users);
-        console.log('ID usuario actual:', this.currentUserId);
+        console.log('=== DEBUG: Carga de usuarios ===');
+        console.log('Usuarios recibidos del servidor:', users);
+        console.log('ID del usuario actual a filtrar:', this.currentUserId);
         
         // Filtrar para excluir al usuario actual
-        this.users = users.filter(user => user.id !== this.currentUserId);
+        this.users = users.filter(user => {
+          // Múltiples comparaciones para asegurar exclusión
+          const isCurrentUserById = user.id === this.currentUserId;
+          const isCurrentUserByIdAccount = user.idAccount === this.currentUserId;
+          const isCurrentUserByStringComparison = Number(user.id) === this.currentUserId;
+          
+          const shouldExclude = isCurrentUserById || isCurrentUserByIdAccount || isCurrentUserByStringComparison;
+          
+          if (shouldExclude) {
+            console.log('Usuario excluido del listado:', user);
+            console.log('Motivo exclusión - ID:', isCurrentUserById, 'idAccount:', isCurrentUserByIdAccount, 'NumericID:', isCurrentUserByStringComparison);
+          }
+          
+          return !shouldExclude;
+        });
+        
         console.log('Usuarios después del filtro:', this.users);
+        console.log('Total usuarios mostrados:', this.users.length);
         
         this.adminService.cacheUsers(this.users);
+        this.usersAlreadyLoaded = true; // Marcar como cargados
         this.isLoadingUsers = false;
       },
       error: (error) => {
@@ -238,7 +313,14 @@ export class AdminComponent implements OnInit {
         // Intentar cargar desde cache si hay error
         const cachedUsers = this.adminService.getCachedUsers();
         if (cachedUsers) {
-          this.users = cachedUsers.filter(user => user.id !== this.currentUserId);
+          console.log('Cargando usuarios desde cache...');
+          this.users = cachedUsers.filter(user => {
+            const isCurrentUserById = user.id === this.currentUserId;
+            const isCurrentUserByIdAccount = user.idAccount === this.currentUserId;
+            const isCurrentUserByNumeric = Number(user.id) === this.currentUserId;
+            return !(isCurrentUserById || isCurrentUserByIdAccount || isCurrentUserByNumeric);
+          });
+          console.log('Usuarios desde cache después del filtro:', this.users);
         }
       }
     });
@@ -257,6 +339,9 @@ export class AdminComponent implements OnInit {
 
   // Modal de confirmación personalizado
   openConfirmModal(user: UserResponse): void {
+    // Cerrar el modal de información si está abierto para reducir lag
+    this.closeUserModal();
+    
     this.userToToggle = user;
     this.showConfirmModal = true;
   }
@@ -290,6 +375,9 @@ export class AdminComponent implements OnInit {
           "success"
         );
         
+        // Forzar recarga para reflejar cambios
+        this.usersAlreadyLoaded = false;
+        
         this.closeConfirmModal();
         this.closeUserModal();
       },
@@ -299,5 +387,11 @@ export class AdminComponent implements OnInit {
         this.closeConfirmModal();
       }
     });
+  }
+
+  // Método para refrescar manualmente la lista de usuarios
+  refreshUsersList(): void {
+    this.usersAlreadyLoaded = false;
+    this.loadUsers(true);
   }
 }

@@ -276,15 +276,15 @@ button, input, .access-btn {
     }
 }
 
-/* Estilos de botones en modo claro - excluye botón de cerrar sesión */
-:root:not([data-theme="dark"]) button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]) {
+/* Estilos de botones en modo claro - excluye botón de cerrar sesión y password toggle */
+:root:not([data-theme="dark"]) button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn) {
     color: var(--text-primary) !important; /* Color oscuro en modo claro */
     background: transparent !important; /* Fondo transparente por defecto */
     border: 1px solid rgba(44, 62, 80, 0.2) !important; /* Borde sutil oscuro */
     transition: all 0.3s ease !important;
 }
 
-:root:not([data-theme="dark"]) button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover {
+:root:not([data-theme="dark"]) button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):hover {
     color: #FFFFFF !important; /* Blanco en hover */
     background: linear-gradient(135deg, #667EEA 0%, #FF6B6B 100%) !important; /* Gradiente indigo-coral en hover */
     border: none !important; /* Sin borde en hover */
@@ -292,16 +292,16 @@ button, input, .access-btn {
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
-/* Estilos específicos para inputs tipo button y submit - excluye logout */
-:root:not([data-theme="dark"]) input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]),
-:root:not([data-theme="dark"]) input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]) {
+/* Estilos específicos para inputs tipo button y submit - excluye logout, password toggle y toast close */
+:root:not([data-theme="dark"]) input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn),
+:root:not([data-theme="dark"]) input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn) {
     color: var(--text-primary) !important;
     background: transparent !important;
     border: 1px solid rgba(44, 62, 80, 0.2) !important;
 }
 
-:root:not([data-theme="dark"]) input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover,
-:root:not([data-theme="dark"]) input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover {
+:root:not([data-theme="dark"]) input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):hover,
+:root:not([data-theme="dark"]) input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):hover {
     color: #FFFFFF !important;
     background: linear-gradient(135deg, #667EEA 0%, #FF6B6B 100%) !important;
     border: none !important;
@@ -309,15 +309,15 @@ button, input, .access-btn {
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
-/* Estilos de botones en modo oscuro - mismo comportamiento con paleta cyberpunk */
-[data-theme="dark"] button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]) {
+/* Estilos de botones en modo oscuro - excluye logout, password toggle y toast close */
+[data-theme="dark"] button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn) {
     color: #39FFCC !important; /* Neon verde/cyan en estado normal */
     background: transparent !important; /* Fondo transparente por defecto */
     border: 1px solid rgba(57, 255, 204, 0.2) !important; /* Borde sutil neon cyan */
     transition: all 0.3s ease !important;
 }
 
-[data-theme="dark"] button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover {
+[data-theme="dark"] button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):hover {
     color: #FFFFFF !important; /* Blanco en hover */
     background: linear-gradient(135deg, #39FFCC 0%, #FF006E 100%) !important; /* Gradiente neon cyan-plasma pink en hover */
     border: none !important; /* Sin borde en hover */
@@ -325,16 +325,16 @@ button, input, .access-btn {
     box-shadow: 0 8px 25px rgba(57, 255, 204, 0.4);
 }
 
-/* Estilos específicos para inputs tipo button y submit en modo oscuro - excluye logout */
-[data-theme="dark"] input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]),
-[data-theme="dark"] input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]) {
+/* Estilos específicos para inputs tipo button y submit en modo oscuro - excluye logout, password toggle y toast close */
+[data-theme="dark"] input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn),
+[data-theme="dark"] input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn) {
     color: #39FFCC !important; /* Neon verde/cyan en estado normal */
     background: transparent !important;
     border: 1px solid rgba(57, 255, 204, 0.2) !important;
 }
 
-[data-theme="dark"] input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover,
-[data-theme="dark"] input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):hover {
+[data-theme="dark"] input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):hover,
+[data-theme="dark"] input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):hover {
     color: #FFFFFF !important; /* Blanco en hover */
     background: linear-gradient(135deg, #39FFCC 0%, #FF006E 100%) !important;
     border: none !important;
@@ -351,5 +351,48 @@ button, input, .access-btn {
 /* Modo oscuro - logo QR blanco */
 [data-theme="dark"] .action-icon.QR {
     color: #FFFFFF !important; /* Blanco en modo oscuro */
+}
+
+/* === PASSWORD TOGGLE STYLES - GLOBAL === */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    z-index: 2;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle:hover {
+    color: var(--accent-color);
+    background: rgba(var(--accent-rgb), 0.1);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.2);
+}
+
+.password-toggle:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.password-toggle svg {
+    transition: all 0.3s ease;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+/* Ajuste para input de password con botón */
+.password-wrapper .effect-1 {
+    padding-right: 45px;
 }
 

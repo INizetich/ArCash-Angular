@@ -764,40 +764,6 @@ button[type="submit"]:active {
     padding-right: 45px;
 }
 
-/* Botón de mostrar/ocultar contraseña */
-.password-toggle {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-secondary);
-    z-index: 2;
-    padding: 4px;
-    border-radius: 6px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.password-toggle:hover {
-    color: var(--accent-color);
-    background: rgba(var(--accent-rgb), 0.1);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.2);
-}
-
-.password-toggle:active {
-    transform: translateY(-50%) scale(0.95);
-}
-
-.password-toggle svg {
-    transition: all 0.3s ease;
-}
-
 .password-wrapper {
     position: relative;
 }
@@ -997,7 +963,7 @@ button:disabled::before {
 /* Botones de acceso base */
 .access-btn {
     width: 100%;
-    padding: 1rem 0;
+    padding: 1.5rem 2rem;
     margin-bottom: 1rem;
     border-radius: 12px;
     font-size: 1rem;
@@ -1068,39 +1034,72 @@ button:disabled::before {
     transition: transform 0.1s;
 }
 
-/* Estados de carga */
+/* Estados de carga - estilo QR */
 .loading-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(26, 31, 46, 0.85);
+    backdrop-filter: blur(4px);
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 100;
-    border-radius: inherit;
+    z-index: 1000;
+    border-radius: 12px;
 }
 
 [data-theme="dark"] .loading-overlay {
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(26, 31, 46, 0.85);
+}
+
+:root:not([data-theme="dark"]) .loading-overlay {
+    background: rgba(248, 250, 255, 0.9);
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+:root:not([data-theme="dark"]) .loading-content {
+    color: var(--text-primary);
+}
+
+.loading-content p {
+    margin-top: 20px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+
+:root:not([data-theme="dark"]) .loading-content p {
+    color: var(--text-primary);
 }
 
 .loading-overlay .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--border-light);
-    border-top: 3px solid var(--text-accent);
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top: 3px solid var(--cyber-blue);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
+    animation: loadingSpin 1s linear infinite;
+    margin: 0 auto;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+:root:not([data-theme="dark"]) .loading-overlay .spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top: 3px solid var(--text-accent);
+}
+
+@keyframes loadingSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Lista de usuarios - más compacta y elegante */
@@ -1108,7 +1107,9 @@ button:disabled::before {
     position: relative;
     max-width: 800px; /* Aumentado de 700px */
     width: 100%;
+    min-height: 400px; /* Altura mínima para que el loading se vea bien */
 }
+
 
 .usuarios-lista {
     list-style: none;
@@ -1129,7 +1130,7 @@ button:disabled::before {
     align-items: center;
     background: var(--bg-primary);
     border-bottom: 1px solid var(--border-light);
-    padding: 0.75rem 1rem; /* Reducido padding */
+    padding: 1rem 1.2rem; /* Aumentado padding para más espacio */
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
@@ -1234,6 +1235,29 @@ button:disabled::before {
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+.status-indicator {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border: 1px solid;
+}
+
+.status-active {
+    background: linear-gradient(135deg, var(--laser-green) 0%, #27ae60 100%);
+    color: white;
+    border-color: var(--laser-green);
+}
+
+.status-inactive {
+    background: linear-gradient(135deg, var(--plasma-pink) 0%, #e74c3c 100%);
+    color: white;
+    border-color: var(--plasma-pink);
 }
 
 .inhabilitar-btn,
@@ -1317,13 +1341,14 @@ button:disabled::before {
     align-items: center;
     z-index: 1000;
     opacity: 0;
-    pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    visibility: hidden;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+    will-change: opacity, visibility;
 }
 
 .modal.show {
     opacity: 1;
-    pointer-events: all;
+    visibility: visible;
 }
 
 .modal-content {
@@ -1339,10 +1364,11 @@ button:disabled::before {
         0 20px 60px rgba(0,0,0,0.3),
         0 8px 32px rgba(0,0,0,0.2);
     position: relative;
-    transform: translateY(-30px) scale(0.95);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: translateY(-15px) scale(0.99);
+    transition: transform 0.15s ease;
     border: 1px solid var(--border-light);
     backdrop-filter: blur(20px);
+    will-change: transform;
 }
 
 .modal.show .modal-content {
@@ -1507,7 +1533,7 @@ button:disabled::before {
 }
 
 .confirmation-modal h3 {
-    color: var(--text-accent);
+    color: var(--text-primary);
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
     font-weight: 700;
@@ -1608,9 +1634,10 @@ button:disabled::before {
     transition: transform 0.1s;
 }
 
-/* Botón de navegación - estilo mejorado */
+/* Botón de navegación - estilo mejorado y alineado a la derecha */
 .nav-button {
     margin-bottom: 1.5rem;
+    margin-left: auto;
     padding: 0.7rem 1.2rem;
     background: transparent;
     border: 2px solid var(--border-color);
@@ -1628,6 +1655,7 @@ button:disabled::before {
     overflow: hidden;
     backdrop-filter: blur(10px);
     letter-spacing: 0.3px;
+    width: fit-content;
 }
 
 .nav-button::before {
@@ -1688,6 +1716,10 @@ button:disabled::before {
         max-width: calc(100vw - 2rem);
     }
 
+    .modal-content h3{
+        color: var(--text-primary);
+    }
+
     .user-info-item {
         grid-template-columns: 1fr;
         gap: 0.4rem;
@@ -1733,3 +1765,82 @@ button:disabled::before {
     stroke: var(--back-arrow-color);
     transition: stroke 0.4s ease;
 }
+
+/* Overlay de carga para usuarios - estilo QR optimizado */
+.search-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  border-radius: 12px;
+  animation: fadeInFast 0.15s ease;
+  min-height: 250px;
+}
+
+.search-loading-content {
+  text-align: center;
+  color: var(--text-primary);
+  width: 240px;
+  max-width: 90%;
+  padding: 30px 20px;
+}
+
+.search-loading-content p {
+  margin-top: 20px;
+  font-size: 16px;
+  color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.search-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid transparent;
+  border-top: 3px solid var(--text-accent);
+  border-radius: 50%;
+  animation: searchSpin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes searchSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInFast {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Alineación de botones principales a la derecha */
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+    
+}
+
+/* Contenedor de botones de acceso alineados a la derecha */
+.buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+

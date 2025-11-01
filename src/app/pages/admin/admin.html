@@ -35,19 +35,21 @@
             <div class="admin-main-view">
                 <h2>Panel de Administración</h2>
                 
-                <button type="button" class="access-btn users-btn" (click)="showUsersListView()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;">
-                        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    Ver Usuarios Autenticados
-                </button>
-                
-                <button type="button" class="access-btn admin-btn" (click)="showCreateAdminView()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;">
-                        <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    Crear Nuevo Administrador
-                </button>
+                <div class="buttons-container">
+                    <button type="button" class="access-btn users-btn" (click)="showUsersListView()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;">
+                            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        Ver Usuarios Autenticados
+                    </button>
+                    
+                    <button type="button" class="access-btn admin-btn" (click)="showCreateAdminView()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;">
+                            <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        Crear Nuevo Administrador
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -333,7 +335,8 @@
 
         <!-- Vista: Lista de Usuarios -->
         <div class="formulario" *ngIf="currentView === 'users-list'">
-            <button type="button" class="nav-button" (click)="showCreateAdminView()">
+            <!-- Botón de navegación solo visible cuando no está cargando -->
+            <button type="button" class="nav-button" (click)="showCreateAdminView()" *ngIf="!isLoadingUsers">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px;">
                     <path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
@@ -341,12 +344,15 @@
             </button>
             
             <div class="usuarios-container">
-                <h2>Usuarios Autenticados</h2>
+                <!-- Título solo visible cuando no está cargando -->
+                <h2 *ngIf="!isLoadingUsers">Usuarios Autenticados</h2>
                 
-                <!-- Loading State -->
-                <div *ngIf="isLoadingUsers" class="loading-overlay">
-                    <div class="spinner"></div>
-                    <p>Cargando usuarios...</p>
+                <!-- Loading State con estilo del QR -->
+                <div *ngIf="isLoadingUsers" class="search-loading-overlay">
+                    <div class="search-loading-content">
+                        <div class="search-spinner"></div>
+                        <p>Cargando usuarios...</p>
+                    </div>
                 </div>
                 
                 <!-- Lista de Usuarios -->
@@ -359,6 +365,9 @@
                             <span class="usuario-email">{{user.email}}</span>
                         </div>
                         <div class="action-buttons" (click)="$event.stopPropagation()">
+                            <span class="status-indicator" [class]="user.active ? 'status-active' : 'status-inactive'">
+                                {{user.active ? 'Activo' : 'Inactivo'}}
+                            </span>
                             <button 
                                 *ngIf="user.active" 
                                 class="inhabilitar-btn"
