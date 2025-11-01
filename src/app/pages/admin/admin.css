@@ -198,6 +198,10 @@ body {
     color: var(--text-primary);
     position: relative;
     z-index: 1;
+}
+
+/* Gradiente solo para tema oscuro */
+[data-theme="dark"] .formulario h2 {
     background: linear-gradient(135deg, var(--text-primary), var(--text-accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -931,7 +935,7 @@ button:disabled::before {
 }
 
 [data-theme="dark"] .logo span {
-    color: var(--text-accent);
+    color: var(--laser-green);
 }
 
 [data-theme="dark"] .logo h4 {

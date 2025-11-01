@@ -84,6 +84,7 @@ export class Forgot implements OnInit, OnDestroy {
     
     if (!this.email) {
       this.emailError = 'Por favor ingresa tu correo electrónico.';
+      this.showToast('Campo requerido: Debes ingresar tu correo electrónico.', 'warning');
       return;
     }
 
@@ -91,6 +92,7 @@ export class Forgot implements OnInit, OnDestroy {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.email)) {
       this.emailError = 'Por favor ingresa un correo electrónico válido.';
+      this.showToast('Formato incorrecto: Revisa que el correo tenga el formato correcto (ejemplo@correo.com).', 'warning');
       return;
     }
 
@@ -99,12 +101,30 @@ export class Forgot implements OnInit, OnDestroy {
     this.authService.sendRecoverMail(this.email).subscribe({
       next: (response: any) => {
         const censurado = this.censurarCorreo(this.email);
-        this.showToast(`Se han enviado las instrucciones a ${censurado}.`, 'success');
+        this.showToast(`Correo enviado exitosamente a ${censurado}. Revisa tu bandeja de entrada.`, 'info');
         this.isLoading = false;
         this.email = ''; // Limpiar el formulario después del éxito
       },
       error: (error: any) => {
-        this.showToast('El correo ingresado no se asocia a una cuenta existente.', 'error');
+        console.error('Error en recuperación:', error);
+        
+        // Diferentes tipos de errores con colores específicos
+        if (error.status === 401) {
+          this.showToast('Error de autenticación: Problema con el servidor. Intenta nuevamente.', 'warning');
+        } else if (error.status === 404) {
+          // Usar el mensaje exacto del backend si está disponible
+          const mensaje = error.error?.message || 'El correo ingresado no está registrado en el sistema.';
+          this.showToast(`${mensaje}`, 'warning');
+        } else if (error.status === 429) {
+          this.showToast('Demasiados intentos: Espera unos minutos antes de intentar nuevamente.', 'warning');
+        } else if (error.status >= 500) {
+          this.showToast('Error del servidor: Intenta nuevamente en unos momentos.', 'error');
+        } else if (error.status === 0 || !navigator.onLine) {
+          this.showToast('Sin conexión: Verifica tu conexión a internet e intenta nuevamente.', 'warning');
+        } else {
+          this.showToast('Error inesperado: No se pudo procesar la solicitud. Intenta nuevamente.', 'error');
+        }
+        
         this.isLoading = false;
       }
     });

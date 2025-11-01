@@ -80,7 +80,7 @@ export class Login implements OnInit {
       // Ya no necesita ser 'async'
       next: (response) => { 
         this.isLoading = false;
-        this.utilService.showToast("Inicio de sesión exitoso!", "success");
+        this.utilService.showToast("Inicio de sesión exitoso.", "success");
         this.loginForm.reset();
 
         if (isPlatformBrowser(this.platformId)) {
@@ -97,17 +97,29 @@ export class Login implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-        let errorMessage = "Error al iniciar sesión";
-        if (error.error?.message) {
+        console.error('Error en login:', error);
+        
+        // Manejo inteligente de errores con colores apropiados
+        if (error.status === 401) {
+          this.utilService.showToast("Nombre de usuario y/o contraseña incorrecta", "error");
+        } else if (error.status === 403) {
+          this.utilService.showToast("Cuenta inhabilitada, por favor confirma su cuenta", "error");
+        } else if (error.status >= 500) {
+          this.utilService.showToast("Error del servidor: Intenta nuevamente en unos momentos.", "error");
+        } else if (error.status === 0 || !navigator.onLine) {
+          this.utilService.showToast("Sin conexión: Verifica tu conexión a internet.", "warning");
+        } else {
+          this.utilService.showToast("Error inesperado: No se pudo iniciar sesión. Intenta nuevamente.", "error");
         }
-        this.utilService.showToast(errorMessage, "error");
       }
     });
   } else {
-    // Marcar campos como touched (sin cambios)
+    // Marcar campos como touched y mostrar mensaje de validación
     Object.keys(this.loginForm.controls).forEach(key => {
       this.loginForm.get(key)?.markAsTouched();
     });
+    
+    this.utilService.showToast("Campos incompletos: Completa todos los campos requeridos.", "warning");
   }
 }
 
@@ -116,6 +128,6 @@ export class Login implements OnInit {
   }
 
   goTo(path: string){
-  this.router.navigate([`/${path}`])
-}
+    this.router.navigate([`/${path}`]);
+  }
 }

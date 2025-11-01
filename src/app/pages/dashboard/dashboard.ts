@@ -946,12 +946,10 @@ handleScanSuccess(resultString: string): void {
         accountId = parseInt(accountData.idaccount);
         
         if (isNaN(accountId)) {
-          console.error('Error: No se pudo obtener un ID válido de la búsqueda:', accountData);
           this.utilService.showToast('Error: No se pudo obtener el ID de cuenta', 'error');
           return;
         }
       } catch (error) {
-        console.error('Error buscando cuenta:', error);
         this.utilService.showToast('Error al buscar información de la cuenta', 'error');
         return;
       }
@@ -960,7 +958,6 @@ handleScanSuccess(resultString: string): void {
       accountId = parseInt(this.transferCompletedData.idaccount.toString());
       
       if (isNaN(accountId)) {
-        console.error('Error: idaccount no se puede convertir a número:', this.transferCompletedData.idaccount);
         this.utilService.showToast('Error: ID de cuenta inválido', 'error');
         return;
       }

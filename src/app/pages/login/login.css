@@ -622,6 +622,15 @@ button[type="submit"]:active {
     z-index: 1;
 }
 
+/* Mejor contraste para inputs en modo claro */
+:not([data-theme="dark"]) .effect-1 {
+    color: #1a1a1a;
+}
+
+:not([data-theme="dark"]) .effect-1::placeholder {
+    color: rgba(26, 26, 26, 0.6);
+}
+
 /* Ajuste para input de password con botón */
 .password-wrapper .effect-1 {
     padding-right: 45px;
@@ -668,6 +677,11 @@ button[type="submit"]:active {
 .effect-1::placeholder {
     color: rgba(var(--text-primary), 0.5);
     transition: all 0.3s ease;
+}
+
+/* Mejor contraste para placeholder en modo claro */
+:not([data-theme="dark"]) .effect-1::placeholder {
+    color: rgba(26, 26, 26, 0.6);
 }
 
 .effect-1:focus::placeholder {
@@ -736,6 +750,20 @@ input[type="password"] {
     color: var(--text-primary);
     font-size: 18px;
     outline: none;
+}
+
+/* Mejor contraste para inputs en modo claro */
+:not([data-theme="dark"]) input[type="text"],
+:not([data-theme="dark"]) input[type="email"],
+:not([data-theme="dark"]) input[type="password"] {
+    color: #1a1a1a;
+    border-bottom-color: #ddd;
+}
+
+:not([data-theme="dark"]) input[type="text"]::placeholder,
+:not([data-theme="dark"]) input[type="email"]::placeholder,
+:not([data-theme="dark"]) input[type="password"]::placeholder {
+    color: rgba(26, 26, 26, 0.6);
 }
 
 input[type="text"]:focus,
@@ -859,7 +887,7 @@ button:disabled::before {
 }
 
 [data-theme="dark"] .logo span {
-    color: var(--text-accent);
+    color: var(--laser-green);
 }
 
 [data-theme="dark"] .logo h4 {

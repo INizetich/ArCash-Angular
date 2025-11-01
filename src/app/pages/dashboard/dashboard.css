@@ -31,14 +31,24 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #1a1f2e;
+  background: var(--bg-primary);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
   opacity: 1;
   visibility: visible;
-  /* Sin transiciones complejas */
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Modo oscuro */
+[data-theme="dark"] #wallet-loader-overlay {
+  background: #1a1f2e;
+}
+
+/* Modo claro */
+:root:not([data-theme="dark"]) #wallet-loader-overlay {
+  background: var(--bg-primary);
 }
 
 #wallet-loader-overlay.loaded {
@@ -65,27 +75,37 @@ body {
 .brand-mark {
   width: 80px;
   height: 80px;
-  filter: drop-shadow(0 0 20px var(--cyber-blue));
+  filter: drop-shadow(0 0 20px var(--text-accent));
   z-index: 2;
   position: relative;
   display: block;
 }
 
+/* Modo claro - filtro más sutil */
+:root:not([data-theme="dark"]) .brand-mark {
+  filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.3));
+}
+
+/* Modo oscuro - filtro más intenso */
+[data-theme="dark"] .brand-mark {
+  filter: drop-shadow(0 0 20px var(--cyber-blue));
+}
+
 .vault-shape {
   fill: none;
-  stroke: var(--cyber-blue);
+  stroke: var(--text-accent);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .security-core {
-  fill: var(--cyber-blue);
+  fill: var(--text-accent);
   opacity: 0.8;
 }
 
 .access-cross {
-  stroke: var(--platinum);
+  stroke: var(--bg-primary);
   stroke-width: 3;
   stroke-linecap: round;
 }
@@ -97,26 +117,25 @@ body {
   right: -10px;
   bottom: -10px;
   border: 2px solid transparent;
-  border-top: 2px solid #00d4ff;
+  border-top: 2px solid var(--text-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   z-index: 1;
-  /* Animación más rápida y simple */
 }
 
 .loading-brand h1 {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--platinum);
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .loading-brand h1 span {
-  color: var(--cyber-blue);
+  color: var(--text-accent);
 }
 
 .loading-text {
-  color: var(--titanium);
+  color: var(--text-primary);
   font-size: 1rem;
   opacity: 0.8;
 }
@@ -1072,6 +1091,19 @@ body {
   transition: all 0.3s ease;
 }
 
+/* Mejor contraste para inputs de modal en modo claro */
+:not([data-theme="dark"]) .modal-content input[type='text'],
+:not([data-theme="dark"]) .modal-content input[type='number'],
+:not([data-theme="dark"]) .modal-content input[type='email'] {
+  color: #1a1a1a;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #ddd;
+}
+
+:not([data-theme="dark"]) .modal-content input::placeholder {
+  color: rgba(26, 26, 26, 0.6);
+}
+
 .modal-content input:focus {
   outline: none;
   border-color: var(--cyber-blue);
@@ -1408,6 +1440,13 @@ modal-content button:active {
   transition: all 0.3s ease;
 }
 
+/* Mejor contraste para form-group inputs en modo claro */
+:not([data-theme="dark"]) .form-group input {
+  color: #1a1a1a;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #ddd;
+}
+
 .form-group label {
   position: absolute;
   top: 20px;
@@ -1608,6 +1647,13 @@ modal-content button:active {
   border-radius: 6px;
   padding: 5px 10px;
   color: #ffffff;
+}
+
+/* Mejor contraste para profile-details inputs en modo claro */
+:not([data-theme="dark"]) .profile-details input {
+  color: #1a1a1a;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #ddd;
 }
 
 .profile-details button {
@@ -1834,7 +1880,7 @@ modal-content button:active {
 }
 
 [data-theme='dark'] .loading-brand h1 span {
-  color: var(--neon-cyan) !important;
+  color: var(--laser-green) !important;
 }
 
 [data-theme='dark'] .loading-text {
@@ -2753,6 +2799,23 @@ modal-content button:active {
   transition: all 0.3s ease;
   font-family: inherit;
   resize: vertical;
+}
+
+/* Mejor contraste para formularios de favoritos en modo claro */
+:not([data-theme="dark"]) .add-favorite-form input,
+:not([data-theme="dark"]) .add-favorite-form textarea,
+:not([data-theme="dark"]) .edit-favorite-form input,
+:not([data-theme="dark"]) .edit-favorite-form textarea {
+  color: #1a1a1a;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #ddd;
+}
+
+:not([data-theme="dark"]) .add-favorite-form input::placeholder,
+:not([data-theme="dark"]) .add-favorite-form textarea::placeholder,
+:not([data-theme="dark"]) .edit-favorite-form input::placeholder,
+:not([data-theme="dark"]) .edit-favorite-form textarea::placeholder {
+  color: rgba(26, 26, 26, 0.6);
 }
 
 [data-theme='dark'] .add-favorite-form input,

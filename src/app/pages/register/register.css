@@ -672,9 +672,19 @@ button[type="submit"]:active {
     z-index: 1;
 }
 
+/* Mejor contraste para inputs en modo claro */
+:not([data-theme="dark"]) .effect-1 {
+    color: #1a1a1a;
+}
+
 .effect-1::placeholder {
     color: rgba(128, 128, 128, 0.253);
     transition: all 0.3s ease;
+}
+
+/* Mejor contraste para placeholder en modo claro */
+:not([data-theme="dark"]) .effect-1::placeholder {
+    color: rgba(26, 26, 26, 0.6);
 }
 
 .effect-1:focus::placeholder {
@@ -909,12 +919,50 @@ button:disabled::before {
 }
 
 [data-theme="dark"] .logo span {
-    color: var(--text-accent);
+    color: var(--laser-green);
 }
 
 [data-theme="dark"] .logo h4 {
     color: var(--text-primary);
     opacity: 0.9;
+}
+
+/* Enlace "Already have an account?" centrado debajo del botón */
+.have-account {
+    display: block;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-accent);
+    text-decoration: none;
+    margin: 1rem auto 0 auto;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+    opacity: 0;
+    animation: linkFadeIn 0.5s ease-out 1.3s forwards;
+    transform: translateY(10px);
+    will-change: transform, opacity;
+    width: fit-content;
+    position: relative;
+    z-index: 1;
+}
+
+.have-account:hover {
+    text-decoration: underline;
+    opacity: 1;
+    color: var(--cobalt);
+    transform: translateY(-2px);
+    cursor: pointer;
+}
+
+@keyframes linkFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 0.8;
+        transform: translateY(0);
+    }
 }
 
 

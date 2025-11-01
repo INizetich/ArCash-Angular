@@ -8,7 +8,7 @@ import {
   AbstractControl,       // Requerido para crear validadores personalizados
   ValidationErrors       // El tipo de dato que retorna un validador con error
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service/auth-service';
 import { themeService } from '../../services/theme-service/theme-service';
 import { UtilService } from '../../services/util-service/util-service';
@@ -75,9 +75,10 @@ export function strongPasswordValidator(control: AbstractControl): ValidationErr
   selector: 'app-register',
   standalone: true, // Marcamos el componente como independiente
   imports: [
-    CommonModule,        // Importamos CommonModule
-    ReactiveFormsModule  // Importamos ReactiveFormsModule
-  ],
+    CommonModule, // Importamos CommonModule
+    ReactiveFormsModule, // Importamos ReactiveFormsModule,
+    RouterLink
+],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
@@ -136,12 +137,10 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
     // Si el formulario es inválido, marcamos todos los campos como "tocados" para mostrar los errores y detenemos la ejecución.
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
-      this.utilService.showToast("Por favor, complete todos los campos correctamente", "warning");
+      this.utilService.showToast("Formulario incompleto: Revisa y completa todos los campos marcados en rojo.", "warning");
       return;
     }
 
-
-    
     // Preparar los datos para enviar al backend
     const formData = this.registerForm.value;
     const userData = {
@@ -155,7 +154,7 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
 
       this.authService.registerUser(userData).subscribe({
         next: () => {
-          this.utilService.showToast("Usuario registrado exitosamente!", "success");
+          this.utilService.showToast("Registro exitoso Bienvenido a ArCash", "success");
           this.registerForm.reset();
           
           // Redirigir al login después de 2 segundos
@@ -164,21 +163,24 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
           }, 2000);
         },
         error: (error) => {
-          let errorMessage = "Error al registrar el usuario";
+          console.error('Error en registro:', error);
           
-          if (error.error?.message) {
-            if (error.error.message === "El usuario ya existe") {
-              errorMessage = "El usuario ya existe. Por favor, use un email o alias diferente.";
-            } else if (error.error.message === "El email ya está en uso") {
-              errorMessage = "El email ya está registrado. Por favor, use un email diferente.";
-            } else if (error.error.message === "El alias ya está en uso") {
-              errorMessage = "El alias ya está en uso. Por favor, elija un alias diferente.";
-            } else {
-              errorMessage = error.error.message;
-            }
+          // Manejo inteligente de errores con colores apropiados
+          if (error.status === 409 || error.error?.message?.includes("ya existe") || error.error?.message?.includes("ya está en uso")) {
+            if (error.error.message?.includes("email")) {
+              this.utilService.showToast("El email ya se encuentra en uso", "warning");
+            } else if (error.error.message?.includes("alias")) {
+              this.utilService.showToast("Nombre de usuario no disponible", "warning");
+            } 
+          } else if (error.status === 400) {
+            this.utilService.showToast("Datos inválidos: Revisa que todos los campos tengan el formato correcto.", "warning");
+          } else if (error.status >= 500) {
+            this.utilService.showToast("Error del servidor: Intenta registrarte nuevamente en unos momentos.", "error");
+          } else if (error.status === 0 || !navigator.onLine) {
+            this.utilService.showToast("Sin conexión: Verifica tu conexión a internet e intenta nuevamente.", "warning");
+          } else {
+            this.utilService.showToast("Error inesperado: No se pudo completar el registro. Intenta nuevamente.", "error");
           }
-          
-          this.utilService.showToast(errorMessage, "error");
         }
       })
   }
