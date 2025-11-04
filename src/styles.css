@@ -438,3 +438,16 @@ button, input, .access-btn {
     transition: none !important;
 }
 
+/* GLOBAL FIX: Asegurar texto blanco en inputs en modo oscuro */
+html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="email"],
+html[data-theme="dark"] input[type="password"],
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] .input-wrapper input,
+[data-theme="dark"] .effect-1 {
+    color: #E8EAF6 !important;
+    -webkit-text-fill-color: #E8EAF6 !important;
+}
+

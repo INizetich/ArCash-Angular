@@ -23,15 +23,10 @@ export const routes: Routes = [
     {path: "register", component:RegisterComponent, canActivate: [guestGuard]},
     {path: "login", component:Login, canActivate: [guestGuard]},
     {path: "forgot", component:Forgot},
-<<<<<<< Updated upstream
     {path: "resend", component:ResendComponent, canActivate: [resendGuard]}, // Solo accesible desde navegación interna
     {path: "validate", component:ValidateComponent, canActivate: [validateGuard]}, // Solo accesible desde email con token
     {path: "validate-request", component:RecoverPasswordComponent}, // Ruta del email para reset password
     {path: "reset-password", component:RecoverPasswordComponent}, // Alias para consistencia
-=======
-    {path: "validate", component:ValidateComponent}, // Solo accesible desde email
-    {path: "reset-password", component:RecoverPasswordComponent}, // Solo accesible desde email
->>>>>>> Stashed changes
     {path: "dashboard", component:DashboardComponent, canActivate: [authGuard]},
     {path: "admin", component:AdminComponent, canActivate: [authGuard, adminGuard]},
     {path: "404", component:Error404Component}, // Página de error

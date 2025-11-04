@@ -411,6 +411,17 @@
     color: rgba(26, 26, 26, 0.6);
 }
 
+/* Estilos para modo oscuro */
+[data-theme="dark"] .input-wrapper input {
+    color: #E8EAF6 !important;
+    border-color: rgba(255, 255, 255, 0.15);
+    -webkit-text-fill-color: #E8EAF6 !important;
+}
+
+[data-theme="dark"] .input-wrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
 .input-wrapper input:focus {
     outline: none;
     border-color: transparent;

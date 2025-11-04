@@ -766,6 +766,24 @@ input[type="password"] {
     color: rgba(26, 26, 26, 0.6);
 }
 
+/* Mejor contraste para inputs en modo oscuro */
+html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="email"],
+html[data-theme="dark"] input[type="password"],
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"] {
+    color: #E8EAF6 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+    -webkit-text-fill-color: #E8EAF6 !important;
+}
+
+[data-theme="dark"] input[type="text"]::placeholder,
+[data-theme="dark"] input[type="email"]::placeholder,
+[data-theme="dark"] input[type="password"]::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus {
