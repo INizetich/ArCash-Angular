@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Location, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../services/auth-service/auth-service';
+import { ResendService } from '../../services/resend-service/resend.service';
 import { themeService } from '../../services/theme-service/theme-service';
 import { UtilService } from '../../services/util-service/util-service';
 
@@ -10,16 +11,22 @@ import { UtilService } from '../../services/util-service/util-service';
   selector: 'app-forgot',
   imports: [FormsModule, CommonModule],
   templateUrl: './forgot.html',
-  styleUrls: ['./forgot.css']
+  styleUrls: ['./forgot.css', './resend-styles.css']
 })
 export class Forgot implements OnInit, OnDestroy {
   email: string = '';
   isLoading: boolean = false;
   emailError: string = '';
+  emailSent: boolean = false;
+  showResendSection: boolean = false;
+  resendCooldown: number = 0;
+  resendTimer: any;
+  isResending: boolean = false;
 
   constructor(
     private location: Location,
     private authService: AuthService,
+    private resendService: ResendService,
     private themeService: themeService,
     private utilService: UtilService,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -34,6 +41,10 @@ export class Forgot implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (isPlatformBrowser(this.platformId)) {
       document.removeEventListener('mousemove', this.handleMouseMove);
+    }
+    // Limpiar timer si existe
+    if (this.resendTimer) {
+      clearInterval(this.resendTimer);
     }
   }
 
@@ -103,7 +114,12 @@ export class Forgot implements OnInit, OnDestroy {
         const censurado = this.censurarCorreo(this.email);
         this.showToast(`Correo enviado exitosamente a ${censurado}. Revisa tu bandeja de entrada.`, 'info');
         this.isLoading = false;
-        this.email = ''; // Limpiar el formulario después del éxito
+        this.emailSent = true;
+        
+        // Mostrar sección de reenvío después de 10 segundos
+        setTimeout(() => {
+          this.showResendSection = true;
+        }, 10000);
       },
       error: (error: any) => {
         console.error('Error en recuperación:', error);
@@ -130,7 +146,7 @@ export class Forgot implements OnInit, OnDestroy {
     });
   }
 
-  private censurarCorreo(email: string): string {
+  censurarCorreo(email: string): string {
     const [usuario, dominio] = email.split('@');
     if (usuario.length <= 2) {
       return usuario[0] + '***@' + dominio;
@@ -141,5 +157,69 @@ export class Forgot implements OnInit, OnDestroy {
 
   private showToast(message: string, type: 'success' | 'error' | 'info' | 'warning'): void {
     this.utilService.showToast(message, type);
+  }
+
+  /**
+   * Reenvía el correo de recuperación de contraseña
+   */
+  resendRecoveryEmail(): void {
+    if (this.resendCooldown > 0 || this.isResending) {
+      return;
+    }
+
+    this.isResending = true;
+    
+    this.resendService.resendPasswordRecovery(this.email).subscribe({
+      next: (response) => {
+        const censurado = this.censurarCorreo(this.email);
+        this.showToast(`Correo reenviado exitosamente a ${censurado}.`, 'success');
+        this.isResending = false;
+        this.startResendCooldown();
+      },
+      error: (error) => {
+        console.error('Error al reenviar:', error);
+        
+        if (error.status === 429) {
+          this.showToast('Demasiados intentos: Espera un momento antes de solicitar otro reenvío.', 'warning');
+        } else if (error.status === 404) {
+          this.showToast('El correo no está registrado en el sistema.', 'warning');
+        } else {
+          this.showToast('Error al reenviar: Intenta nuevamente en unos momentos.', 'error');
+        }
+        
+        this.isResending = false;
+      }
+    });
+  }
+
+  /**
+   * Inicia el cooldown para evitar spam de reenvíos
+   */
+  private startResendCooldown(): void {
+    this.resendCooldown = 60; // 60 segundos
+    
+    this.resendTimer = setInterval(() => {
+      this.resendCooldown--;
+      
+      if (this.resendCooldown <= 0) {
+        clearInterval(this.resendTimer);
+        this.resendTimer = null;
+      }
+    }, 1000);
+  }
+
+  /**
+   * Resetea el formulario para enviar a otro email
+   */
+  sendToAnotherEmail(): void {
+    this.email = '';
+    this.emailSent = false;
+    this.showResendSection = false;
+    this.resendCooldown = 0;
+    
+    if (this.resendTimer) {
+      clearInterval(this.resendTimer);
+      this.resendTimer = null;
+    }
   }
 }

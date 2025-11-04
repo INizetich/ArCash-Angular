@@ -30,9 +30,11 @@
 
     <div class="right-panel">
         <div class="formulario">
-            <h2>Registrarse</h2>
+            <!-- Formulario de registro -->
+            <div *ngIf="!registrationSuccessful">
+                <h2>Registrarse</h2>
 
-            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+                <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
 
                 <div class="input-container">
                     <label>Nombre</label>
@@ -296,10 +298,72 @@
                     </div>
                 </div>
 
-                <button type="submit" [disabled]="registerForm.invalid">Enviar</button>
+                <button type="submit" [disabled]="registerForm.invalid || loading">
+                    {{ loading ? 'Enviando...' : 'Enviar' }}
+                </button>
             </form>
             
             <a routerLink="/login" class="have-account">Already have an account?</a>
+            </div>
+
+            <!-- Sección de éxito post-registro -->
+            <div class="registration-success" *ngIf="registrationSuccessful">
+                <div class="success-message">
+                    <div class="success-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>¡Registro exitoso!</h3>
+                    <p>Se envió un correo de validación a:</p>
+                    <p class="registered-email">{{ censurarCorreo(registeredEmail) }}</p>
+                    <p class="check-spam">Revisa tu bandeja de entrada y la carpeta de spam.</p>
+                </div>
+
+                <!-- Sección de reenvío que aparece después de 15 segundos -->
+                <div class="resend-section" *ngIf="showResendSection">
+                    <div class="resend-prompt">
+                        <h4>¿Todavía no recibiste tu correo?</h4>
+                        <p>Solicita uno nuevo</p>
+                    </div>
+                    
+                    <button 
+                        class="resend-btn"
+                        [disabled]="isResending || resendCooldown > 0"
+                        (click)="resendValidationEmail()">
+                        @if (!isResending && resendCooldown === 0) {
+                            <span class="btn-content">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Reenviar correo
+                            </span>
+                        }
+                        @if (isResending) {
+                            <span class="btn-loading">
+                                <div class="spinner"></div>
+                                Reenviando...
+                            </span>
+                        }
+                        @if (resendCooldown > 0) {
+                            <span class="btn-cooldown">
+                                Reenviar en {{ resendCooldown }}s
+                            </span>
+                        }
+                    </button>
+
+                    <button class="login-btn" (click)="goToLogin()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2"/>
+                            <polyline points="16,17 21,12 16,7" stroke="currentColor" stroke-width="2"/>
+                            <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Ir al login
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

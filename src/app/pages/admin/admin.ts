@@ -77,6 +77,9 @@ export class AdminComponent implements OnInit {
   showPassword = false;
   showConfirmPassword = false;
   
+  // Variable para controlar el estado de carga del formulario
+  loading = false;
+  
   // Nueva lógica para vistas
   currentView: 'main' | 'create-admin' | 'users-list' = 'main';
   users: UserResponse[] = [];
@@ -173,6 +176,14 @@ export class AdminComponent implements OnInit {
       return;
     }
 
+    // Evitar múltiples envíos si ya se está procesando
+    if (this.loading) {
+      return;
+    }
+
+    // Establecer estado de carga
+    this.loading = true;
+
     const formData = this.adminForm.value;
     const adminRequest: AdminRequest = {
       name: formData.name,
@@ -185,15 +196,49 @@ export class AdminComponent implements OnInit {
 
     this.adminService.createAdmin(adminRequest).subscribe({
       next: () => {
+        this.loading = false;
         this.utilService.showToast("Administrador creado exitosamente!", "success");
         this.adminForm.reset();
       },
       error: (error) => {
-        let errorMessage = "Error al crear el administrador";
-        if (error.error?.message) {
-          errorMessage = error.error.message;
+        this.loading = false;
+        console.error('Error en creación de admin:', error);
+        console.error('Error status:', error.status);
+        console.error('Error error:', error.error);
+        console.error('Error message:', error.error?.message);
+        console.error('Error mensaje:', error.error?.mensaje);
+        
+        // Buscar el mensaje tanto en 'message' como en 'mensaje'
+        const backendMessage = error.error?.message || error.error?.mensaje;
+        
+        // Manejo específico de errores del backend
+        if (backendMessage) {
+          console.log('Mensaje del backend:', backendMessage);
+          
+          // Manejar errores específicos de conflictos
+          if (backendMessage.includes("email ya se encuentra en uso") ||
+              backendMessage.includes("nombre de usuario no está disponible") ||
+              backendMessage.includes("DNI ya está registrado")) {
+            this.utilService.showToast(backendMessage, "warning");
+          } else if (backendMessage.includes("campos son obligatorios")) {
+            this.utilService.showToast("Todos los campos son obligatorios.", "warning");
+          } else {
+            // Para otros mensajes del servidor, mostrarlos tal como vienen
+            this.utilService.showToast(backendMessage, "error");
+          }
+        } else {
+          // Manejo de errores por código de estado cuando no hay mensaje específico
+          console.log('No hay mensaje específico del backend, usando manejo por status code');
+          if (error.status === 400) {
+            this.utilService.showToast("Datos inválidos. Revisa que todos los campos tengan el formato correcto.", "warning");
+          } else if (error.status >= 500) {
+            this.utilService.showToast("Error del servidor. Intenta crear el administrador nuevamente en unos momentos.", "error");
+          } else if (error.status === 0 || !navigator.onLine) {
+            this.utilService.showToast("Sin conexión. Verifica tu conexión a internet e intenta nuevamente.", "warning");
+          } else {
+            this.utilService.showToast("Error inesperado. No se pudo crear el administrador. Intenta nuevamente.", "error");
+          }
         }
-        this.utilService.showToast(errorMessage, "error");
       }
     });
   }

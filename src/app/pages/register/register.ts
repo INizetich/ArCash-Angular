@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Necesario para directivas como *ngIf
 import { 
   ReactiveFormsModule, 
@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service/auth-service';
+import { ResendService } from '../../services/resend-service/resend.service';
 import { themeService } from '../../services/theme-service/theme-service';
 import { UtilService } from '../../services/util-service/util-service';
 
@@ -82,7 +83,7 @@ export function strongPasswordValidator(control: AbstractControl): ValidationErr
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
-export class RegisterComponent implements OnInit { // Implementamos OnInit para usar el ciclo de vida
+export class RegisterComponent implements OnInit, OnDestroy { // Implementamos OnInit para usar el ciclo de vida
 
   // Declaramos la propiedad que contendrá nuestro formulario.
   // El '!' indica a TypeScript que estamos seguros de que esta propiedad se inicializará más tarde (en ngOnInit).
@@ -92,9 +93,27 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
   showPassword = false;
   showConfirmPassword = false;
 
+  // Variable para controlar el estado de carga del formulario
+  loading = false;
+
+  // Variables para el estado post-registro
+  registrationSuccessful = false;
+  registeredEmail = '';
+  showResendSection = false;
+  isResending = false;
+  resendCooldown = 0;
+  resendTimer: any;
+
   // --- CONSTRUCTOR ---
   // Inyectamos el 'FormBuilder' (fb) para poder usarlo. Angular se encarga de proveerlo.
-  constructor(private fb: FormBuilder,private utilService : UtilService, private authService : AuthService, private themeService : themeService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private utilService: UtilService, 
+    private authService: AuthService, 
+    private resendService: ResendService,
+    private themeService: themeService, 
+    private router: Router
+  ) {}
 
   // --- CICLO DE VIDA ngOnInit ---
   // Este método se ejecuta automáticamente una vez que el componente se ha inicializado.
@@ -141,6 +160,14 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
       return;
     }
 
+    // Evitar múltiples envíos si ya se está procesando
+    if (this.loading) {
+      return;
+    }
+
+    // Establecer estado de carga
+    this.loading = true;
+
     // Preparar los datos para enviar al backend
     const formData = this.registerForm.value;
     const userData = {
@@ -153,33 +180,59 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
     };
 
       this.authService.registerUser(userData).subscribe({
-        next: () => {
-          this.utilService.showToast("Registro exitoso Bienvenido a ArCash", "success");
-          this.registerForm.reset();
+        next: (response) => {
+          this.loading = false;
+          this.registrationSuccessful = true;
+          this.registeredEmail = userData.email;
           
-          // Redirigir al login después de 2 segundos
+          const emailCensurado = this.censurarCorreo(userData.email);
+          this.utilService.showToast(`¡Registro exitoso! Se envió un correo de validación a ${emailCensurado}. Revisa tu bandeja de entrada para activar tu cuenta.`, "success");
+          
+          // Mostrar sección de reenvío después de 15 segundos
           setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000);
+            this.showResendSection = true;
+          }, 15000);
+          
+          // Removemos el auto-redirect automático - solo manual con botón
         },
         error: (error) => {
+          this.loading = false;
           console.error('Error en registro:', error);
+          console.error('Error status:', error.status);
+          console.error('Error error:', error.error);
+          console.error('Error message:', error.error?.message);
+          console.error('Error mensaje:', error.error?.mensaje);
           
-          // Manejo inteligente de errores con colores apropiados
-          if (error.status === 409 || error.error?.message?.includes("ya existe") || error.error?.message?.includes("ya está en uso")) {
-            if (error.error.message?.includes("email")) {
-              this.utilService.showToast("El email ya se encuentra en uso", "warning");
-            } else if (error.error.message?.includes("alias")) {
-              this.utilService.showToast("Nombre de usuario no disponible", "warning");
-            } 
-          } else if (error.status === 400) {
-            this.utilService.showToast("Datos inválidos: Revisa que todos los campos tengan el formato correcto.", "warning");
-          } else if (error.status >= 500) {
-            this.utilService.showToast("Error del servidor: Intenta registrarte nuevamente en unos momentos.", "error");
-          } else if (error.status === 0 || !navigator.onLine) {
-            this.utilService.showToast("Sin conexión: Verifica tu conexión a internet e intenta nuevamente.", "warning");
+          // Buscar el mensaje tanto en 'message' como en 'mensaje'
+          const backendMessage = error.error?.message || error.error?.mensaje;
+          
+          // Manejo específico de errores del backend
+          if (backendMessage) {
+            console.log('Mensaje del backend:', backendMessage);
+            
+            // Manejar errores específicos de conflictos
+            if (backendMessage.includes("email ya se encuentra en uso") ||
+                backendMessage.includes("nombre de usuario no está disponible") ||
+                backendMessage.includes("DNI ya está registrado")) {
+              this.utilService.showToast(backendMessage, "warning");
+            } else if (backendMessage.includes("campos son obligatorios")) {
+              this.utilService.showToast("Todos los campos son obligatorios.", "warning");
+            } else {
+              // Para otros mensajes del servidor, mostrarlos tal como vienen
+              this.utilService.showToast(backendMessage, "error");
+            }
           } else {
-            this.utilService.showToast("Error inesperado: No se pudo completar el registro. Intenta nuevamente.", "error");
+            // Manejo de errores por código de estado cuando no hay mensaje específico
+            console.log('No hay mensaje específico del backend, usando manejo por status code');
+            if (error.status === 400) {
+              this.utilService.showToast("Datos inválidos. Revisa que todos los campos tengan el formato correcto.", "warning");
+            } else if (error.status >= 500) {
+              this.utilService.showToast("Error del servidor. Intenta registrarte nuevamente en unos momentos.", "error");
+            } else if (error.status === 0 || !navigator.onLine) {
+              this.utilService.showToast("Sin conexión. Verifica tu conexión a internet e intenta nuevamente.", "warning");
+            } else {
+              this.utilService.showToast("Error inesperado. No se pudo completar el registro. Intenta nuevamente.", "error");
+            }
           }
         }
       })
@@ -218,5 +271,82 @@ export class RegisterComponent implements OnInit { // Implementamos OnInit para 
 
   toggleConfirmPasswordVisibility() {
     this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  /**
+   * Censura un email mostrando solo los primeros caracteres
+   */
+  censurarCorreo(email: string): string {
+    const [usuario, dominio] = email.split('@');
+    if (usuario.length <= 2) {
+      return usuario[0] + '***@' + dominio;
+    }
+    const visible = usuario.slice(0, 2);
+    return visible + '***@' + dominio;
+  }
+
+  /**
+   * Reenvía el correo de validación
+   */
+  resendValidationEmail(): void {
+    if (this.resendCooldown > 0 || this.isResending) {
+      return;
+    }
+
+    this.isResending = true;
+    
+    this.resendService.resendValidationEmail(this.registeredEmail).subscribe({
+      next: (response) => {
+        const censurado = this.censurarCorreo(this.registeredEmail);
+        this.utilService.showToast(`Correo reenviado exitosamente a ${censurado}.`, 'success');
+        this.isResending = false;
+        this.startResendCooldown();
+      },
+      error: (error) => {
+        console.error('Error al reenviar:', error);
+        
+        if (error.status === 429) {
+          this.utilService.showToast('Demasiados intentos: Espera un momento antes de solicitar otro reenvío.', 'warning');
+        } else if (error.status === 400) {
+          this.utilService.showToast('La cuenta ya está validada.', 'info');
+        } else {
+          this.utilService.showToast('Error al reenviar: Intenta nuevamente en unos momentos.', 'error');
+        }
+        
+        this.isResending = false;
+      }
+    });
+  }
+
+  /**
+   * Inicia el cooldown para evitar spam de reenvíos
+   */
+  private startResendCooldown(): void {
+    this.resendCooldown = 60; // 60 segundos
+    
+    this.resendTimer = setInterval(() => {
+      this.resendCooldown--;
+      
+      if (this.resendCooldown <= 0) {
+        clearInterval(this.resendTimer);
+        this.resendTimer = null;
+      }
+    }, 1000);
+  }
+
+  /**
+   * Navega al login manualmente
+   */
+  goToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  /**
+   * Limpia timers al destruir el componente
+   */
+  ngOnDestroy(): void {
+    if (this.resendTimer) {
+      clearInterval(this.resendTimer);
+    }
   }
 }

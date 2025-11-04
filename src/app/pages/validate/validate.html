@@ -1,0 +1,60 @@
+<div class="success-container">
+  <div class="icon-validate success" *ngIf="validationResult?.success">
+    <!-- Tick verde -->
+    <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.08)" stroke="none"/>
+      <path d="M14 25.5L22 33L34 17" stroke="white"/>
+    </svg>
+  </div>
+  
+  <div class="icon-validate error" *ngIf="validationResult && !validationResult.success">
+    <!-- Cruz roja -->
+    <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.08)" stroke="none"/>
+      <path d="M16 16L32 32M32 16L16 32" stroke="white"/>
+    </svg>
+  </div>
+  
+  <div class="icon-validate error" *ngIf="!validationResult && !isLoading">
+    <!-- Cruz roja para error de token -->
+    <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.08)" stroke="none"/>
+      <path d="M16 16L32 32M32 16L16 32" stroke="white"/>
+    </svg>
+  </div>
+
+  <div class="icon-validate loading" *ngIf="isLoading">
+    <!-- Spinner de carga -->
+    <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="24" cy="24" r="20" stroke="white" opacity="0.3"/>
+      <path d="M24,4 A20,20 0 0,1 44,24" stroke="white" class="spinner"/>
+    </svg>
+  </div>
+  
+  <h2 id="status">{{ getMessage() }}</h2>
+  
+  <button 
+    class="main-btn"
+    [ngClass]="getBtnClass()"
+    (click)="goToHome()"
+    [disabled]="isLoading">
+    <span *ngIf="!isLoading">Ir al menú principal</span>
+    <span *ngIf="isLoading">Procesando...</span>
+  </button>
+
+  <!-- Botón de reenvío solo visible cuando hay error de validación -->
+  <button 
+    *ngIf="showResendOption()"
+    class="secondary-btn resend-btn"
+    [disabled]="isResending"
+    (click)="resendValidationEmail()">
+    @if (!isResending) {
+      <i class="fas fa-envelope-open-text"></i>
+      Solicitar nuevo enlace
+    }
+    @if (isResending) {
+      <div class="loading-spinner"></div>
+      Reenviando...
+    }
+  </button>
+</div>

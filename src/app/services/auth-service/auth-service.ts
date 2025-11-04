@@ -14,7 +14,7 @@ export class AuthService {
 
   ///METODO POST PARA CREAR EL USUARIO
   registerUser(user : User){
-    return this.http.post<User>(`${this.baseUrl}/user/create`, user)
+    return this.http.post<any>(`${this.baseUrl}/user/create`, user)
   }
 
   ///METODO POST PARA LOGIN DEL USUARIO
@@ -33,6 +33,7 @@ export class AuthService {
   sendRecoverMail(email: string): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/auth/send-recover-mail`, { email })
   }
+
 
   ///METODO POST PARA REFRESH TOKEN
   refreshToken(): Observable<any> {
@@ -73,6 +74,6 @@ export class AuthService {
 
   }
 
-  
+
 
 }

@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth-service/auth-service';
 import { UtilService } from '../../services/util-service/util-service';
 import { CacheService } from '../../services/cache-service/cache.service';
 import { DataService } from '../../services/data-service/data-service';
+import { ResendNavigationService } from '../../services/resend-navigation/resend-navigation.service';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +27,7 @@ export class Login implements OnInit {
     private authService: AuthService,
     private utilService: UtilService,
     private cacheService: CacheService,
+    private resendNavigationService: ResendNavigationService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.loginForm = this.fb.group({
@@ -129,5 +131,13 @@ export class Login implements OnInit {
 
   goTo(path: string){
     this.router.navigate([`/${path}`]);
+  }
+
+  /**
+   * Navega al componente de reenvío desde el contexto de login
+   * para permitir reenvío de emails de validación
+   */
+  goToResend() {
+    this.resendNavigationService.navigateFromLogin();
   }
 }

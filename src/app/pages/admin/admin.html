@@ -215,36 +215,6 @@
                     </div>
                 </div>
 
-                <div class="input-container">
-                    <label>Nombre de usuario</label>
-                    <div class="input-wrapper">
-                        <input class="effect-1"  
-                                type="text" 
-                                formControlName="username"
-                                placeholder="usuario123"
-                                maxlength="10">
-                        <span class="focus-border"></span>
-                    </div>
-                    <div>
-                        @if (adminForm.get('username')?.invalid && adminForm.get('username')?.touched) {
-                            <div class="error-container">
-                                @if (adminForm.get('username')?.hasError('required')) {
-                                    <small class="error-message">El nombre de usuario es requerido.</small>
-                                }
-                                @if (adminForm.get('username')?.hasError('minlength')) {
-                                    <small class="error-message">El nombre de usuario debe tener al menos 3 caracteres.</small>
-                                }
-                                @if (adminForm.get('username')?.hasError('maxlength')) {
-                                    <small class="error-message">El nombre de usuario no puede tener más de 10 caracteres.</small>
-                                }
-                                @if (adminForm.get('username')?.hasError('pattern')) {
-                                    <small class="error-message">Solo se permiten letras, números, guiones y guiones bajos.</small>
-                                }
-                            </div>
-                        }
-                    </div>
-                </div>
-
                 <div formGroupName="passwords" class="password-group">
                     <div class="input-container">
                         <label>Contraseña</label>
@@ -328,7 +298,39 @@
                     </div>
                 </div>
 
-                <button type="submit" [disabled]="adminForm.invalid">Crear Administrador</button>
+                <div class="input-container">
+                    <label>Nombre de usuario</label>
+                    <div class="input-wrapper">
+                        <input class="effect-1"  
+                                type="text" 
+                                formControlName="username"
+                                placeholder="usuario123"
+                                maxlength="10">
+                        <span class="focus-border"></span>
+                    </div>
+                    <div>
+                        @if (adminForm.get('username')?.invalid && adminForm.get('username')?.touched) {
+                            <div class="error-container">
+                                @if (adminForm.get('username')?.hasError('required')) {
+                                    <small class="error-message">El nombre de usuario es requerido.</small>
+                                }
+                                @if (adminForm.get('username')?.hasError('minlength')) {
+                                    <small class="error-message">El nombre de usuario debe tener al menos 3 caracteres.</small>
+                                }
+                                @if (adminForm.get('username')?.hasError('maxlength')) {
+                                    <small class="error-message">El nombre de usuario no puede tener más de 10 caracteres.</small>
+                                }
+                                @if (adminForm.get('username')?.hasError('pattern')) {
+                                    <small class="error-message">Solo se permiten letras, números, guiones y guiones bajos.</small>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" [disabled]="adminForm.invalid || loading">
+                    {{ loading ? 'Creando...' : 'Crear Administrador' }}
+                </button>
 
             </form>
         </div>

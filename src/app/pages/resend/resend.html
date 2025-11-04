@@ -1,0 +1,223 @@
+<div class="theme-control">
+    <button id="theme-switcher" (click)="toggleTheme()" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+            <path class="sun" d="M12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0-2a8 8 0 1 0 0 16 8 8 0 0 0 0-16"/>
+            <path class="sun-ray" d="M12 2v2m0 16v2M4 12H2m20 0h-2m3-7l-2 2m-13 13l-2 2m17-15l2 2M3 19l2 2"/>
+        </svg>
+    </button>
+</div>
+
+<div>
+    <button id="back-button" (click)="goBack()" aria-label="Volver">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" class="back-circle"/>
+            <path d="M14 8L10 12L14 16" class="back-arrow" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </button>
+</div>
+
+<div class="main">
+    <div class="left-panel">
+        <div class="logo">
+            <svg class="brand-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape"/>
+                <circle cx="60" cy="60" r="18" class="security-core"/>
+                <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross"/>
+            </svg>
+            <h1>AR<span>Cash</span></h1>
+            <h4>VIRTUAL WALLET</h4>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <!-- Vista Principal con Opciones de Reenvío -->
+        <div class="formulario" *ngIf="currentView === 'main'">
+            <div class="resend-main-view">
+                <h2>Reenviar Enlaces</h2>
+                <p class="description">¿No recibiste un enlace o expiró? Solicita uno nuevo aquí.</p>
+                
+                <div class="resend-options">
+                    <div class="resend-option" (click)="showValidationView()">
+                        <div class="option-icon validation-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" stroke="currentColor" stroke-width="1.5"/>
+                                <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <div class="option-content">
+                            <h3>Validación de Email</h3>
+                            <p>Reenviar enlace para activar tu cuenta</p>
+                        </div>
+                        <div class="option-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="resend-option" (click)="showPasswordRecoveryView()">
+                        <div class="option-icon recovery-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="option-content">
+                            <h3>Recuperación de Contraseña</h3>
+                            <p>Reenviar enlace para restablecer contraseña</p>
+                        </div>
+                        <div class="option-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <div class="help-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="12" cy="17" r="1" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <p class="help-text">¿Sigues teniendo problemas? Verifica tu bandeja de spam o contacta a soporte.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista: Reenviar Validación de Email -->
+        <div class="formulario" *ngIf="currentView === 'validation'">
+            <button type="button" class="nav-button" (click)="showPasswordRecoveryView()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px;">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Recuperar Contraseña
+            </button>
+            
+            <h2>Reenviar Validación</h2>
+            <p class="form-description">Ingresa tu email para recibir un nuevo enlace de activación de cuenta.</p>
+
+            <form [formGroup]="resendForm" (ngSubmit)="onSubmitValidation()" novalidate>
+                <div class="input-container">
+                    <label>Email</label>
+                    <div class="input-wrapper">
+                        <input class="effect-1" 
+                               type="email" 
+                               formControlName="email" 
+                               placeholder="tu-email@ejemplo.com"
+                               [class.error]="resendForm.get('email')?.invalid && resendForm.get('email')?.touched">
+                        <span class="focus-border"></span>
+                    </div>
+                    <div>
+                        @if (resendForm.get('email')?.invalid && resendForm.get('email')?.touched) {
+                            <div class="error-container">
+                                @if (resendForm.get('email')?.hasError('required')) {
+                                    <small class="error-message">El email es requerido.</small>
+                                }
+                                @if (resendForm.get('email')?.hasError('email') || resendForm.get('email')?.hasError('pattern')) {
+                                    <small class="error-message">Ingresa un formato de email válido.</small>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" [disabled]="resendForm.invalid || isLoading" class="submit-btn validation-btn">
+                    <span class="btn-content">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" *ngIf="!isLoading">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/>
+                            <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <div class="loading-spinner" *ngIf="isLoading"></div>
+                        {{ isLoading ? 'Enviando...' : 'Reenviar Validación' }}
+                    </span>
+                </button>
+            </form>
+
+            <div class="info-section">
+                <div class="info-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M12 16v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="12" cy="8" r="1" fill="currentColor"/>
+                    </svg>
+                </div>
+                <p>El nuevo enlace invalidará el anterior y será válido por 24 horas.</p>
+            </div>
+        </div>
+
+        <!-- Vista: Reenviar Recuperación de Contraseña -->
+        <div class="formulario" *ngIf="currentView === 'password-recovery'">
+            <button type="button" class="nav-button" (click)="showValidationView()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px;">
+                    <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                Validar Cuenta
+            </button>
+            
+            <h2>Reenviar Recuperación</h2>
+            <p class="form-description">Ingresa tu email para recibir un nuevo enlace de recuperación de contraseña.</p>
+
+            <form [formGroup]="resendForm" (ngSubmit)="onSubmitPasswordRecovery()" novalidate>
+                <div class="input-container">
+                    <label>Email</label>
+                    <div class="input-wrapper">
+                        <input class="effect-1" 
+                               type="email" 
+                               formControlName="email" 
+                               placeholder="tu-email@ejemplo.com"
+                               [class.error]="resendForm.get('email')?.invalid && resendForm.get('email')?.touched">
+                        <span class="focus-border"></span>
+                    </div>
+                    <div>
+                        @if (resendForm.get('email')?.invalid && resendForm.get('email')?.touched) {
+                            <div class="error-container">
+                                @if (resendForm.get('email')?.hasError('required')) {
+                                    <small class="error-message">El email es requerido.</small>
+                                }
+                                @if (resendForm.get('email')?.hasError('email') || resendForm.get('email')?.hasError('pattern')) {
+                                    <small class="error-message">Ingresa un formato de email válido.</small>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" [disabled]="resendForm.invalid || isLoading" class="submit-btn recovery-btn">
+                    <span class="btn-content">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" *ngIf="!isLoading">
+                            <path d="M2.5 2v6h6M21.5 22v-6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <div class="loading-spinner" *ngIf="isLoading"></div>
+                        {{ isLoading ? 'Enviando...' : 'Reenviar Recuperación' }}
+                    </span>
+                </button>
+            </form>
+
+            <div class="info-section">
+                <div class="info-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M12 16v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="12" cy="8" r="1" fill="currentColor"/>
+                    </svg>
+                </div>
+                <p>El nuevo enlace invalidará el anterior y será válido por 1 hora.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="global-footer">
+        <p>ArCash™ | Virtual Wallet</p>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=helparcash2025@gmail.com" target="_blank" class="email-link">helparcash2025@gmail.com</a>
+    </div>
+</div>
