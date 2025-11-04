@@ -627,10 +627,6 @@ button[type="submit"]:active {
     color: #1a1a1a;
 }
 
-:not([data-theme="dark"]) .effect-1::placeholder {
-    color: rgba(26, 26, 26, 0.6);
-}
-
 /* Ajuste para input de password con botón */
 .password-wrapper .effect-1 {
     padding-right: 45px;
@@ -672,16 +668,6 @@ button[type="submit"]:active {
 
 .password-wrapper {
     position: relative;
-}
-
-.effect-1::placeholder {
-    color: rgba(var(--text-primary), 0.5);
-    transition: all 0.3s ease;
-}
-
-/* Mejor contraste para placeholder en modo claro */
-:not([data-theme="dark"]) .effect-1::placeholder {
-    color: rgba(26, 26, 26, 0.6);
 }
 
 .effect-1:focus::placeholder {
@@ -758,30 +744,6 @@ input[type="password"] {
 :not([data-theme="dark"]) input[type="password"] {
     color: #1a1a1a;
     border-bottom-color: #ddd;
-}
-
-:not([data-theme="dark"]) input[type="text"]::placeholder,
-:not([data-theme="dark"]) input[type="email"]::placeholder,
-:not([data-theme="dark"]) input[type="password"]::placeholder {
-    color: rgba(26, 26, 26, 0.6);
-}
-
-/* Mejor contraste para inputs en modo oscuro */
-html[data-theme="dark"] input[type="text"],
-html[data-theme="dark"] input[type="email"],
-html[data-theme="dark"] input[type="password"],
-[data-theme="dark"] input[type="text"],
-[data-theme="dark"] input[type="email"],
-[data-theme="dark"] input[type="password"] {
-    color: #E8EAF6 !important;
-    border-bottom-color: rgba(255, 255, 255, 0.3);
-    -webkit-text-fill-color: #E8EAF6 !important;
-}
-
-[data-theme="dark"] input[type="text"]::placeholder,
-[data-theme="dark"] input[type="email"]::placeholder,
-[data-theme="dark"] input[type="password"]::placeholder {
-    color: rgba(255, 255, 255, 0.6);
 }
 
 input[type="text"]:focus,

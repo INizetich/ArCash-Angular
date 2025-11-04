@@ -438,10 +438,7 @@ button, input, .access-btn {
     transition: none !important;
 }
 
-/* GLOBAL FIX: Asegurar texto blanco en inputs en modo oscuro */
-html[data-theme="dark"] input[type="text"],
-html[data-theme="dark"] input[type="email"],
-html[data-theme="dark"] input[type="password"],
+/* Texto en inputs modo oscuro */
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] input[type="email"],
 [data-theme="dark"] input[type="password"],
@@ -449,5 +446,180 @@ html[data-theme="dark"] input[type="password"],
 [data-theme="dark"] .effect-1 {
     color: #E8EAF6 !important;
     -webkit-text-fill-color: #E8EAF6 !important;
+}
+
+/* Placeholders modo oscuro */
+[data-theme="dark"] input[type="text"]::placeholder,
+[data-theme="dark"] input[type="email"]::placeholder,
+[data-theme="dark"] input[type="password"]::placeholder,
+[data-theme="dark"] .input-wrapper input::placeholder,
+[data-theme="dark"] .effect-1::placeholder {
+    color: rgba(140, 140, 140, 0.6) !important;
+    -webkit-text-fill-color: rgba(140, 140, 140, 0.6) !important;
+}
+
+/* === GLOBAL FOOTER === */
+.global-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 15px 20px;
+    background: transparent;
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: background-color, color, border-color;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Modo claro - solo ajustar borde y sombra */
+:not([data-theme="dark"]) .global-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.05);
+}
+
+/* Efectos de glassmorphism para el footer */
+.global-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.03) 0%,
+        rgba(var(--quantum-violet-rgb, 108, 92, 231), 0.02) 50%,
+        rgba(var(--neon-cyan-rgb, 57, 255, 204), 0.03) 100%
+    );
+    pointer-events: none;
+    z-index: -1;
+    border-radius: 0;
+}
+
+/* Texto del footer con efectos tecnológicos */
+.global-footer p {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: relative;
+}
+
+/* Separador tecnológico */
+.global-footer p::before {
+    content: '';
+    width: 30px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--text-accent), transparent);
+    flex-shrink: 0;
+}
+
+.global-footer p::after {
+    content: '';
+    width: 30px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--text-accent), transparent);
+    flex-shrink: 0;
+}
+
+.global-footer a {
+    color: var(--text-accent);
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.1);
+    border: 1px solid rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.3px;
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+/* Modo claro para enlaces */
+:not([data-theme="dark"]) .global-footer a {
+    background: rgba(52, 152, 219, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+/* Hover solo para el enlace específico del email */
+.global-footer a.email-link:hover {
+    transform: translateY(-2px) scale(1.05);
+    background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
+    border-color: var(--text-accent);
+    box-shadow: 
+        0 8px 25px rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.3),
+        0 0 20px rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
+    text-decoration: none;
+}
+
+/* Modo claro para hover del email */
+:not([data-theme="dark"]) .global-footer a.email-link:hover {
+    background: rgba(52, 152, 219, 0.2);
+    border-color: #3498db;
+    box-shadow: 
+        0 8px 25px rgba(52, 152, 219, 0.3),
+        0 0 20px rgba(52, 152, 219, 0.2);
+}
+
+/* Efecto de brillo en el enlace - SOLO para el email */
+.global-footer a.email-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: width 0.4s ease;
+    z-index: 1;
+    opacity: 0;
+    border-radius: inherit;
+}
+
+.global-footer a.email-link:hover::before {
+    width: 100%;
+    opacity: 1;
+}
+
+/* Media queries para global footer */
+@media (max-width: 768px) {
+    .global-footer {
+        padding: 15px;
+        font-size: 12px;
+    }
+
+    .global-footer p::before,
+    .global-footer p::after {
+        width: 15px;
+    }
+
+    .global-footer a {
+        padding: 3px 8px;
+        font-size: 11px;
+    }
 }
 
