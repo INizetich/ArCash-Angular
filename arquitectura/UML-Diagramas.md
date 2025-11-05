@@ -10,6 +10,9 @@ graph TD
     DolarAPI((DolarAPI))
     ResendAPI((Resend API))
     
+    %% Relación de herencia
+    Admin -.->|extends| Usuario
+    
     %% Sistema
     subgraph "ArCash System"
         %% Casos de uso principales de usuario
@@ -29,7 +32,7 @@ graph TD
         UC14[Recuperar Contraseña]
         UC15[Ingresar Dinero]
         
-        %% Casos de uso administrativos
+        %% Casos de uso administrativos exclusivos
         UC16[Gestionar Usuarios]
         UC17[Ver Reportes Sistema]
         UC18[Habilitar/Deshabilitar Usuarios]
@@ -40,7 +43,7 @@ graph TD
         UC21[Enviar Email Recuperación]
     end
     
-    %% Relaciones Usuario
+    %% Relaciones Usuario (posicionadas a la izquierda)
     Usuario --> UC1
     Usuario --> UC2
     Usuario --> UC3
@@ -57,11 +60,10 @@ graph TD
     Usuario --> UC14
     Usuario --> UC15
     
-    %% Relaciones Admin
-    Admin --> UC2
-    Admin --> UC16
-    Admin --> UC17
-    Admin --> UC18
+    %% Relaciones Admin exclusivas (posicionadas a la derecha)
+    Admin -.-> UC16
+    Admin -.-> UC17
+    Admin -.-> UC18
     
     %% Relaciones Sistemas Externos
     DolarAPI --> UC19
@@ -78,17 +80,21 @@ graph TD
     
     %% Estilos
     classDef person fill:#08427b,stroke:#052e4b,stroke-width:2px,color:#fff
+    classDef admin fill:#d35400,stroke:#a0392f,stroke-width:3px,color:#fff
     classDef system fill:#1168bd,stroke:#0b4884,stroke-width:2px,color:#fff
+    classDef adminSystem fill:#e67e22,stroke:#d35400,stroke-width:2px,color:#fff
     classDef external fill:#999999,stroke:#666666,stroke-width:2px,color:#fff
     
-    class Usuario,Admin person
-    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13,UC14,UC15,UC16,UC17,UC18,UC19,UC20,UC21 system
+    class Usuario person
+    class Admin admin
+    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13,UC14,UC15,UC19,UC20,UC21 system
+    class UC16,UC17,UC18 adminSystem
     class DolarAPI,ResendAPI external
 ```
 
 **Descripción:**
 - **Usuario**: Persona que usa la billetera para transacciones financieras
-- **Administrador**: Gestiona usuarios y monitorea el sistema
+- **Administrador**: Extiende de Usuario - puede hacer todo lo que hace un usuario más funciones administrativas específicas
 - **DolarAPI**: Sistema externo para cotización del dólar
 - **Resend API**: Sistema externo para envío de emails (solo verificación y recuperación)
 
@@ -96,9 +102,11 @@ graph TD
 
 **Explicación del Diagrama:**
 
-Este diagrama muestra las funcionalidades principales de ArCash desde la perspectiva de los usuarios. Tenemos tres actores principales: el Usuario final, el Administrador, y dos sistemas externos - DolarAPI y Resend API.
+Este diagrama muestra las funcionalidades principales de ArCash desde la perspectiva de los usuarios. Tenemos dos actores principales: el Usuario final y el Administrador (que extiende de Usuario), y dos sistemas externos - DolarAPI y Resend API.
 
-Los usuarios pueden realizar 15 operaciones principales como registrarse, iniciar sesión, transferir dinero, consultar saldo, y gestionar contactos favoritos. Los administradores tienen acceso adicional para gestionar usuarios y ver reportes del sistema.
+El Administrador hereda todas las capacidades de un Usuario regular (15 operaciones como registrarse, transferir dinero, consultar saldo, etc.) y además tiene acceso a 3 funcionalidades administrativas exclusivas: gestionar usuarios, ver reportes del sistema, y habilitar/deshabilitar usuarios.
+
+Los usuarios pueden realizar 15 operaciones principales como registrarse, iniciar sesión, transferir dinero, consultar saldo, y gestionar contactos favoritos. Los administradores tienen acceso a estas mismas funcionalidades más las administrativas.
 
 Es importante destacar las relaciones 'include' - por ejemplo, cuando un usuario se registra, automáticamente se incluye el envío de email de verificación. Y cuando realiza transferencias, necesariamente debe estar autenticado.
 
@@ -115,50 +123,52 @@ sequenceDiagram
     participant B as Backend Spring Boot
     participant DB as Base de Datos
     
-    Note over F,DB: Líneas de vida punteadas indican procesos activos
     
-    U->>+F: Ingresar datos transferencia<br/>(alias destino, monto)
-    F->>F: Validar formulario cliente
+    U->>+F: 1. Ingresar datos transferencia<br/>(alias destino, monto)
+    F->>F: 2. Validar formulario cliente
     
-    F->>+B: POST /api/transactions/{origen}/transfer/{destino}<br/>Authorization: Bearer {JWT}<br/>Body: {balance: monto}<br/>Puerto 8080
-    B->>B: Extraer userID del JWT
-    B->>+DB: Buscar cuenta origen por ID
-    DB-->>-B: Datos cuenta origen
+   
     
-    B->>+DB: Buscar cuenta destino por ID  
-    DB-->>-B: Datos cuenta destino
+    F->>+B: 3. Petición POST al backend<br/>Body: {balance: monto}
+    B->>B: 4. Extraer userID del JWT
+    B->>+DB: 5. Buscar cuenta origen por ID
+    DB-->>-B: 6. Datos cuenta origen
     
-    B->>B: Validar permisos usuario<br/>(cuenta origen le pertenece)
+    B->>+DB: 7. Buscar cuenta destino por ID  
+    DB-->>-B: 8. Datos cuenta destino
+    
+    B->>B: 9. Validar permisos usuario<br/>(cuenta origen le pertenece)
+    
     
     alt Validaciones exitosas
-        B->>+DB: Consultar saldo cuenta origen
-        DB-->>-B: Saldo actual
+        B->>+DB: 10. Consultar saldo cuenta origen
+        DB-->>-B: 11. Saldo actual
         
         alt Saldo suficiente
-            Note over B,DB: Transacción ACID
-            B->>+DB: BEGIN TRANSACTION
-            B->>DB: UPDATE cuenta origen (-monto)
-            B->>DB: UPDATE cuenta destino (+monto)
-            B->>DB: INSERT transaction (state: COMPLETED)
-            B->>DB: COMMIT TRANSACTION
-            DB-->>-B: Transacción confirmada
+            B->>+DB: 12. BEGIN TRANSACTION
+            B->>DB: 13. UPDATE cuenta origen (-monto)
+            B->>DB: 14. UPDATE cuenta destino (+monto)
+            B->>DB: 15. INSERT transaction (state: COMPLETED)
+            B->>DB: 16. COMMIT TRANSACTION
+            DB-->>-B: 17. Transacción confirmada
             
-            B-->>F: 200 OK<br/>{success: true, message: "Transferencia realizada correctamente"}
+            B-->>F: 18. 200 OK<br/>{success: true, message: "Transferencia realizada correctamente"}
         else Saldo insuficiente
-            B->>+DB: INSERT transaction (state: FAILED)
-            DB-->>-B: Registro creado
-            B-->>F: 403 Forbidden<br/>{success: false, message: "Not enough cash, stranger."}
+            B->>+DB: 19. INSERT transaction (state: FAILED)
+            DB-->>-B: 20. Registro creado
+            B-->>F: 21. 403 Forbidden<br/>{success: false, message: "Not enough cash, stranger."}
         end
     else Error validación
-        B-->>F: 404/403 Error<br/>{success: false, message: "Error específico"}
+        B-->>F: 22. 404/403 Error<br/>{success: false, message: "Error específico"}
     end
     
-    B-->>-F: Response del backend
-    F->>F: Actualizar saldo en UI
-    F->>F: Recargar historial transacciones
-    F-->>-U: Mostrar resultado (éxito/error)
     
-    Note over U,DB: No se envían emails por transferencias
+    B-->>-F: 23. Response del backend
+    F->>F: 24. Actualizar saldo en UI
+    F->>F: 25. Recargar historial transacciones
+    F-->>-U: 26. Mostrar resultado (éxito/error)
+    
+  
 ```
 
 **Explicación del Diagrama:**
@@ -344,101 +354,101 @@ Este enfoque sistemático nos permite validar que el sistema se comporta correct
 
 ---
 
-## 6. Prueba del Sistema - Flujo Completo E2E
+## 6. Diagrama de Prueba de Seguridad - ArCash
 
-### Escenario: Usuario Nuevo Realiza Primera Transferencia
-
-```gherkin
-Feature: Transferencia de dinero entre usuarios de ArCash
-  Como usuario nuevo de ArCash
-  Quiero poder registrarme y realizar mi primera transferencia por alias
-  Para comenzar a usar la billetera virtual
-
-Scenario: Registro exitoso y primera transferencia
-  Given el usuario accede a la aplicación ArCash en localhost:4200
-  When completa el formulario de registro con datos válidos
-    | email    | juan.perez@email.com |
-    | password | MiPassword123!       |
-    | nombre   | Juan                 |
-    | apellido | Pérez                |
-    | dni      | 12345678             |
-  And hace clic en "Registrarse"
-  Then el sistema crea el usuario con estado "Pendiente_Verificacion"
-  And se crea automáticamente una cuenta ARS con saldo $0
-  And se genera un alias único "juan.perez.arcash"
-  And recibe un email de verificación de Resend API
-  
-  When hace clic en el enlace de verificación del email
-  Then su cuenta cambia a estado "Activa"
-  And puede iniciar sesión exitosamente
-  
-  When inicia sesión con sus credenciales
-  Then accede al dashboard principal
-  And puede ver su saldo inicial de $0.00
-  And puede ver su alias "juan.perez.arcash"
-  
-  # Simular ingreso de dinero (usuarios y admins pueden usar este endpoint)
-  Given el usuario ingresa $10,000 a su cuenta usando el endpoint interno
-  When el usuario refresca el dashboard
-  Then puede ver su nuevo saldo de $10,000.00
-  
-  When selecciona "Transferir dinero" 
-  And ingresa el alias del destinatario "maria.gonzalez.arcash"
-  And hace clic en "Buscar cuenta"
-  Then ve los datos del destinatario: "María González - DNI: 87654321"
-  
-  When ingresa el monto $2,500
-  And hace clic en "Confirmar transferencia"
-  Then ve el mensaje "Transferencia realizada con éxito" (toast)
-  And su saldo se actualiza a $7,500.00 en tiempo real
-  And la transacción aparece en el historial con estado "COMPLETED"
-  And NO recibe email de confirmación (solo toast notification)
-  
-  When consulta su historial de transacciones
-  Then puede ver la transferencia registrada con:
-    | Campo     | Valor                    |
-    | Destino   | maria.gonzalez.arcash   |
-    | Monto     | -$2,500.00              |
-    | Estado    | COMPLETED               |
-    | Fecha     | [timestamp actual]       |
+```mermaid
+flowchart TD
+    Start([Inicio]) --> InicioSesion[Inicio de Sesión]
+    
+    InicioSesion --> VerificarUsuario[Verificar Usuario]
+    VerificarUsuario -->|Usuario no registrado| UsuarioNoExiste[Usuario No Existe]
+    VerificarUsuario -->|Usuario encontrado| VerificarPassword[Verificar Password]
+    
+    VerificarPassword -->|Contraseña inválida| PasswordIncorrecta[Password Incorrecta]
+    VerificarPassword -->|Contraseña válida| VerificarEstado[Verificar Estado]
+    
+    VerificarEstado -->|Usuario inactivo| UsuarioDeshabilitado[Usuario Deshabilitado]
+    VerificarEstado -->|Usuario activo| SesionIniciada[Sesión Iniciada]
+    
+    SesionIniciada -->|Operación solicitada| SolicitarTransferencia[Solicitar Transferencia]
+    
+    SolicitarTransferencia -->|Verificar autenticación| ValidarToken[Validar Token]
+    ValidarToken -->|Token expirado o inválido| TokenInvalido[Token Inválido]
+    ValidarToken -->|Token válido| VerificarPropiedad[Verificar Propiedad]
+    
+    VerificarPropiedad -->|No es propietario| CuentaAjena[Cuenta Ajena]
+    VerificarPropiedad -->|Cuenta propia| VerificarSaldo[Verificar Saldo]
+    
+    VerificarSaldo -->|Fondos insuficientes| SaldoInsuficiente[Saldo Insuficiente]
+    VerificarSaldo -->|Saldo disponible| TransferenciaAprobada[Transferencia Aprobada]
+    
+    UsuarioNoExiste -->|Acceso denegado| End([Fin])
+    PasswordIncorrecta -->|Acceso denegado| End
+    UsuarioDeshabilitado -->|Acceso denegado| End
+    TokenInvalido -->|Sesión terminada| End
+    CuentaAjena -->|Operación no autorizada| End
+    SaldoInsuficiente -->|Transferencia rechazada| End
+    TransferenciaAprobada -->|Transferencia completada| End
 ```
-
-### Criterios de Aceptación:
-1. Registro completo en menos de 1 minuto
-2. Email de verificación llega en menos de 30 segundos  
-3. Búsqueda de cuenta por alias responde en menos de 2 segundos
-4. Transferencia se procesa en menos de 3 segundos
-5. Saldos se actualizan en tiempo real (sin refresh manual)
-6. Historial se actualiza automáticamente post-transferencia
-7. Transacciones quedan registradas con estados correctos
-8. NO se envían emails por transferencias (solo toasts)
-
-### Ambiente de Prueba:
-- **Frontend**: Angular en http://localhost:4200
-- **Backend**: Spring Boot en http://localhost:8080
-- **Base de Datos**: MySQL con datos de prueba limpios
-- **Email Service**: Resend API configurado para ambiente testing
-- **Navegador**: Chrome/Firefox con DevTools para monitoreo
-
-### Endpoints Principales Utilizados:
-- `POST /api/user/create` - Registro de usuario
-- `POST /api/auth/login` - Autenticación
-- `GET /api/transactions/search/{alias}` - Búsqueda de cuenta
-- `POST /api/transactions/{origen}/transfer/{destino}` - Transferencia
-- `GET /api/transactions/{id}/getTransactions` - Historial
-- `PUT /api/accounts/{id}/balance` - Ingreso de dinero (usuarios y admins)
 
 **Explicación del Diagrama:**
 
-Este escenario de prueba end-to-end valida el journey completo de un usuario nuevo: desde el registro hasta su primera transferencia exitosa.
+Este diagrama representa el flujo completo de validaciones de seguridad que ejecuta ArCash desde el momento que un usuario intenta acceder al sistema hasta que completa una transferencia de dinero.
 
-El escenario está escrito en formato Gherkin para mayor claridad. Comienza con un usuario que accede a localhost:4200, se registra con datos válidos, recibe y confirma el email de verificación, y automáticamente se le crea una cuenta ARS.
+El proceso inicia cuando el usuario solicita acceso al sistema. Primero se verifica si el usuario existe en la base de datos - si no existe, se deniega el acceso inmediatamente.
 
-Luego simula el ingreso de dinero usando el endpoint PUT /api/accounts/{id}/balance, que pueden usar tanto usuarios como administradores. Una vez con saldo, busca un destinatario por alias, confirma los datos, y ejecuta la transferencia.
+Si el usuario existe, se valida la contraseña usando el algoritmo BCrypt. Este algoritmo es computacionalmente costoso, lo que previene ataques de fuerza bruta. Si la contraseña es incorrecta, se deniega el acceso.
 
-Los criterios de aceptación son específicos y medibles: registro en menos de 1 minuto, emails en menos de 30 segundos, búsquedas en menos de 2 segundos, y transferencias en menos de 3 segundos.
+Una vez validada la contraseña, se verifica el estado del usuario. Los administradores pueden deshabilitar usuarios, por lo que se controla que el usuario esté activo antes de permitir el acceso.
 
-Este tipo de prueba nos asegura que toda la integración entre frontend Angular, backend Spring Boot, base de datos MySQL, y servicios externos funciona correctamente en un escenario real de uso.
+Cuando la sesión está iniciada correctamente, el usuario puede solicitar transferencias. Aquí comienza un segundo nivel de validaciones de seguridad.
+
+Primero se valida el token JWT que contiene la información de la sesión. Si el token está expirado o es inválido, se termina la sesión inmediatamente.
+
+Con un token válido, se verifica que el usuario sea propietario de la cuenta desde la cual quiere transferir dinero. Esta validación crucial previene que usuarios accedan a cuentas ajenas.
+
+Finalmente, se verifica que la cuenta tenga saldo suficiente para realizar la transferencia. Solo si pasa todas estas validaciones, la transferencia es aprobada y completada.
+
+Cada punto de falla en este flujo termina el proceso y registra el intento para auditoría, garantizando que el sistema sea seguro contra múltiples tipos de ataques.
+
+### Validaciones de Seguridad Implementadas
+
+**Control de Acceso:**
+- Verificación de existencia de usuario en base de datos
+- Validación de contraseña con algoritmo BCrypt
+- Control de estado activo del usuario
+
+**Autenticación de Sesión:**
+- Validación de token JWT en cada operación
+- Verificación de expiración de token
+- Control de integridad de la sesión
+
+**Autorización de Operaciones:**
+- Validación de propiedad de cuenta
+- Verificación de permisos de operación
+- Control de saldo disponible antes de transferencias
+
+### Flujos de Validación Implementados
+
+**Proceso de Autenticación:**
+1. Verificación de existencia del usuario
+2. Validación de contraseña mediante BCrypt
+3. Control de estado activo del usuario
+4. Generación de token JWT válido
+
+**Proceso de Autorización:**
+1. Validación de token JWT en cada solicitud
+2. Verificación de propiedad de cuenta
+3. Control de permisos específicos
+4. Validación de saldo disponible
+
+**Manejo de Errores de Seguridad:**
+- Acceso denegado para credenciales inválidas
+- Sesión terminada para tokens expirados
+- Operaciones bloqueadas para cuentas ajenas
+- Transferencias rechazadas por saldo insuficiente
+
+Este diagrama de estado representa las validaciones críticas de seguridad que protegen el sistema ArCash en cada operación financiera.
 
 ---
 
