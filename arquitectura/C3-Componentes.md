@@ -124,7 +124,7 @@ graph TB
         subgraph "🔧 Support Services"
             EmailService[Email Service<br/>Resend API]
             CotizationService[Cotization Service<br/>USD Exchange Rate]
-            FavoriteService[Favorite Service<br/>Contact Management]
+            FavoriteService[Favorite contact Service<br/>Contact Management]
             ValidationTokenService[Validation Service<br/>Email Verification]
             RecoveryTokenService[Recovery Service<br/>Password Reset]
         end
@@ -142,7 +142,7 @@ graph TB
             TransactionRepo[Transaction Repository]
             CredentialRepo[Credential Repository]
             TokenRepos[Token Repositories<br/>Refresh, Validation, Recovery]
-            FavoriteRepo[Favorite Repository]
+            FavoriteRepo[Favorite contact Repository]
         end
     end
     
@@ -172,6 +172,7 @@ graph TB
     TransactionService --> AccountRepo
     AccountService --> AccountRepo
     AdminService --> UserRepo
+    FavoriteService --> FavoriteRepo
     
     %% Security Flow
     JwtFilter --> JwtUtils
@@ -181,6 +182,13 @@ graph TB
     %% External Integrations
     EmailService -.-> ResendAPI
     CotizationService -.-> DolarAPI
+    
+    %% Support Services to Controllers
+    EmailService --> AuthController
+    ValidationTokenService --> AuthController
+    RecoveryTokenService --> AuthController
+    CotizationService --> TaxController
+    FavoriteService --> FavoriteController
     
     %% Database
     UserRepo --> MySQL
