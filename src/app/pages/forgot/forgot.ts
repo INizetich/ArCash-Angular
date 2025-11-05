@@ -7,6 +7,7 @@ import { BackButtonComponent } from '../../components/ui/back-button/back-button
 import { BrandLogoComponent } from '../../components/ui/brand-logo/brand-logo';
 import { ForgotPasswordFormComponent } from '../../components/forms/forgot-password-form/forgot-password-form';
 import { GlobalFooterComponent } from '../../components/ui/global-footer/global-footer';
+import { UtilService } from '../../services/util-service/util-service';
 
 @Component({
   selector: 'app-forgot',
@@ -23,20 +24,11 @@ import { GlobalFooterComponent } from '../../components/ui/global-footer/global-
   templateUrl: './forgot.html',
   styleUrls: ['./forgot.css']
 })
-export class ForgotComponent implements OnInit, OnDestroy {
+export class ForgotComponent  {
   
-  constructor(private router: Router) {}
+  constructor(private utilService : UtilService){}
 
-  ngOnInit(): void {
-    // Los componentes manejan su propia lógica de tema
-  }
-
-  ngOnDestroy(): void {
-    // Limpieza si es necesaria
-  }
-
-  onEmailSent(): void {
-    // Lógica adicional si es necesaria cuando se envía el email
-    console.log('Email de recuperación enviado desde componente');
+  onEmailSent(){
+    this.utilService.showToast("Correo reenviado correctamente!", 'info')
   }
 }
