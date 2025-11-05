@@ -258,7 +258,6 @@ input[type="password"] {
     margin-bottom: 0;
     background-color: transparent;
     border: none;
-    border-bottom: 2px solid var(--text-primary);
     color: var(--text-primary);
     font-size: 18px;
     outline: none;
@@ -337,209 +336,6 @@ button[type="submit"]:active {
     transition: transform 0.1s;
 }
 
-.theme-control {
-    position: fixed;
-    top: 1rem;
-    right: 2rem;
-    z-index: 9999;
-}
-
-#theme-switcher {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.75rem;
-    position: relative;
-    z-index: 9999;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#theme-switcher:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.1);
-}
-
-#theme-switcher:active {
-    transform: scale(0.95);
-}
-
-#theme-switcher svg {
-    width: 22px;
-    height: 22px;
-}
-
-.sun {
-    fill: var(--text-primary);
-    opacity: 0.7;
-    transition: opacity 0.3s;
-}
-
-.sun-ray {
-    stroke: var(--text-primary);
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-#theme-switcher:hover .sun {
-    opacity: 1;
-}
-
-#theme-switcher:hover .sun-ray {
-    opacity: 0.4;
-}
-
-.global-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    padding: 20px;
-    background: transparent;
-    backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    font-size: 14px;
-    font-weight: 500;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    z-index: 100;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    will-change: background-color, color, border-color;
-    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
-}
-
-/* Modo claro - solo ajustar borde y sombra */
-:not([data-theme="dark"]) .global-footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.05);
-}
-
-/* Efectos de glassmorphism para el footer */
-.global-footer::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-        135deg,
-        rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.03) 0%,
-        rgba(var(--quantum-violet-rgb, 108, 92, 231), 0.02) 50%,
-        rgba(var(--neon-cyan-rgb, 57, 255, 204), 0.03) 100%
-    );
-    pointer-events: none;
-    z-index: -1;
-    border-radius: 0;
-}
-
-/* Texto del footer con efectos tecnológicos */
-.global-footer p {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: relative;
-    margin-bottom: 8px;
-}
-
-/* Separador tecnológico */
-.global-footer p::before {
-    content: '';
-    width: 20px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--text-accent), transparent);
-    margin-right: 8px;
-}
-
-.global-footer p::after {
-    content: '';
-    width: 20px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--text-accent), transparent);
-    margin-left: 8px;
-}
-
-.global-footer a {
-    color: var(--text-accent);
-    text-decoration: none;
-    font-weight: 600;
-    position: relative;
-    padding: 4px 12px;
-    border-radius: 8px;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.1);
-    border: 1px solid rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
-    backdrop-filter: blur(10px);
-    letter-spacing: 0.3px;
-    display: inline-block;
-}
-
-/* Modo claro para enlaces */
-:not([data-theme="dark"]) .global-footer a {
-    background: rgba(52, 152, 219, 0.1);
-    border: 1px solid rgba(52, 152, 219, 0.2);
-    color: #3498db;
-}
-
-/* Hover solo para el enlace específico del email */
-.global-footer a.email-link:hover {
-    transform: translateY(-2px) scale(1.05);
-    background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
-    border-color: var(--text-accent);
-    box-shadow: 
-        0 8px 25px rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.3),
-        0 0 20px rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
-    text-decoration: none;
-}
-
-/* Modo claro para hover del email */
-:not([data-theme="dark"]) .global-footer a.email-link:hover {
-    background: rgba(52, 152, 219, 0.2);
-    border-color: #3498db;
-    box-shadow: 
-        0 8px 25px rgba(52, 152, 219, 0.3),
-        0 0 20px rgba(52, 152, 219, 0.2);
-}
-
-/* Efecto de brillo en el enlace - SOLO para el email */
-.global-footer a.email-link::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.3),
-        transparent
-    );
-    transition: width 0.4s ease;
-    z-index: 1;
-    opacity: 0;
-    border-radius: inherit;
-}
-
-.global-footer a.email-link:hover::before {
-    width: 100%;
-    opacity: 1;
-}
 
 @media (max-width: 768px) {
     .main {
@@ -590,37 +386,7 @@ button[type="submit"]:active {
         grid-column: 1;
     }
 
-    .theme-control {
-        top: 1rem;
-        right: 1rem;
-    }
-
-    .global-footer {
-        position: static;
-        padding: 20px 15px;
-        font-size: 13px;
-        flex-direction: column;
-        gap: 12px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        background: transparent;
-    }
-
-    /* Modo claro responsive */
-    :not([data-theme="dark"]) .global-footer {
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    /* Ajustes responsive para el texto del footer */
-    .global-footer p::before,
-    .global-footer p::after {
-        width: 15px;
-        margin: 0 6px;
-    }
-
-    .global-footer a {
-        padding: 6px 10px;
-        font-size: 13px;
-    }
+   
 
     /* Lista de usuarios responsive */
     .usuarios-container {
@@ -646,38 +412,6 @@ button[type="submit"]:active {
     }
 }
 
-#back-button {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    z-index: 1000;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-
-
-#back-button svg {
-    width: 100%;
-    height: 100%;
-}
-
-
-.back-arrow {
-    stroke: var(--back-arrow-color);
-    transition: stroke 0.4s ease;
-}
-
-/* EFECTOS EN EL INPUT NO TOCAR, TUCU lcdtm */
 .input-container {
     position: relative;
     margin-bottom: 0;
@@ -1741,34 +1475,6 @@ button:disabled::before {
     }
 }
 
-/* Estilos adicionales para el botón de retroceso */
-#back-button {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    z-index: 1000;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-#back-button svg {
-    width: 100%;
-    height: 100%;
-}
-
-.back-arrow {
-    stroke: var(--back-arrow-color);
-    transition: stroke 0.4s ease;
-}
 
 /* Overlay de carga para usuarios - estilo QR optimizado */
 .search-loading-overlay {

@@ -21,6 +21,8 @@
     --quantum-violet: #6C5CE7;
     --neural-orange: #FF7F50;
     --hologram-blue: #4ECDC4;
+    --love-pink: #FF006E;
+    --love-red: #FF0000;
     
     /* Gradientes tecnológicos */
     --tech-gradient-primary: linear-gradient(135deg, var(--cyber-blue) 0%, var(--quantum-violet) 100%);
