@@ -690,12 +690,30 @@ async realizarTransferencia(): Promise<void> {
   }
 
   closeTransferModal(): void {
+    // Si la transferencia viene de un favorito, volver al modal de información del favorito
+    if (this.cuentaDestinoData?.isFromFavorite && this.selectedFavoriteContact) {
+      this.isScanning = false;
+      this.transferStep = 1;
+      this.destinatarioInput = '';
+      this.montoTransfer = 0;
+      this.cuentaDestinoData = null;
+      this.isBuscandoCuenta = false;
+      this.isTransfiriendo = false;
+      this.isBalanceDecreasing = false;
+      // NO limpiar selectedFavoriteContact aquí porque queremos volver al modal del favorito
+      this.closeAllModals();
+      this.showFavoriteDetailsModal = true;
+      return;
+    }
+    
+    // Si no viene de favorito, comportamiento normal
     this.closeAllModals();
     this.isScanning = false;
     this.transferStep = 1;
     this.destinatarioInput = '';
     this.montoTransfer = 0;
     this.cuentaDestinoData = null;
+    this.selectedFavoriteContact = null; // Limpiar favorito seleccionado
     this.isBuscandoCuenta = false; // Resetear estado de búsqueda
     this.isTransfiriendo = false; // Resetear estado de transferencia
     this.isBalanceDecreasing = false; // Resetear animación de transferencia
@@ -895,6 +913,7 @@ handleScanSuccess(resultString: string): void {
   async transferToFavorite(favorite: any): Promise<void> {
     // Configurar datos de transferencia usando el service
     this.cuentaDestinoData = this.favoriteService.createTransferDataFromFavorite(favorite);
+    this.selectedFavoriteContact = favorite; // Guardar el favorito seleccionado
     this.transferStep = 3;
     
     // Cerrar todos los modales y abrir el de transferencia inmediatamente
@@ -1058,15 +1077,39 @@ handleScanSuccess(resultString: string): void {
   }
 
   cancelarBusqueda(): void {
+    // Si la transferencia viene de un favorito, volver al modal de información del favorito
+    if (this.cuentaDestinoData?.isFromFavorite && this.selectedFavoriteContact) {
+      this.transferStep = 1;
+      this.destinatarioInput = '';
+      this.cuentaDestinoData = null;
+      this.isScanning = false;
+      // NO limpiar selectedFavoriteContact aquí porque queremos volver al modal del favorito
+      this.closeAllModals();
+      this.showFavoriteDetailsModal = true;
+      return;
+    }
+    
+    // Si no viene de favorito, comportamiento normal
     this.transferStep = 1;
     this.destinatarioInput = '';
     this.cuentaDestinoData = null;
+    this.selectedFavoriteContact = null; // Limpiar favorito seleccionado
     this.isScanning = false;
   }
   volverAConfirmacion(): void {
+    // Si la transferencia viene de un favorito, volver al modal de información del favorito
+    if (this.cuentaDestinoData?.isFromFavorite && this.selectedFavoriteContact) {
+      this.transferStep = 2; // Resetear el step
+      this.montoTransfer = null; // Resetea el monto
+      this.closeAllModals();
+      this.showFavoriteDetailsModal = true;
+      return;
+    }
+    
+    // Si no viene de favorito, comportamiento normal
     this.transferStep = 2; // Vuelve al paso de confirmar datos
     this.montoTransfer = null; // Resetea el monto
-}
+  }
 
   volverBusqueda(): void { // Este método ya no se usa directamente desde el paso 3
     this.transferStep = 1;

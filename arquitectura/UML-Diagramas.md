@@ -167,8 +167,6 @@ sequenceDiagram
     F->>F: 24. Actualizar saldo en UI
     F->>F: 25. Recargar historial transacciones
     F-->>-U: 26. Mostrar resultado (éxito/error)
-    
-  
 ```
 
 **Explicación del Diagrama:**

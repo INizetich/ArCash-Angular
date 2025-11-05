@@ -275,6 +275,8 @@ export class DataService {
     } catch (error) { console.error('Error calculando impuestos ARS:', error); throw error; }
   }
 
+
+
   async calculateTaxesUSD(amount: number): Promise<TaxCalculationResult> {
      try {
        const response = await lastValueFrom(this.http.get<any>(`${this.baseUrl}/impuestos/calculateUSD?montoUSD=${amount}`));
@@ -282,6 +284,8 @@ export class DataService {
         return { montoOriginal: response.montoOriginal, iva: response.iva, precioDolar: response.precioDolar, totalFinal: response.totalFinal };
      } catch (error) { console.error('Error calculando impuestos USD:', error); throw error; }
   }
+
+  
 
   async buscarCuenta(input: string): Promise<AccountSearchResult> {
      if (!localStorage.getItem('JWT')) throw new Error('No hay sesión activa');

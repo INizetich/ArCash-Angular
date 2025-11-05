@@ -434,6 +434,7 @@ body {
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  padding-bottom: 100px;
 }
 
 /* ====================================
@@ -702,7 +703,8 @@ body {
 
   border: 1px solid var(--glass-border-light);
   border-radius: 16px;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 400px;
   box-shadow: var(--glass-shadow-light);
 }
 
@@ -1104,6 +1106,16 @@ body {
   color: rgba(26, 26, 26, 0.6);
 }
 
+[data-theme="dark"] .modal-content input[type='text'],
+[data-theme="dark"] .modal-content input[type='number'],
+[data-theme="dark"] .modal-content input[type='email'] {
+  color: #1a1a1a !important;
+}
+
+[data-theme="dark"] .modal-content input::placeholder {
+  color: rgba(26, 26, 26, 0.6) !important;
+}
+
 .modal-content input:focus {
   outline: none;
   border-color: var(--cyber-blue);
@@ -1426,7 +1438,8 @@ modal-content button:active {
 /* Form Group for Floating Labels */
 .form-group {
   position: relative;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
+  
 }
 
 .form-group input {
@@ -1435,7 +1448,6 @@ modal-content button:active {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  color: #ffffff;
   font-size: 16px;
   transition: all 0.3s ease;
 }
@@ -1447,11 +1459,15 @@ modal-content button:active {
   border-color: #ddd;
 }
 
+[data-theme="dark"] .form-group input {
+  color: var(--obsidian) !important;
+}
+
 .form-group label {
   position: absolute;
-  top: 20px;
+  top: 30px;
   left: 15px;
-  color: rgba(255, 255, 255, 0.6);
+  color: transparent;
   font-size: 16px;
   transition: all 0.3s ease;
   pointer-events: none;
@@ -1461,7 +1477,7 @@ modal-content button:active {
 .form-group input:not(:placeholder-shown) + label {
   top: 2px;
   font-size: 11px;
-  color: var(--cyber-blue);
+  color: var(--text-accent);
   font-weight: 600;
   transform: translateY(-2px);
 }
@@ -1656,6 +1672,10 @@ modal-content button:active {
   border-color: #ddd;
 }
 
+[data-theme="dark"] .profile-details input {
+  color: #1a1a1a !important;
+}
+
 .profile-details button {
   width: auto !important;
   padding: 5px 10px !important;
@@ -1732,13 +1752,12 @@ modal-content button:active {
 
 /* Estilos específicos para el input del monto en modo claro */
 #amount-step input[type='number'] {
-  color: var(--obsidian); /* Asegura que el texto sea oscuro */
+  color: var(--bg-primary); /* Asegura que el texto sea oscuro */
   background-color: rgba(var(--platinum-rgb), 0.8); /* Fondo ligeramente transparente */
   border: 1px solid var(--border-color); /* Borde sutil */
-  padding: 12px 15px;
   border-radius: 8px;
   width: 100%; /* Ocupar el ancho */
-  margin-bottom: 20px; /* Espacio abajo */
+  margin-top: 1rem;
 }
 
 /* Estilos para el placeholder en modo claro (opcional) */
@@ -2822,8 +2841,16 @@ modal-content button:active {
 [data-theme='dark'] .add-favorite-form textarea,
 [data-theme='dark'] .edit-favorite-form input,
 [data-theme='dark'] .edit-favorite-form textarea {
+  color: #1a1a1a !important;
   background: rgba(var(--carbon-rgb), 0.3);
   border-color: var(--border-color);
+}
+
+[data-theme='dark'] .add-favorite-form input::placeholder,
+[data-theme='dark'] .add-favorite-form textarea::placeholder,
+[data-theme='dark'] .edit-favorite-form input::placeholder,
+[data-theme='dark'] .edit-favorite-form textarea::placeholder {
+  color: rgba(26, 26, 26, 0.6) !important;
 }
 
 .add-favorite-form input:focus,

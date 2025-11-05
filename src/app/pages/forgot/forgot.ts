@@ -29,6 +29,6 @@ export class ForgotComponent  {
   constructor(private utilService : UtilService){}
 
   onEmailSent(){
-    this.utilService.showToast("Correo reenviado correctamente!", 'info')
+    console.log("Correo reenviado correctamente!")
   }
 }

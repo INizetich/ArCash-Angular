@@ -285,8 +285,6 @@ button, input, .access-btn {
 }
 
 :root:not([data-theme="dark"]) button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):not(.toast-close):not([class*="toast"]):hover {
-    color: #FFFFFF !important; /* Blanco en hover */
-    background: linear-gradient(135deg, #667EEA 0%, #FF6B6B 100%) !important; /* Gradiente indigo-coral en hover */
     border: none !important; /* Sin borde en hover */
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
@@ -319,9 +317,9 @@ button, input, .access-btn {
 
 [data-theme="dark"] button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):not(.toast-close):not([class*="toast"]):hover {
     color: #FFFFFF !important; /* Blanco en hover */
-    background: linear-gradient(135deg, #39FFCC 0%, #FF006E 100%) !important; /* Gradiente neon cyan-plasma pink en hover */
     border: none !important; /* Sin borde en hover */
     transform: translateY(-2px);
+    background: var(--text-accent);
     box-shadow: 0 8px 25px rgba(57, 255, 204, 0.4);
 }
 
@@ -439,14 +437,22 @@ button, input, .access-btn {
 }
 
 /* Texto en inputs modo oscuro */
+/* Texto en inputs modo oscuro */
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] input[type="email"],
 [data-theme="dark"] input[type="password"],
 [data-theme="dark"] .input-wrapper input,
 [data-theme="dark"] .effect-1 {
-    color: #E8EAF6 !important;
-    -webkit-text-fill-color: #E8EAF6 !important;
+ 
+    /* Texto claro (como lo tenías o usando la variable del tema) */
+color: var(--text-primary);
+-webkit-text-fill-color: var(--text-primary);
+
+/* Opcional: un borde claro para que se vea el input */
+border-bottom: 1px solid var(--border-color); 
 }
+
+
 
 /* Placeholders modo oscuro */
 [data-theme="dark"] input[type="text"]::placeholder,
@@ -457,6 +463,18 @@ button, input, .access-btn {
     color: rgba(140, 140, 140, 0.6) !important;
     -webkit-text-fill-color: rgba(140, 140, 140, 0.6) !important;
 }
+
+/* Reemplaza '.modal-content' por la clase real de tu modal si es diferente */
+[data-theme="dark"] .modal-content input[type="text"],
+[data-theme="dark"] .modal-content input[type="email"],
+[data-theme="dark"] .modal-content input[type="password"] {
+    background: var(--glass-bg-dark) !important;
+    /* Usa una de tus variables de color oscuro */
+    color: var(--platinum) !important; 
+    -webkit-text-fill-color: var(--platinum) !important;
+}
+
+
 
 /* === GLOBAL FOOTER === */
 .global-footer {
