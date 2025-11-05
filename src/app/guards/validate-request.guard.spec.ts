@@ -1,33 +1,33 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { validateGuard } from './validate.guard';
-import { ValidationService } from '../services/validation-service/validation-service';
+import { validateRequestGuard } from './validate-request.guard';
+import { RecoveryService } from '../services/recovery-service/recovery-service';
 import { of, throwError } from 'rxjs';
 
-describe('ValidateGuard', () => {
+describe('ValidateRequestGuard', () => {
   let router: jasmine.SpyObj<Router>;
-  let validationService: jasmine.SpyObj<ValidationService>;
+  let recoveryService: jasmine.SpyObj<RecoveryService>;
   let route: ActivatedRouteSnapshot;
 
   beforeEach(() => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    const validationServiceSpy = jasmine.createSpyObj('ValidationService', ['validateEmailToken']);
+    const recoveryServiceSpy = jasmine.createSpyObj('RecoveryService', ['validateRecoveryToken']);
     
     TestBed.configureTestingModule({
       providers: [
         { provide: Router, useValue: routerSpy },
-        { provide: ValidationService, useValue: validationServiceSpy }
+        { provide: RecoveryService, useValue: recoveryServiceSpy }
       ]
     });
     
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    validationService = TestBed.inject(ValidationService) as jasmine.SpyObj<ValidationService>;
+    recoveryService = TestBed.inject(RecoveryService) as jasmine.SpyObj<RecoveryService>;
     route = new ActivatedRouteSnapshot();
   });
 
   it('should be created', () => {
-    expect(validateGuard).toBeTruthy();
+    expect(validateRequestGuard).toBeTruthy();
   });
 
   it('should allow access when token is valid', (done) => {
@@ -35,9 +35,9 @@ describe('ValidateGuard', () => {
     route.queryParams = { token: 'valid-token-123' };
     
     // Mock respuesta exitosa del servicio
-    validationService.validateEmailToken.and.returnValue(of({ success: true, message: 'Token válido' }));
+    recoveryService.validateRecoveryToken.and.returnValue(of({ success: true }));
     
-    const result = TestBed.runInInjectionContext(() => validateGuard(route, {} as any));
+    const result = TestBed.runInInjectionContext(() => validateRequestGuard(route, {} as any));
     
     if (result instanceof Promise) {
       result.then(canActivate => {
@@ -58,7 +58,7 @@ describe('ValidateGuard', () => {
     // Simular query params sin token
     route.queryParams = {};
     
-    const result = TestBed.runInInjectionContext(() => validateGuard(route, {} as any));
+    const result = TestBed.runInInjectionContext(() => validateRequestGuard(route, {} as any));
     
     expect(result).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith(['/404']);
@@ -68,7 +68,7 @@ describe('ValidateGuard', () => {
     // Simular query params con token vacío
     route.queryParams = { token: '' };
     
-    const result = TestBed.runInInjectionContext(() => validateGuard(route, {} as any));
+    const result = TestBed.runInInjectionContext(() => validateRequestGuard(route, {} as any));
     
     expect(result).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith(['/404']);
@@ -79,9 +79,9 @@ describe('ValidateGuard', () => {
     route.queryParams = { token: 'invalid-token' };
     
     // Mock respuesta de fallo del servicio
-    validationService.validateEmailToken.and.returnValue(of({ success: false, message: 'Token expirado' }));
+    recoveryService.validateRecoveryToken.and.returnValue(of({ success: false }));
     
-    const result = TestBed.runInInjectionContext(() => validateGuard(route, {} as any));
+    const result = TestBed.runInInjectionContext(() => validateRequestGuard(route, {} as any));
     
     if (typeof result === 'object' && 'subscribe' in result) {
       result.subscribe(canActivate => {
@@ -97,9 +97,9 @@ describe('ValidateGuard', () => {
     route.queryParams = { token: 'some-token' };
     
     // Mock error del servicio
-    validationService.validateEmailToken.and.returnValue(throwError({ status: 404 }));
+    recoveryService.validateRecoveryToken.and.returnValue(throwError({ status: 404 }));
     
-    const result = TestBed.runInInjectionContext(() => validateGuard(route, {} as any));
+    const result = TestBed.runInInjectionContext(() => validateRequestGuard(route, {} as any));
     
     if (typeof result === 'object' && 'subscribe' in result) {
       result.subscribe(canActivate => {

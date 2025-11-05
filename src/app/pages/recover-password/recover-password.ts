@@ -84,21 +84,6 @@ export class RecoverPasswordComponent implements OnInit, OnDestroy {
     this.validateToken();
   }
 
-  ngOnDestroy(): void {
-    if (this.routeSubscription) {
-      this.routeSubscription.unsubscribe();
-    }
-  }
-
-  private initializeForm(): void {
-    this.resetForm = this.fb.group({
-      passwords: this.fb.group({
-        password: ['', [Validators.required, strongPasswordValidator]],
-        confirmPassword: ['', [Validators.required]]
-      }, { validators: [passwordMatchValidator] })
-    });
-  }
-
   private validateToken(): void {
     this.isValidatingToken = true;
     
@@ -114,18 +99,34 @@ export class RecoverPasswordComponent implements OnInit, OnDestroy {
       this.recoveryService.validateRecoveryToken(this.token).subscribe({
         next: (response) => {
           this.isValidatingToken = false;
-          if (!response.success) {
-            this.error = response.message || 'Token inválido o expirado.';
-            this.token = null;
+          if (!response.valid) {
+            // Token inválido, usado o expirado - redirigir a 404
+            this.router.navigate(['/404']);
           }
+          // Si response.valid es true, el token es válido y se muestra el formulario
         },
         error: (error) => {
           this.isValidatingToken = false;
           console.error('Error validating token:', error);
-          this.error = error.error?.message || 'Error al validar el enlace. Puede estar expirado.';
-          this.token = null;
+          // Error del servidor o token inválido - redirigir a 404
+          this.router.navigate(['/404']);
         }
       });
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
+  }
+
+  private initializeForm(): void {
+    this.resetForm = this.fb.group({
+      passwords: this.fb.group({
+        password: ['', [Validators.required, strongPasswordValidator]],
+        confirmPassword: ['', [Validators.required]]
+      }, { validators: [passwordMatchValidator] })
     });
   }
 

@@ -286,3 +286,174 @@ h2#status {
 .resend-btn:hover i {
   transform: translateX(2px);
 }
+
+/* ===============================================
+   VALIDATION LOADING SCREEN
+   =============================================== */
+
+#validation-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Modo oscuro */
+[data-theme="dark"] #validation-loader-overlay {
+  background: #1a1f2e;
+}
+
+/* Modo claro */
+:root:not([data-theme="dark"]) #validation-loader-overlay {
+  background: var(--bg-primary);
+}
+
+.validation-loader-container {
+  text-align: center;
+  animation: fadeInUp 1s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-logo-container {
+  position: relative;
+  margin-bottom: 2rem;
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+
+.loading-logo-container .brand-mark {
+  width: 80px;
+  height: 80px;
+  filter: drop-shadow(0 0 20px var(--text-accent));
+  z-index: 2;
+  position: relative;
+  display: block;
+}
+
+/* Modo claro - filtro más sutil */
+:root:not([data-theme="dark"]) .loading-logo-container .brand-mark {
+  filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.3));
+}
+
+/* Modo oscuro - filtro más intenso */
+[data-theme="dark"] .loading-logo-container .brand-mark {
+  filter: drop-shadow(0 0 20px var(--cyber-blue));
+}
+
+.loading-logo-container .vault-shape {
+  fill: none;
+  stroke: var(--text-accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.loading-logo-container .security-core {
+  fill: var(--text-accent);
+  opacity: 0.8;
+}
+
+.loading-logo-container .access-cross {
+  stroke: var(--bg-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.spinner-circle {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--text-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 1;
+}
+
+.loading-brand h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.loading-brand h1 span {
+  color: var(--text-accent);
+}
+
+.brand-tagline {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 1rem 0;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.loading-text {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 500;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Animaciones */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Responsive para el loading screen */
+@media (max-width: 480px) {
+  .loading-logo-container {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .loading-logo-container .brand-mark {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .spinner-circle {
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+  }
+  
+  .loading-brand h1 {
+    font-size: 2rem;
+  }
+}

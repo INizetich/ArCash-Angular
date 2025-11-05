@@ -38,23 +38,17 @@ export class ValidateComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Obtener el token desde la URL
+    // Obtener el token desde la URL y validarlo
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
       
-      // Validar si el token está vacío, es "error" o no es válido
-      if (!token || token.trim() === '' || token === 'error') {
-        // Navegar inmediatamente a 404 sin mostrar nada
-        this.router.navigate(['/404']);
-        return;
-      }
-      
+      // El guard ya verificó que existe el token, ahora validamos su estado
       this.validateToken(token);
     });
   }
 
   private validateToken(token: string) {
-    // Usar el ValidationService para la validación
+    // Usar el ValidationService para la validación real
     this.validationService.validateEmailToken(token).subscribe({
       next: (response: ValidationResponse) => {
         this.validationResult = response;
