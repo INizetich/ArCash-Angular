@@ -8,7 +8,8 @@
 
     <div class="right-panel">
         <!-- Vista Principal con Opciones de Reenvío -->
-        <div class="formulario" *ngIf="currentView === 'main'">
+        @if (currentView === 'main') {
+        <div class="formulario">
             <div class="resend-main-view">
                 <h2>Reenviar Enlaces</h2>
                 <p class="description">¿No recibiste un enlace o expiró? Solicita uno nuevo aquí.</p>
@@ -68,9 +69,11 @@
                 </div>
             </div>
         </div>
+        }
 
         <!-- Vista de Validación de Email -->
-        <div class="formulario" *ngIf="currentView === 'validation'">
+        @if (currentView === 'validation') {
+        <div class="formulario">
             <div class="resend-form-view">
                 <div class="form-header">
                     <button class="back-to-main" (click)="goBackToMain()">
@@ -110,17 +113,20 @@
                     </div>
 
                     <button type="submit" [disabled]="resendForm.invalid || isLoading">
-                        <span *ngIf="!isLoading" class="btn-content">
+                        @if (!isLoading) {
+                        <span class="btn-content">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                 <path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                             Reenviar Validación
                         </span>
-                        <span *ngIf="isLoading" class="btn-loading">
+                        } @else {
+                        <span class="btn-loading">
                             <div class="loading-spinner"></div>
                             Enviando...
                         </span>
+                        }
                     </button>
                 </form>
 
@@ -136,9 +142,11 @@
                 </div>
             </div>
         </div>
+        }
 
         <!-- Vista de Recuperación de Contraseña -->
-        <div class="formulario" *ngIf="currentView === 'password-recovery'">
+        @if (currentView === 'password-recovery') {
+        <div class="formulario">
             <div class="resend-form-view">
                 <div class="form-header">
                     <button class="back-to-main" (click)="goBackToMain()">
@@ -178,17 +186,20 @@
                     </div>
 
                     <button type="submit" [disabled]="resendForm.invalid || isLoading">
-                        <span *ngIf="!isLoading" class="btn-content">
+                        @if (!isLoading) {
+                        <span class="btn-content">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                 <path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                             Reenviar Recuperación
                         </span>
-                        <span *ngIf="isLoading" class="btn-loading">
+                        } @else {
+                        <span class="btn-loading">
                             <div class="loading-spinner"></div>
                             Enviando...
                         </span>
+                        }
                     </button>
                 </form>
 
@@ -204,6 +215,7 @@
                 </div>
             </div>
         </div>
+        }
     </div>
 
     <app-global-footer></app-global-footer>

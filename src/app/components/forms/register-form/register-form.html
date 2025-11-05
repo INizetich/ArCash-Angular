@@ -1,6 +1,6 @@
 <div class="formulario">
     <!-- Formulario de registro -->
-    <div *ngIf="!registrationSuccessful">
+    @if(!registrationSuccessful){
         <h2>Registrarse</h2>
 
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
@@ -273,10 +273,11 @@
     </form>
     
     <a (click)="goToLogin()" class="have-account" style="cursor: pointer;">Already have an account?</a>
+    }
     </div>
 
-    <!-- Sección de éxito post-registro -->
-    <div class="registration-success" *ngIf="registrationSuccessful">
+    <div class="registration-success">
+        @if(registrationSuccessful){
         <div class="success-message">
             <div class="success-icon">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
@@ -290,8 +291,8 @@
             <p class="check-spam">Revisa tu bandeja de entrada y la carpeta de spam.</p>
         </div>
 
-        <!-- Sección de reenvío que aparece después de 15 segundos -->
-        <div class="resend-section" *ngIf="showResendSection">
+        <div class="resend-section">
+            @if(showResendSection){
             <div class="resend-prompt">
                 <h4>¿Todavía no recibiste tu correo?</h4>
                 <p>Solicita uno nuevo</p>
@@ -331,6 +332,8 @@
                 </svg>
                 Ir al login
             </button>
+            }
         </div>
+        }
     </div>
-</div>
+

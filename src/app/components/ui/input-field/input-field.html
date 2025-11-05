@@ -1,5 +1,7 @@
 <div class="input-container">
-    <label *ngIf="label">{{ label }}</label>
+    @if (label) {
+      <label>{{ label }}</label>
+    }
     <div class="input-wrapper">
         <input 
             class="effect-1" 
@@ -13,7 +15,9 @@
             (blur)="onBlur()">
         <span class="focus-border"></span>
     </div>
-    <div *ngIf="hasError()" class="error-container">
-        <small class="error-message">{{ getErrorMessage() }}</small>
-    </div>
+    @if (hasError()) {
+      <div class="error-container">
+          <small class="error-message">{{ getErrorMessage() }}</small>
+      </div>
+    }
 </div>

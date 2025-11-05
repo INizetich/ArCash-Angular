@@ -38,13 +38,17 @@
         
         <div class="nav-actions">
             <!-- Botón de admin (solo para administradores) -->
-            <button 
-                *ngIf="isAdmin" 
+             @if(isAdmin){      
+
+            <button      
                 class="admin-panel-btn" 
                 (click)="goToAdminPanel()" 
                 title="Acceder al Panel de Administración">
                 Panel de Administración
             </button>
+
+             }
+         
             
             <button class="theme-toggle" (click)="toggleTheme()" type="button">
                 <svg width="20" height="20" viewBox="0 0 24 24">

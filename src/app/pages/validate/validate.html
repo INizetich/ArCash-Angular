@@ -1,72 +1,79 @@
-<!-- Loading Screen de validación de token -->
-<div *ngIf="isLoading" id="validation-loader-overlay">
+@if (isLoading) {
+  <div id="validation-loader-overlay">
     <div class="validation-loader-container">
-        <div class="loading-logo-container">
-            <svg class="brand-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape"/>
-                <circle cx="60" cy="60" r="18" class="security-core"/>
-                <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross"/>
-            </svg>
-            <div class="spinner-circle"></div>
-        </div>
-        <div class="loading-brand">
-            <h1>AR<span>Cash</span></h1>
-            <p class="brand-tagline">The best virtual wallet</p>
-            <p class="loading-text">Validando tu cuenta...</p>
-        </div>
+      <div class="loading-logo-container">
+        <svg class="brand-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape" />
+          <circle cx="60" cy="60" r="18" class="security-core" />
+          <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross" />
+        </svg>
+        <div class="spinner-circle"></div>
+      </div>
+      <div class="loading-brand">
+        <h1>AR<span>Cash</span></h1>
+        <p class="brand-tagline">The best virtual wallet</p>
+        <p class="loading-text">Validando tu cuenta...</p>
+      </div>
     </div>
-</div>
+  </div>
+}
 
-<!-- Success Container -->
-<div class="success-container" *ngIf="!isLoading">
-  <div class="icon-validate success" *ngIf="validationResult?.success">
-    <!-- Tick verde -->
-    <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.08)" stroke="none"/>
-      <path d="M14 25.5L22 33L34 17" stroke="white"/>
-    </svg>
-  </div>
-  
-  <div class="icon-validate error" *ngIf="validationResult && !validationResult.success">
-    <!-- Cruz roja -->
-    <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.08)" stroke="none"/>
-      <path d="M16 16L32 32M32 16L16 32" stroke="white"/>
-    </svg>
-  </div>
-  
-  <div class="icon-validate error" *ngIf="!validationResult && !isLoading">
-    <!-- Cruz roja para error de token -->
-    <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.08)" stroke="none"/>
-      <path d="M16 16L32 32M32 16L16 32" stroke="white"/>
-    </svg>
-  </div>
-  
-  <h2 id="status">{{ getMessage() }}</h2>
-  
-  <button 
-    class="main-btn"
-    [ngClass]="getBtnClass()"
-    (click)="goToHome()"
-    [disabled]="isLoading">
-    <span *ngIf="!isLoading">Ir al menú principal</span>
-    <span *ngIf="isLoading">Procesando...</span>
-  </button>
+@if (!isLoading) {
+  <div class="success-container">
+    
+    @if (validationResult?.success) {
+      <div class="icon-validate success">
+        <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.08)" stroke="none" />
+          <path d="M14 25.5L22 33L34 17" stroke="white" />
+        </svg>
+      </div>
+    }
 
-  <!-- Botón de reenvío solo visible cuando hay error de validación -->
-  <button 
-    *ngIf="showResendOption()"
-    class="secondary-btn resend-btn"
-    [disabled]="isResending"
-    (click)="resendValidationEmail()">>
-    @if (!isResending) {
-      <i class="fas fa-envelope-open-text"></i>
-      Solicitar nuevo enlace
+    @if (validationResult && !validationResult.success) {
+      <div class="icon-validate error">
+        <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.08)" stroke="none" />
+          <path d="M16 16L32 32M32 16L16 32" stroke="white" />
+        </svg>
+      </div>
     }
-    @if (isResending) {
-      <div class="loading-spinner"></div>
-      Reenviando...
+
+    @if (!validationResult && !isLoading) {
+      <div class="icon-validate error">
+        <svg viewBox="0 0 48 48" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.08)" stroke="none" />
+          <path d="M16 16L32 32M32 16L16 32" stroke="white" />
+        </svg>
+      </div>
     }
-  </button>
-</div>
+
+    <h2 id="status">{{ getMessage() }}</h2>
+
+    <button
+      class="main-btn"
+      [ngClass]="getBtnClass()"
+      (click)="goToHome()"
+      [disabled]="isLoading">
+      @if (!isLoading) {
+        <span>Ir al menú principal</span>
+      } @else {
+        <span>Procesando...</span>
+      }
+    </button>
+
+    @if (showResendOption()) {
+      <button
+        class="secondary-btn resend-btn"
+        [disabled]="isResending"
+        (click)="resendValidationEmail()">> @if (!isResending) {
+          <i class="fas fa-envelope-open-text"></i>
+          Solicitar nuevo enlace
+        } @else {
+          <div class="loading-spinner"></div>
+          Reenviando...
+        }
+      </button>
+    }
+  </div>
+}

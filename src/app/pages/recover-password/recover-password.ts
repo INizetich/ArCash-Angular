@@ -1,64 +1,20 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { 
-  ReactiveFormsModule, 
-  FormBuilder, 
-  FormGroup, 
-  Validators,
-  AbstractControl,
-  ValidationErrors 
-} from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { UtilService } from '../../services/util-service/util-service';
 import { RecoveryService } from '../../services/recovery-service/recovery-service';
 import { Subscription } from 'rxjs';
 
-// --- VALIDADORES PERSONALIZADOS ---
-export function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
-  const password = control.get('password')?.value;
-  const confirmPassword = control.get('confirmPassword')?.value;
-  return password === confirmPassword ? null : { passwordMismatch: true };
-}
+import { ThemeToggleComponent } from "../../components/ui/theme-toggle/theme-toggle";
+import { strongPasswordValidator, passwordMatchValidator } from '../../components/forms/register-form/register-form';
 
-export function strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
-  const value = control.value;
-  
-  if (!value) {
-    return null;
-  }
 
-  const errors: ValidationErrors = {};
-
-  if (value.length < 8) {
-    errors['minLength'] = true;
-  }
-
-  if (!/[a-z]/.test(value)) {
-    errors['lowercase'] = true;
-  }
-
-  if (!/[A-Z]/.test(value)) {
-    errors['uppercase'] = true;
-  }
-
-  if (!/[0-9]/.test(value)) {
-    errors['number'] = true;
-  }
-
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-    errors['specialChar'] = true;
-  }
-
-  return Object.keys(errors).length > 0 ? errors : null;
-}
 
 @Component({
   selector: 'app-recover-password',
   standalone: true,
-  imports: [
-    CommonModule, 
-    ReactiveFormsModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, ThemeToggleComponent],
   templateUrl: './recover-password.html',
   styleUrls: ['./recover-password.css']
 })
@@ -68,6 +24,8 @@ export class RecoverPasswordComponent implements OnInit, OnDestroy {
   error: string | null = null;
   isLoading = false;
   isValidatingToken = false;
+  showPassword = false;
+  showConfirmPassword = false;
   
   private routeSubscription!: Subscription;
 
@@ -162,23 +120,48 @@ export class RecoverPasswordComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleTheme(): void {
-    document.documentElement.classList.toggle('dark-theme');
-  }
-
-  goBack(): void {
-    this.router.navigate(['/forgot']);
-  }
-
+  
   canSubmit(): boolean {
     return this.resetForm.valid && !this.isLoading && !!this.token;
+  }
+
+  getPasswordErrors(controlName: string): string[] {
+    const control = this.resetForm.get(controlName);
+    if (!control || !control.errors) return [];
+
+    const errors: string[] = [];
+    if (control.hasError('required')) {
+      errors.push('La contraseña es obligatoria.');
+    }
+    if (control.hasError('minLength')) {
+      errors.push('La contraseña debe tener al menos 8 caracteres.');
+    }
+    if (control.hasError('lowercase')) {
+      errors.push('Debe contener al menos una letra minúscula.');
+    }
+    if (control.hasError('uppercase')) {
+      errors.push('Debe contener al menos una letra mayúscula.');
+    }
+    if (control.hasError('number')) {
+      errors.push('Debe contener al menos un número.');
+    }
+    if (control.hasError('specialChar')) {
+      errors.push('Debe contener al menos un carácter especial (!@#$%^&*...).');
+    }
+    return errors;
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   goToLogin(): void {
     this.router.navigate(['/login']);
   }
 
-  requestNewLink(): void {
-    this.router.navigate(['/forgot']);
-  }
+  
 }
