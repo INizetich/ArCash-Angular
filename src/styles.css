@@ -515,7 +515,7 @@ button, input, .access-btn {
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 16px;
     position: relative;
 }
 
@@ -541,8 +541,8 @@ button, input, .access-btn {
     text-decoration: none;
     font-weight: 600;
     position: relative;
-    padding: 6px 10px;
-    border-radius: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.1);
     border: 1px solid rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
@@ -550,7 +550,8 @@ button, input, .access-btn {
     letter-spacing: 0.3px;
     display: inline-block;
     white-space: nowrap;
-    font-size: 13px;
+    font-size: 14px;
+    min-width: 120px;
 }
 
 /* Modo claro para enlaces */

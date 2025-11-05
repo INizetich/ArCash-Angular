@@ -1,0 +1,159 @@
+.global-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    background: transparent;
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    z-index: 100;
+}
+
+:not([data-theme="dark"]) .global-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(20px);
+}
+
+.global-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent,
+        rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.5),
+        rgba(var(--quantum-violet-rgb, 108, 92, 231), 0.5),
+        rgba(var(--neon-cyan-rgb, 57, 255, 204), 0.5),
+        transparent
+    );
+    filter: blur(0.5px);
+}
+
+/* Texto del footer con efectos tecnológicos */
+.global-footer p {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    margin-bottom: 8px;
+}
+
+/* Separador tecnológico */
+.global-footer p::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--text-accent), transparent);
+    margin-right: 8px;
+}
+
+.global-footer p::after {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--text-accent), transparent);
+    margin-left: 8px;
+}
+
+.global-footer a {
+    color: var(--text-accent);
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    padding: 4px 12px;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.1);
+    border: 1px solid rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.3px;
+    display: inline-block;
+}
+
+/* Modo claro para enlaces */
+:not([data-theme="dark"]) .global-footer a {
+    background: rgba(52, 152, 219, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+/* Hover solo para el enlace específico del email */
+.global-footer a.email-link:hover {
+    transform: translateY(-2px) scale(1.05);
+    background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
+    border-color: var(--text-accent);
+    box-shadow: 
+        0 8px 25px rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.3),
+        0 0 20px rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.2);
+    text-decoration: none;
+}
+
+/* Modo claro para hover del email */
+:not([data-theme="dark"]) .global-footer a.email-link:hover {
+    background: rgba(52, 152, 219, 0.2);
+    border-color: #3498db;
+    box-shadow: 
+        0 8px 25px rgba(52, 152, 219, 0.3),
+        0 0 20px rgba(52, 152, 219, 0.2);
+}
+
+.global-footer a.email-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    padding: 1px;
+    background: linear-gradient(45deg, 
+        rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.6),
+        rgba(var(--quantum-violet-rgb, 108, 92, 231), 0.6),
+        rgba(var(--neon-cyan-rgb, 57, 255, 204), 0.6)
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.global-footer a.email-link:hover::before {
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .global-footer {
+        padding: 15px 10px;
+        font-size: 12px;
+    }
+    
+    :not([data-theme="dark"]) .global-footer {
+        backdrop-filter: blur(15px);
+    }
+    
+    .global-footer p::before,
+    .global-footer p::after {
+        display: none;
+    }
+    
+    .global-footer a {
+        padding: 3px 8px;
+        font-size: 11px;
+    }
+}

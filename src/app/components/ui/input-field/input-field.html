@@ -1,0 +1,19 @@
+<div class="input-container">
+    <label *ngIf="label">{{ label }}</label>
+    <div class="input-wrapper">
+        <input 
+            class="effect-1" 
+            [type]="type" 
+            [placeholder]="placeholder"
+            [attr.maxlength]="maxlength"
+            [value]="value"
+            [disabled]="disabled"
+            [class.error]="hasError()"
+            (input)="onInput($event)"
+            (blur)="onBlur()">
+        <span class="focus-border"></span>
+    </div>
+    <div *ngIf="hasError()" class="error-container">
+        <small class="error-message">{{ getErrorMessage() }}</small>
+    </div>
+</div>

@@ -359,7 +359,7 @@ button[type="submit"]:active {
     opacity: 0.4;
 }
 
-#back-button {
+.global-footer {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -677,6 +677,16 @@ button[type="submit"]:active {
     color: #1a1a1a;
 }
 
+.effect-1::placeholder {
+    color: rgba(128, 128, 128, 0.253);
+    transition: all 0.3s ease;
+}
+
+/* Mejor contraste para placeholder en modo claro */
+:not([data-theme="dark"]) .effect-1::placeholder {
+    color: rgba(26, 26, 26, 0.6);
+}
+
 .effect-1:focus::placeholder {
     opacity: 0.3;
     transform: translateY(-2px);
@@ -793,6 +803,27 @@ input[type="email"]:focus,
 input[type="password"]:focus {
     border-bottom-color: transparent;
 }
+
+/* Estilos específicos para modo oscuro */
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"] {
+    color: #E8EAF6 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+    -webkit-text-fill-color: #E8EAF6 !important;
+}
+
+/* Placeholder específico para modo oscuro */
+[data-theme="dark"] .effect-1::placeholder {
+    color: rgba(140, 140, 140, 0.6) !important;
+}
+
+/* Placeholder específico para modo oscuro cuando tiene foco */
+[data-theme="dark"] .effect-1:focus::placeholder {
+    color: rgba(140, 140, 140, 0.4) !important;
+    opacity: 1 !important;
+}
+
 
 button:disabled {
     cursor: not-allowed !important;

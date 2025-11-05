@@ -1,0 +1,60 @@
+<div class="formulario">
+    <h2>Iniciar Sesión</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <div class="input-container">
+            <label>Username</label>
+            <div class="input-wrapper">
+                <input class="effect-1" type="text" formControlName="username">
+                <span class="focus-border"></span>
+            </div>
+            <div>
+                @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
+                    <div class="error-container">
+                        @if (loginForm.get('username')?.hasError('required')) {
+                            <small class="error-message">El campo Usuario es obligatorio.</small>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="input-container">
+            <label>Password</label>
+
+            <div class="input-wrapper password-wrapper">
+                <input class="effect-1" [type]="showPassword ? 'text' : 'password'" formControlName="password">    
+                <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        @if (!showPassword) {
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        }
+                        @if (showPassword) {
+                            <path d="m1 1 22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M6.71 6.71C4.03 8.75 2 12 2 12s3 6 10 6c1.35 0 2.6-.3 3.71-.9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M14 14.12c-.55.19-1.14.29-1.76.29-2.48 0-4.5-2.02-4.5-4.5 0-.62.1-1.21.29-1.76" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 7c2.76 0 5 2.24 5 5 0 .28-.02.56-.07.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        }
+                    </svg>
+                </button>
+                <span class="focus-border"></span>
+            </div>
+            <a class="access-link" (click)="goTo('forgot')">Forgot password?</a>
+            <div>
+                @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                    <div class="error-container">
+                        @if (loginForm.get('password')?.hasError('required')) {
+                            <small class="error-message">El campo Contraseña es obligatorio.</small>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <button type="submit" [disabled]="loginForm.invalid || isLoading">
+            {{ isLoading ? 'Iniciando...' : 'Iniciar Sesión' }}
+        </button>
+    </form>
+</div>

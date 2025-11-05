@@ -1,42 +1,21 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { themeService } from '../../services/theme-service/theme-service';
-import { Subscription } from 'rxjs';
+
+// Importar componentes
+import { ThemeToggleComponent } from '../../components/ui/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-error-404',
   standalone: true,
-  imports: [CommonModule],
+  imports: [ThemeToggleComponent],
   templateUrl: './error-404.html',
   styleUrls: ['./error-404.css']
 })
-export class Error404Component implements OnDestroy {
-  
-  currentTheme: string = 'light';
-  private themeSubscription: Subscription;
+export class Error404Component {
 
-  constructor(
-    private router: Router,
-    private themeService: themeService
-  ) {
-    // Suscribirse a los cambios de tema
-    this.themeSubscription = this.themeService.theme$.subscribe(theme => {
-      this.currentTheme = theme;
-    });
-  }
+  constructor(private router: Router) {}
 
-  toggleTheme() {
-    this.themeService.toggleTheme();
-  }
-
-  goToHome() {
+  goToHome(): void {
     this.router.navigate(['/']);
-  }
-
-  ngOnDestroy() {
-    if (this.themeSubscription) {
-      this.themeSubscription.unsubscribe();
-    }
   }
 }

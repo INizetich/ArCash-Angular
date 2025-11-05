@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { Home } from './pages/home/home';
 import { RegisterComponent } from './pages/register/register';
-import { Login } from './pages/login/login';
-import { Forgot } from './pages/forgot/forgot';
+import { LoginComponent } from './pages/login/login';
+import { ForgotComponent } from './pages/forgot/forgot';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { AdminComponent } from './pages/admin/admin';
 import { ValidateComponent } from './pages/validate/validate';
@@ -21,8 +21,8 @@ import { ResendComponent } from './pages/resend/resend';
 export const routes: Routes = [
     {path: "", component:Home, canActivate: [homeGuard]},
     {path: "register", component:RegisterComponent, canActivate: [guestGuard]},
-    {path: "login", component:Login, canActivate: [guestGuard]},
-    {path: "forgot", component:Forgot},
+    {path: "login", component:LoginComponent, canActivate: [guestGuard]},
+    {path: "forgot", component:ForgotComponent},
     {path: "resend", component:ResendComponent, canActivate: [resendGuard]}, // Solo accesible desde navegación interna
     {path: "validate", component:ValidateComponent, canActivate: [validateGuard]}, // Solo accesible desde email con token
     {path: "validate-request", component:RecoverPasswordComponent}, // Ruta del email para reset password
