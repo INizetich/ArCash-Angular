@@ -8,6 +8,7 @@ import { themeService } from '../../services/theme-service/theme-service';
 import { UtilService } from '../../services/util-service/util-service';
 import { BackButtonComponent } from "../../components/ui/back-button/back-button";
 import { ThemeToggleComponent } from "../../components/ui/theme-toggle/theme-toggle";
+import { BrandLogoComponent } from "../../components/ui/brand-logo/brand-logo";
 
 // --- VALIDADORES PERSONALIZADOS ---
 // Esta función comprueba que las dos contraseñas coincidan.
@@ -70,7 +71,7 @@ export function strongPasswordValidator(control: AbstractControl): ValidationErr
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, BackButtonComponent, BackButtonComponent, ThemeToggleComponent, ThemeToggleComponent],
+  imports: [CommonModule, ReactiveFormsModule, BackButtonComponent, BackButtonComponent, ThemeToggleComponent, ThemeToggleComponent, BrandLogoComponent],
   templateUrl: './admin.html',
   styleUrls: ['./admin.css'],
 })

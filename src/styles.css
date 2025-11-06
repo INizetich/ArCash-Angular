@@ -11,6 +11,7 @@
     --titanium: #E8EAF6;
     --platinum: rgba(248, 250, 255, 0.98);
     --platinum-rgb: 248, 250, 255;
+    --cyber-blue-rgb: 0, 212, 255; /* <-- AÑADE ESTA LÍNEA */
     
     /* Paleta neón tecnológica */
     --cyber-blue: #00D4FF;
@@ -280,22 +281,24 @@ button, input, .access-btn {
 
 /* Estilos de botones en modo claro - excluye botón de cerrar sesión, password toggle y elementos toast */
 :root:not([data-theme="dark"]) button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):not(.toast-close):not([class*="toast"]) {
-    color: var(--text-primary) !important; /* Color oscuro en modo claro */
+    color: var(--text-accent) ; /* Color oscuro en modo claro */
     background: transparent !important; /* Fondo transparente por defecto */
     border: 1px solid rgba(44, 62, 80, 0.2) !important; /* Borde sutil oscuro */
     transition: all 0.3s ease !important;
 }
 
 :root:not([data-theme="dark"]) button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):not(.toast-close):not([class*="toast"]):hover {
-    border: none !important; /* Sin borde en hover */
+    color: var(--carbon) !important;
+    border: var(--text-accent) !important; /* Sin borde en hover */
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    
 }
 
 /* Estilos específicos para inputs tipo button y submit - excluye logout, password toggle y elementos toast */
 :root:not([data-theme="dark"]) input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):not(.toast-close):not([class*="toast"]),
 :root:not([data-theme="dark"]) input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):not(.toast-close):not([class*="toast"]) {
-    color: var(--text-primary) !important;
+    
     background: transparent !important;
     border: 1px solid rgba(44, 62, 80, 0.2) !important;
 }
@@ -352,6 +355,124 @@ button, input, .access-btn {
 [data-theme="dark"] .action-icon.QR {
     color: #FFFFFF !important; /* Blanco en modo oscuro */
 }
+
+/* * =================================================================
+ * FIX: BOTONES DE COLOR DESHABILITADOS (Modo Oscuro)
+ * =================================================================
+ * Mantiene el color/gradiente original del botón,
+ * pero lo "apaga" con un filtro para que se vea grisáceo.
+ * Esta regla es más específica, por lo que anula
+ * el 'button:disabled' genérico de otros archivos.
+ */
+
+[data-theme="dark"] .formulario button[type="submit"]:disabled,
+[data-theme="dark"] .access-btn:disabled,
+[data-theme="dark"] .users-btn:disabled,
+[data-theme="dark"] .admin-btn:disabled,
+[data-theme="dark"] .habilitar-btn:disabled,
+[data-theme="dark"] .inhabilitar-btn:disabled,
+[data-theme="dark"] .confirm-btn:disabled {
+    
+    /* * 1. LA MAGIA: Aplicamos un filtro 
+     * saturate(20%) -> Mantiene 20% del color (verde, celeste, rosa)
+     * brightness(70%) -> Lo hace un 30% más oscuro
+     */
+    filter: saturate(80%) brightness(70%);
+
+    /* * 2. Anulamos las propiedades genéricas de :disabled
+     * Usamos !important para asegurarnos de "ganar" a la regla
+     * genérica de button:disabled { background: rgba(...) }
+     * que está en tus otros archivos.
+     */
+    opacity: 1 !important;
+    background: unset !important; /* Anula el 'background' genérico */
+    
+    /* * 3. Anulamos el color de texto genérico.
+     * El texto (ej. 'Acceder') también se filtra.
+     * Mantenemos el color de texto claro del tema.
+     */
+    color: var(--text-primary) !important;
+
+    /* 4. Nos aseguramos de que el cursor siga siendo el correcto */
+    cursor: not-allowed;
+}
+
+/* * =================================================================
+ * FIX: BOTONES DE COLOR DESHABILITADOS (Modo Claro)
+ * =================================================================
+ * Mantiene el color/gradiente original del botón,
+ * pero lo "apaga" con un filtro para que se vea pálido/grisáceo.
+ * Esta regla es más específica, por lo que anula
+ * el ':root button:disabled' genérico.
+ */
+
+:root:not([data-theme="dark"]) .formulario button[type="submit"]:disabled,
+:root:not([data-theme="dark"]) .access-btn:disabled,
+:root:not([data-theme="dark"]) .users-btn:disabled,
+:root:not([data-theme="dark"]) .admin-btn:disabled,
+:root:not([data-theme="dark"]) .habilitar-btn:disabled,
+:root:not([data-theme="dark"]) .inhabilitar-btn:disabled,
+:root:not([data-theme="dark"]) .confirm-btn:disabled {
+    
+    /* * 1. EL FILTRO (diferente al modo oscuro):
+     * saturate(30%) -> Mantiene 30% del color (celeste, rosa, etc.)
+     * brightness(110%) -> Lo hace un 10% más pálido (para "lavar" el color)
+     * opacity(80%) -> Le da un poco de transparencia
+     */
+    filter: saturate(80%) brightness(110%) opacity(80%);
+
+    /* * 2. Anulamos las propiedades genéricas de :disabled
+     * Usamos !important para "ganar" a la regla genérica
+     * de ':root button:disabled { background: ... }'
+     */
+    opacity: 1 !important; /* El filtro ya maneja la opacidad */
+    background: unset !important; /* Anula el 'background' genérico */
+    
+    /* * 3. Anulamos el color de texto genérico.
+     * Mantenemos el color de texto que querías (celeste).
+     * El filtro también lo hará un poco más pálido.
+     */
+    color: var(--text-accent) !important;
+
+    /* * 4. Anulamos el borde genérico para mantener el original
+     * (o quitárselo si no tenía)
+     */
+    border: unset !important;
+
+    /* 5. Cursor */
+    cursor: not-allowed;
+}
+
+/* * =================================================================
+ * FIX: EFECTO DE BRILLO "SHINE" (Modo Claro)
+ * =================================================================
+ * Sobrescribe el brillo blanco por defecto (del modo oscuro) 
+ * y lo reemplaza por un brillo "celeste" en modo claro.
+ */
+
+:root:not([data-theme="dark"]) .formulario button[type="submit"]::before,
+:root:not([data-theme="dark"]) .access-btn::before,
+:root:not([data-theme="dark"]) .users-btn::before,
+:root:not([data-theme="dark"]) .admin-btn::before,
+:root:not([data-theme="dark"]) .habilitar-btn::before,
+:root:not([data-theme="dark"]) .inhabilitar-btn::before,
+:root:not([data-theme="dark"]) .confirm-btn::before,
+:root:not([data-theme="dark"]) .cancel-btn::before,
+:root:not([data-theme="dark"]) .nav-button::before {
+    
+    /* * Anulamos el gradiente blanco (rgba(255,255,255,0.2)) 
+     * y lo reemplazamos con el "celeste" (cyber-blue).
+     * Usamos 0.3 de opacidad para que sea un poco más visible.
+     */
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(var(--cyber-blue-rgb), 0.3), /* <-- ¡Color Celeste! */
+        transparent
+    ) !important; /* Usamos !important para asegurar que pise la regla del componente */
+}
+
+
 
 /* === PASSWORD TOGGLE STYLES - GLOBAL === */
 .password-toggle {

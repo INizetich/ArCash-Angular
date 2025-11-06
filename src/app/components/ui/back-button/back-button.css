@@ -17,27 +17,25 @@
 }
 
 #back-button:hover {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
   transform: translateY(-2px);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
 }
 
 #back-button:hover .back-circle {
-  stroke: white;
+  stroke: var(--text-accent);
 }
 
 #back-button:hover .back-arrow {
-  stroke: white;
+    stroke: var(--text-accent);
 }
 
 .back-circle {
-  stroke: var(--border-color);
+  stroke: var(--text-accent);
   fill: none;
   transition: all 0.3s ease;
 }
 
 .back-arrow {
-  stroke: var(--text-color);
+  stroke: var(--text-accent);
   transition: all 0.3s ease;
 }

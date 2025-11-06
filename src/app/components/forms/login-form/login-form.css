@@ -296,7 +296,6 @@ button[type="submit"] {
     text-transform: uppercase;
     letter-spacing: 1px;
     background: var(--tech-gradient-primary);
-    color: white;
     box-shadow: 
         0 4px 20px var(--shadow-primary),
         0 2px 10px rgba(0, 0, 0, 0.2),
@@ -350,18 +349,6 @@ button[type="submit"]:active {
     transition: transform 0.1s;
 }
 
-button:disabled {
-    cursor: not-allowed !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    color: rgba(255, 255, 255, 0.5) !important;
-    box-shadow: none !important;
-    transform: none !important;
-    opacity: 0.6 !important;
-}
-
-button:disabled::before {
-    display: none !important;
-}
 
 /* Efectos específicos para tema oscuro */
 [data-theme="dark"] .formulario {

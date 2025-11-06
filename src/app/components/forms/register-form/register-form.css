@@ -246,7 +246,7 @@ button[type="submit"] {
     text-transform: uppercase;
     letter-spacing: 1px;
     background: var(--primary-color);
-    color: white;
+    color: var(--text-accent);
     box-shadow: 
         0 4px 20px rgba(var(--primary-color-rgb), 0.3),
         0 2px 10px rgba(0, 0, 0, 0.2),

@@ -1,42 +1,3 @@
-:root {
-    --cyber-blue-rgb: 0, 212, 255;
-    --quantum-violet-rgb: 108, 92, 231;
-    --neon-cyan-rgb: 57, 255, 204;
-}
-
-/* Modo claro específico para admin - paleta elegante */
-:root:not([data-theme="dark"]) {
-    --bg-primary: #F8F9FA;
-    --bg-secondary: #FFFFFF;
-    --text-primary: #2C3E50;
-    --text-accent: #667EEA;
-    --text-secondary: #FF6B6B;
-    --border-light: rgba(102, 126, 234, 0.15);
-    --border-color: rgba(102, 126, 234, 0.25);
-    --shadow-primary: rgba(102, 126, 234, 0.2);
-    --shadow-secondary: rgba(255, 107, 107, 0.15);
-    
-    --back-circle-fill: #FFFFFF;
-    --back-circle-stroke: #667EEA;
-    --back-arrow-color: #667EEA;
-    
-    --glass-bg-light: rgba(255, 255, 255, 0.85);
-    --glass-border-light: rgba(102, 126, 234, 0.2);
-    --glass-shadow-light: 0 8px 32px rgba(102, 126, 234, 0.12);
-}
-
-/* Arreglar color de texto en inputs para modo claro */
-:root:not([data-theme="dark"]) input[type="text"],
-:root:not([data-theme="dark"]) input[type="email"],
-:root:not([data-theme="dark"]) input[type="password"],
-:root:not([data-theme="dark"]) .effect-1 {
-    color: var(--text-primary) !important; /* Texto oscuro en modo claro */
-}
-
-:root:not([data-theme="dark"]) input::placeholder,
-:root:not([data-theme="dark"]) .effect-1::placeholder {
-    color: rgba(44, 62, 80, 0.6) !important; /* Placeholder más suave pero visible */
-}
 
 html, body {
     height: 100%;
@@ -75,65 +36,7 @@ body {
     padding: 2rem;
 }
 
-.logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-}
 
-.logo h1 {
-    color: var(--text-primary);
-    font-family: 'Unna', serif;
-    font-size: 48px;
-    font-weight: bold;
-    margin: 0;
-    transition: all 0.4s ease;
-}
-
-.logo span {
-    color: var(--text-accent);
-    transition: all 0.4s ease;
-}
-
-.logo h4 {
-    color: var(--text-primary);
-    font-family: 'Manrope', sans-serif;
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 300;
-    letter-spacing: 2px;
-    opacity: 0.8;
-    transition: all 0.4s ease;
-}
-
-/* Estilos del logo SVG */
-.brand-mark {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 1rem;
-}
-
-.vault-shape {
-    fill: none;
-    stroke: var(--text-accent);
-    stroke-width: 2.5;
-    transition: stroke 0.4s ease;
-}
-
-.security-core {
-    fill: var(--text-accent);
-    stroke: var(--bg-primary);
-    stroke-width: 2;
-    transition: fill 0.4s ease, stroke 0.4s ease;
-}
-
-.access-cross {
-    stroke: var(--bg-primary);
-    stroke-width: 2;
-    stroke-linecap: round;
-    transition: stroke 0.4s ease;
-}
 
 /* Animaciones mejoradas y optimizadas */
 .formulario {
@@ -556,29 +459,15 @@ input[type="password"]:focus {
 
 
 button:disabled {
-    cursor: not-allowed !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    color: rgba(255, 255, 255, 0.5) !important;
-    box-shadow: none !important;
-    transform: none !important;
-    opacity: 0.6 !important;
+    cursor: not-allowed ;
+    background: rgba(255, 255, 255, 0.1) ;
+    box-shadow: none ;
+    transform: none ;
+    opacity: 0.6 ;
 }
 
-/* Mejor contraste para modo claro */
-:root button:disabled {
-    background: var(--border-light) !important;
-    color: var(--text-secondary) !important;
-    border: 1px solid var(--border-color) !important;
-    opacity: 0.7 !important;
-}
 
-/* Mantener estilo original para modo oscuro */
-[data-theme="dark"] button:disabled {
-    background: rgba(255, 255, 255, 0.1) !important;
-    color: rgba(255, 255, 255, 0.5) !important;
-    border: none !important;
-    opacity: 0.6 !important;
-}
+
 
 button:disabled::before {
     display: none !important;
@@ -752,20 +641,6 @@ button:disabled::before {
         0 0 20px var(--text-accent);
 }
 
-/* Botón de admin */
-.admin-btn {
-    background: linear-gradient(135deg, var(--text-secondary) 0%, var(--plasma-pink) 100%);
-    color: white;
-    border-color: var(--text-secondary);
-}
-
-.admin-btn:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 
-        0 8px 25px var(--shadow-secondary),
-        0 4px 15px rgba(0, 0, 0, 0.2),
-        0 0 20px var(--text-secondary);
-}
 
 .access-btn:active {
     transform: translateY(0) scale(1.01);

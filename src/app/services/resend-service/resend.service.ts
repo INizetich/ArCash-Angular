@@ -24,8 +24,8 @@ export class ResendService {
    */
   resendValidationEmail(email: string): Observable<ResendResponse> {
     const params = { email };
-    // 3. APUNTAR A LA RUTA CORREGIDA (asumiendo /api/auth/)
-    return this.http.post<ResendResponse>(`${this.apiUrl}/auth/resend-validation`, null, { params });
+   
+    return this.http.post<ResendResponse>(`${this.apiUrl}/resend/validation`, null, { params });
   }
 
   /**
@@ -35,7 +35,7 @@ export class ResendService {
    */
   resendPasswordRecovery(email: string): Observable<ResendResponse> {
     const params = { email };
-    // 3. APUNTAR A LA RUTA CORREGIDA (asumiendo /api/auth/)
-    return this.http.post<ResendResponse>(`${this.apiUrl}/auth/resend-password-recovery`, null, { params });
+
+    return this.http.post<ResendResponse>(`${this.apiUrl}/resend/password-recovery`, null, { params });
   }
 }

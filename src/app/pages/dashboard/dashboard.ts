@@ -201,10 +201,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           if (data) {
             // No necesitamos hacer nada aquí porque setupSubscriptions ya reacciona a los cambios
             // Pero podríamos forzar detección si fuera necesario: this.cdr.detectChanges();
-          } else {
-            console.warn(">>> Polling: loadUserData devolvió null durante el polling.");
-            // Podrías querer manejar este caso (ej: mostrar un error si persiste)
-          }
+          } 
         },
         error: (err) => {
            console.error(">>> Polling: Error durante la llamada de loadUserData:", err);
@@ -1191,7 +1188,7 @@ handleScanSuccess(resultString: string): void {
     this.isLoading = false;
     
     // Redireccionar al login
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login'], {replaceUrl: true});
   }
 
   private clearAllCaches(): void {
