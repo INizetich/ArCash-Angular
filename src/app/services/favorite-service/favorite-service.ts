@@ -174,17 +174,8 @@ export class FavoriteService {
   }
 
   createTransferDataFromFavorite(favorite: any): TransferData {
-    // Según el backend, el favorito tiene:
-    // - id (del favorito)
-    // - accountCbu (CBU de la cuenta favorita)
-    // - accountAlias (alias de la cuenta favorita)
-    // - accountOwnerName (nombre del dueño)
-    // Pero NO tiene el ID numérico de la cuenta directamente
-    
     return {
-      // IMPORTANTE: Para favoritos, NO tenemos el ID numérico de cuenta
-      // Solo tenemos el CBU, por eso necesitamos una estrategia diferente
-      idaccount: favorite.accountCbu, // Este es el CBU, no el ID numérico
+      idaccount: favorite.accountCbu, 
       alias: favorite.accountAlias,
       cvu: favorite.accountCbu,
       user: {

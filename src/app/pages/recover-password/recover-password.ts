@@ -8,13 +8,14 @@ import { Subscription } from 'rxjs';
 
 import { ThemeToggleComponent } from "../../components/ui/theme-toggle/theme-toggle";
 import { strongPasswordValidator, passwordMatchValidator } from '../../components/forms/register-form/register-form';
+import { BrandLogoComponent } from "../../components/ui/brand-logo/brand-logo";
 
 
 
 @Component({
   selector: 'app-recover-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ThemeToggleComponent],
+  imports: [CommonModule, ReactiveFormsModule, ThemeToggleComponent, BrandLogoComponent],
   templateUrl: './recover-password.html',
   styleUrls: ['./recover-password.css']
 })
@@ -79,14 +80,29 @@ export class RecoverPasswordComponent implements OnInit, OnDestroy {
     }
   }
 
-  private initializeForm(): void {
-    this.resetForm = this.fb.group({
-      passwords: this.fb.group({
-        password: ['', [Validators.required, strongPasswordValidator]],
-        confirmPassword: ['', [Validators.required]]
-      }, { validators: [passwordMatchValidator] })
-    });
-  }
+private initializeForm(): void {
+    this.resetForm = this.fb.group({
+      passwords: this.fb.group({
+        
+        // --- AQUÍ EL CAMBIO 1 ---
+        // Usamos la sintaxis de objeto para añadir updateOn: 'blur'
+        password: ['', {
+          validators: [Validators.required, strongPasswordValidator],
+          
+        }],
+        
+        // --- AQUÍ EL CAMBIO 2 ---
+        // Hacemos lo mismo para el segundo control
+        confirmPassword: ['', {
+          validators: [Validators.required],
+         
+        }]
+
+      }, { 
+        validators: [passwordMatchValidator]
+      })
+    });
+}
 
   onSubmit(): void {
     if (this.resetForm.invalid || this.isLoading || !this.token) {

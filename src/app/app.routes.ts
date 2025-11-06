@@ -16,20 +16,21 @@ import { validateGuard } from './guards/validate.guard';
 import { resendGuard } from './guards/resend.guard';
 import { ResendComponent } from './pages/resend/resend';
 
-
-
 export const routes: Routes = [
     {path: "", component:Home, canActivate: [homeGuard]},
     {path: "register", component:RegisterComponent, canActivate: [guestGuard]},
     {path: "login", component:LoginComponent, canActivate: [guestGuard]},
     {path: "forgot", component:ForgotComponent},
-    {path: "resend", component:ResendComponent, canActivate: [resendGuard]}, // Solo accesible desde navegación interna
-    {path: "validate", component:ValidateComponent, canActivate: [validateGuard]}, // Solo accesible desde email con token
-    {path: "validate-request", component:RecoverPasswordComponent}, // Ruta del email para reset password
-    {path: "reset-password", component:RecoverPasswordComponent}, // Alias para consistencia
+    {path: "resend", component:ResendComponent, canActivate: [resendGuard]},
+    
+    // 1. Ruta de Verificación 
+    {path: "validate", component:ValidateComponent, canActivate: [validateGuard]},
+    
+    // 2. Ruta de Reseteo 
+    {path: "reset-password", component:RecoverPasswordComponent}, 
+    
     {path: "dashboard", component:DashboardComponent, canActivate: [authGuard]},
     {path: "admin", component:AdminComponent, canActivate: [authGuard, adminGuard]},
-    {path: "404", component:Error404Component}, // Página de error
-    {path: "**", redirectTo: "/404"} // Ruta wildcard para cualquier URL no encontrada
-
+    {path: "404", component:Error404Component},
+    {path: "**", redirectTo: "/404"}
 ];

@@ -35,7 +35,8 @@ export class App implements OnInit, OnDestroy {
                                !event.url.includes('/login') &&
                                !event.url.includes('/forgot') &&
                                !event.url.includes('/recover-password') &&
-                               !event.url.includes('/validate-request');
+                               !event.url.includes('/validate-request') &&
+                               !event.url.includes('/reset-password');
       });
   }
 
