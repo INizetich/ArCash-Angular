@@ -1,5 +1,4 @@
 .global-footer {
-   
     color: var(--text-primary);
     transition: all 0.4s ease;
     position: fixed;
@@ -28,8 +27,6 @@
     margin: 0;
     color: var(--text-primary);
     margin-bottom: 5px;
-
-    
 }
 
 .separator {
@@ -37,8 +34,6 @@
     margin: 0 8px;
     opacity: 0.6;
 }
-
-
 
 .autor-link {
     display: inline-flex;
@@ -75,6 +70,30 @@
     }
 }
 
+/* ===== RESPONSIVE SIN CAMBIAR ESTILOS EXISTENTES ===== */
+
+/* Tablets grandes */
+@media (max-width: 1024px) {
+    .global-footer {
+        padding: 20px 10px;
+        font-size: 0.74rem;
+    }
+}
+
+/* Tablets */
+@media (max-width: 900px) {
+    .global-footer {
+        padding: 18px 10px;
+        font-size: 0.73rem;
+        gap: 3px;
+    }
+    
+    .separator {
+        margin: 0 6px;
+    }
+}
+
+/* Tablets pequeñas */
 @media (max-width: 768px) {
     .global-footer {
         font-size: 0.7rem;
@@ -93,3 +112,123 @@
     }
 }
 
+/* Móviles grandes */
+@media (max-width: 640px) {
+    .global-footer {
+        padding: 6px;
+        font-size: 0.68rem;
+        gap: 1px;
+    }
+    
+    .autor-link {
+        margin: 1px 3px;
+    }
+    
+    .global-footer p {
+        margin-bottom: 3px;
+    }
+}
+
+/* Móviles medianos */
+@media (max-width: 480px) {
+    .global-footer {
+        padding: 4px;
+        font-size: 0.65rem;
+    }
+    
+    .autor-link {
+        margin: 1px 2px;
+        gap: 2px;
+    }
+}
+
+/* Móviles pequeños */
+@media (max-width: 400px) {
+    .global-footer {
+        padding: 3px;
+        font-size: 0.62rem;
+    }
+    
+    .autor-link {
+        margin: 0 1px;
+    }
+}
+
+/* Móviles extra pequeños (Galaxy Fold) */
+@media (max-width: 360px) {
+    .global-footer {
+        padding: 2px;
+        font-size: 0.6rem;
+        gap: 0;
+    }
+    
+    .autor-link {
+        margin: 0;
+    }
+}
+
+/* Orientación landscape en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+    .global-footer {
+        padding: 4px 8px;
+        font-size: 0.6rem;
+    }
+}
+
+/* Pantallas muy altas */
+@media (min-height: 1000px) {
+    .global-footer {
+        padding: 30px 15px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Alta densidad de píxeles */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .global-footer {
+        backdrop-filter: blur(15px);
+    }
+}
+
+/* Soporte para dispositivos con notch */
+@supports (padding: max(0px)) {
+    .global-footer {
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+    }
+    
+    @media (max-width: 768px) {
+        .global-footer {
+            padding-left: max(8px, env(safe-area-inset-left));
+            padding-right: max(8px, env(safe-area-inset-right));
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .global-footer {
+            padding-left: max(4px, env(safe-area-inset-left));
+            padding-right: max(4px, env(safe-area-inset-right));
+            padding-bottom: max(4px, env(safe-area-inset-bottom));
+        }
+    }
+}
+
+/* Modo toque - optimizar hover */
+@media (hover: none) and (pointer: coarse) {
+    .autor-link:hover {
+        transform: none;
+    }
+}
+
+/* Modo contraste alto */
+@media (prefers-contrast: high) {
+    .global-footer {
+        border-top: 2px solid var(--text-primary);
+    }
+    
+    .autor-link {
+        text-decoration: underline;
+    }
+}

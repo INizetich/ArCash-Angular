@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin-service/admin.service';
 import { AdminRequest, UserResponse } from '../../models/admin.interface';
-import { themeService } from '../../services/theme-service/theme-service';
 import { UtilService } from '../../services/util-service/util-service';
 import { BackButtonComponent } from "../../components/ui/back-button/back-button";
 import { ThemeToggleComponent } from "../../components/ui/theme-toggle/theme-toggle";
 import { BrandLogoComponent } from "../../components/ui/brand-logo/brand-logo";
+import { AuthenticatedInfoComponent } from '../../components/ui/authenticated-info/authenticated-info';
 
 // --- VALIDADORES PERSONALIZADOS ---
 // Esta función comprueba que las dos contraseñas coincidan.
@@ -71,7 +70,14 @@ export function strongPasswordValidator(control: AbstractControl): ValidationErr
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, BackButtonComponent, BackButtonComponent, ThemeToggleComponent, ThemeToggleComponent, BrandLogoComponent],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    BackButtonComponent, 
+    ThemeToggleComponent, 
+    BrandLogoComponent, 
+    AuthenticatedInfoComponent
+  ],
   templateUrl: './admin.html',
   styleUrls: ['./admin.css'],
 })
@@ -94,11 +100,12 @@ export class AdminComponent implements OnInit {
   userToToggle: UserResponse | null = null;
   currentUserId: number = 0;
 
+  // Nueva variable para controlar carga de botones
+  loadingUserAction: number | null = null; // ID del usuario que se está procesando
+
   constructor(
     private adminService: AdminService,
     private fb: FormBuilder,
-    private router: Router,
-    private themeService: themeService,
     private utilService: UtilService
   ) {}
 
@@ -124,25 +131,17 @@ export class AdminComponent implements OnInit {
 
   // Método para obtener el ID del usuario actual
   private getCurrentUserId(): void {
-    console.log('=== DEBUG: Obteniendo ID del usuario actual ===');
-    
     // Verificar todas las fuentes posibles
     const userDataString = localStorage.getItem('userData');
     const userIdString = localStorage.getItem('userId');
     const accountIdString = localStorage.getItem('accountId');
-    
-    console.log('userData en localStorage:', userDataString);
-    console.log('userId en localStorage:', userIdString);
-    console.log('accountId en localStorage:', accountIdString);
-    
+  
     // Intentar desde userData
     if (userDataString) {
       try {
         const userData = JSON.parse(userDataString);
-        console.log('userData parseado:', userData);
         this.currentUserId = userData.id || userData.userId || userData.accountId || 0;
         if (this.currentUserId > 0) {
-          console.log('ID obtenido desde userData:', this.currentUserId);
           return;
         }
       } catch (e) {
@@ -154,7 +153,6 @@ export class AdminComponent implements OnInit {
     if (userIdString) {
       this.currentUserId = parseInt(userIdString, 10) || 0;
       if (this.currentUserId > 0) {
-        console.log('ID obtenido desde userId:', this.currentUserId);
         return;
       }
     }
@@ -163,7 +161,6 @@ export class AdminComponent implements OnInit {
     if (accountIdString) {
       this.currentUserId = parseInt(accountIdString, 10) || 0;
       if (this.currentUserId > 0) {
-        console.log('ID obtenido desde accountId:', this.currentUserId);
         return;
       }
     }
@@ -173,80 +170,125 @@ export class AdminComponent implements OnInit {
   }
 
   createAdmin(): void {
-    if (this.adminForm.invalid) {
-      this.adminForm.markAllAsTouched();
-      this.utilService.showToast("Por favor, complete todos los campos correctamente", "warning");
-      return;
-    }
-
-    // Evitar múltiples envíos si ya se está procesando
-    if (this.loading) {
-      return;
-    }
-
-    // Establecer estado de carga
-    this.loading = true;
-
-    const formData = this.adminForm.value;
-    const adminRequest: AdminRequest = {
-      name: formData.name,
-      lastName: formData.lastName,
-      dni: formData.dni,
-      email: formData.emails.email,
-      username: formData.username,
-      password: formData.passwords.password
-    };
-
-    this.adminService.createAdmin(adminRequest).subscribe({
-      next: () => {
-        this.loading = false;
-        this.utilService.showToast("Administrador creado exitosamente!", "success");
-        this.adminForm.reset();
-      },
-      error: (error) => {
-        this.loading = false;
-        console.error('Error en creación de admin:', error);
-        console.error('Error status:', error.status);
-        console.error('Error error:', error.error);
-        console.error('Error message:', error.error?.message);
-        console.error('Error mensaje:', error.error?.mensaje);
-        
-        // Buscar el mensaje tanto en 'message' como en 'mensaje'
-        const backendMessage = error.error?.message || error.error?.mensaje;
-        
-        // Manejo específico de errores del backend
-        if (backendMessage) {
-          console.log('Mensaje del backend:', backendMessage);
-          
-          // Manejar errores específicos de conflictos
-          if (backendMessage.includes("email ya se encuentra en uso") ||
-              backendMessage.includes("nombre de usuario no está disponible") ||
-              backendMessage.includes("DNI ya está registrado")) {
-            this.utilService.showToast(backendMessage, "warning");
-          } else if (backendMessage.includes("campos son obligatorios")) {
-            this.utilService.showToast("Todos los campos son obligatorios.", "warning");
-          } else {
-            // Para otros mensajes del servidor, mostrarlos tal como vienen
-            this.utilService.showToast(backendMessage, "error");
-          }
-        } else {
-          // Manejo de errores por código de estado cuando no hay mensaje específico
-          console.log('No hay mensaje específico del backend, usando manejo por status code');
-          if (error.status === 400) {
-            this.utilService.showToast("Datos inválidos. Revisa que todos los campos tengan el formato correcto.", "warning");
-          } else if (error.status >= 500) {
-            this.utilService.showToast("Error del servidor. Intenta crear el administrador nuevamente en unos momentos.", "error");
-          } else if (error.status === 0 || !navigator.onLine) {
-            this.utilService.showToast("Sin conexión. Verifica tu conexión a internet e intenta nuevamente.", "warning");
-          } else {
-            this.utilService.showToast("Error inesperado. No se pudo crear el administrador. Intenta nuevamente.", "error");
-          }
-        }
-      }
-    });
+  if (this.adminForm.invalid) {
+    this.adminForm.markAllAsTouched();
+    this.utilService.showToast("Formulario incompleto: Revisa y completa todos los campos marcados en rojo.", "warning");
+    return;
   }
 
-   // Método para filtrar solo números en el input del DNI
+  // Evitar múltiples envíos si ya se está procesando
+  if (this.loading) {
+    return;
+  }
+
+  // Establecer estado de carga
+  this.loading = true;
+
+  const formData = this.adminForm.value;
+  const adminRequest: AdminRequest = {
+    name: formData.name,
+    lastName: formData.lastName,
+    dni: formData.dni,
+    email: formData.emails.email,
+    username: formData.username,
+    password: formData.passwords.password
+  };
+
+  this.adminService.createAdmin(adminRequest).subscribe({
+    next: () => {
+      this.loading = false;
+      
+      // Mensaje de éxito más específico
+      const emailCensurado = this.censurarCorreo(adminRequest.email);
+      this.utilService.showToast(
+        `¡Administrador creado exitosamente! Se ha creado la cuenta para ${adminRequest.name} ${adminRequest.lastName} (${emailCensurado}) con permisos de administrador.`, 
+        "success"
+      );
+      
+      this.adminForm.reset();
+    },
+    error: (error) => {
+      this.loading = false;
+      console.error('Error en creación de admin:', error);
+      
+      // Buscar el mensaje tanto en 'message' como en 'mensaje'
+      const backendMessage = error.error?.mensaje || error.error?.message;
+      const campo = error.error?.campo;
+      
+      // Manejo específico de errores del backend
+      if (backendMessage) {
+        // Manejar errores específicos de conflictos con mensajes más descriptivos
+        if (backendMessage.includes("email ya se encuentra en uso")) {
+          const emailCensurado = this.censurarCorreo(adminRequest.email);
+          this.utilService.showToast(
+            `El correo ${emailCensurado} ya está registrado en el sistema. Por favor, utiliza otro correo electrónico.`, 
+            "warning"
+          );
+        } else if (backendMessage.includes("nombre de usuario no está disponible")) {
+          this.utilService.showToast(
+            `El nombre de usuario "${adminRequest.username}" no está disponible. Por favor, elige otro nombre de usuario.`, 
+            "warning"
+          );
+        } else if (backendMessage.includes("DNI ya está registrado")) {
+          this.utilService.showToast(
+            `El DNI ${adminRequest.dni} ya está registrado en el sistema. Verifica los datos e intenta nuevamente.`, 
+            "warning"
+          );
+        } else if (backendMessage.includes("campos son obligatorios")) {
+          this.utilService.showToast("Todos los campos son obligatorios para crear un administrador.", "warning");
+        } else {
+          // Para otros mensajes del servidor, mostrarlos tal como vienen
+          this.utilService.showToast(`Error al crear administrador: ${backendMessage}`, "error");
+        }
+      } else {
+        // Manejo de errores por código de estado
+        if (error.status === 400) {
+          this.utilService.showToast(
+            "Datos inválidos: Revisa que todos los campos tengan el formato correcto y que las contraseñas coincidan.", 
+            "warning"
+          );
+        } else if (error.status === 403) {
+          this.utilService.showToast(
+            "Acceso denegado: No tienes permisos suficientes para crear administradores.", 
+            "error"
+          );
+        } else if (error.status === 409) {
+          this.utilService.showToast(
+            "Conflicto: Los datos ingresados ya existen en el sistema.", 
+            "warning"
+          );
+        } else if (error.status >= 500) {
+          this.utilService.showToast(
+            "Error del servidor: No se pudo crear el administrador en este momento. Intenta nuevamente en unos minutos.", 
+            "error"
+          );
+        } else if (error.status === 0 || !navigator.onLine) {
+          this.utilService.showToast(
+            "Sin conexión: Verifica tu conexión a internet e intenta crear el administrador nuevamente.", 
+            "warning"
+          );
+        } else {
+          this.utilService.showToast(
+            "Error inesperado: No se pudo crear el administrador. Verifica los datos e intenta nuevamente.", 
+            "error"
+          );
+        }
+      }
+    }
+  });
+}
+
+  // Método para censurar correo (similar al del register)
+  private censurarCorreo(email: string): string {
+    const [usuario, dominio] = email.split('@');
+    if (usuario.length <= 2) {
+      return usuario[0] + '***@' + dominio;
+    }
+    const visible = usuario.slice(0, 2);
+    return visible + '***@' + dominio;
+  }
+
+  // Método para filtrar solo números en el input del DNI
   onDniInput(event: any): void {
     const input = event.target;
     let value = input.value;
@@ -264,21 +306,12 @@ export class AdminComponent implements OnInit {
     this.adminForm.get('dni')?.setValue(value);
   }
 
-
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
   toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
-  }
-
-  toogleTheme() {
-    this.themeService.toggleTheme();
-  }
-
-  goBack() {
-    this.router.navigate(['/dashboard']);
   }
 
   // ===== NUEVOS MÉTODOS PARA LA FUNCIONALIDAD ADMIN =====
@@ -325,10 +358,6 @@ export class AdminComponent implements OnInit {
     
     this.adminService.getAuthenticatedUsers().subscribe({
       next: (users) => {
-        console.log('=== DEBUG: Carga de usuarios ===');
-        console.log('Usuarios recibidos del servidor:', users);
-        console.log('ID del usuario actual a filtrar:', this.currentUserId);
-        
         // Filtrar para excluir al usuario actual
         this.users = users.filter(user => {
           // Múltiples comparaciones para asegurar exclusión
@@ -337,18 +366,9 @@ export class AdminComponent implements OnInit {
           const isCurrentUserByStringComparison = Number(user.id) === this.currentUserId;
           
           const shouldExclude = isCurrentUserById || isCurrentUserByIdAccount || isCurrentUserByStringComparison;
-          
-          if (shouldExclude) {
-            console.log('Usuario excluido del listado:', user);
-            console.log('Motivo exclusión - ID:', isCurrentUserById, 'idAccount:', isCurrentUserByIdAccount, 'NumericID:', isCurrentUserByStringComparison);
-          }
-          
           return !shouldExclude;
         });
-        
-        console.log('Usuarios después del filtro:', this.users);
-        console.log('Total usuarios mostrados:', this.users.length);
-        
+            
         this.adminService.cacheUsers(this.users);
         this.usersAlreadyLoaded = true; // Marcar como cargados
         this.isLoadingUsers = false;
@@ -361,35 +381,47 @@ export class AdminComponent implements OnInit {
         // Intentar cargar desde cache si hay error
         const cachedUsers = this.adminService.getCachedUsers();
         if (cachedUsers) {
-          console.log('Cargando usuarios desde cache...');
           this.users = cachedUsers.filter(user => {
             const isCurrentUserById = user.id === this.currentUserId;
             const isCurrentUserByIdAccount = user.idAccount === this.currentUserId;
             const isCurrentUserByNumeric = Number(user.id) === this.currentUserId;
             return !(isCurrentUserById || isCurrentUserByIdAccount || isCurrentUserByNumeric);
           });
-          console.log('Usuarios desde cache después del filtro:', this.users);
         }
       }
     });
   }
 
-  // Modal de usuario
+  // Modal de usuario - VERSIÓN OPTIMIZADA
   openUserModal(user: UserResponse): void {
-    this.selectedUser = user;
-    this.showUserModal = true;
+    // Usar requestAnimationFrame para mejor performance
+    requestAnimationFrame(() => {
+      this.selectedUser = user;
+      this.showUserModal = true;
+    });
   }
 
   closeUserModal(): void {
-    this.selectedUser = null;
     this.showUserModal = false;
+    // No resetear selectedUser inmediatamente - esperar a que la animación termine
+    setTimeout(() => {
+      this.selectedUser = null;
+    }, 150); // Solo 150ms para coincidir con la duración de la animación CSS
+  }
+
+  resetUserModal(): void {
+    this.showUserModal = false;
+    this.selectedUser = null;
+  }
+
+  onToggleUserStatus(user: UserResponse): void {
+    // Cerrar inmediatamente sin animación para mejor respuesta
+    this.resetUserModal();
+    this.openConfirmModal(user);
   }
 
   // Modal de confirmación personalizado
   openConfirmModal(user: UserResponse): void {
-    // Cerrar el modal de información si está abierto para reducir lag
-    this.closeUserModal();
-    
     this.userToToggle = user;
     this.showConfirmModal = true;
   }
@@ -397,6 +429,7 @@ export class AdminComponent implements OnInit {
   closeConfirmModal(): void {
     this.userToToggle = null;
     this.showConfirmModal = false;
+    this.loadingUserAction = null; // Resetear estado de carga al cerrar
   }
 
   // Confirmar cambio de estado
@@ -406,6 +439,9 @@ export class AdminComponent implements OnInit {
     const user = this.userToToggle;
     const action = user.active ? 'deshabilitar' : 'habilitar';
     
+    // Activar estado de carga
+    this.loadingUserAction = user.id;
+
     const serviceCall = user.active 
       ? this.adminService.disableUser(user.id)
       : this.adminService.enableUser(user.id);
@@ -426,12 +462,18 @@ export class AdminComponent implements OnInit {
         // Forzar recarga para reflejar cambios
         this.usersAlreadyLoaded = false;
         
+        // Resetear estado de carga
+        this.loadingUserAction = null;
+        
         this.closeConfirmModal();
-        this.closeUserModal();
+        this.resetUserModal();
       },
       error: (error) => {
         console.error(`Error al ${action} usuario:`, error);
         this.utilService.showToast(`Error al ${action} usuario`, "error");
+        
+        // Resetear estado de carga en caso de error
+        this.loadingUserAction = null;
         this.closeConfirmModal();
       }
     });

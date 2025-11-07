@@ -7,7 +7,6 @@
   box-sizing: border-box;
 }
 
-/* Desactivar transiciones complejas para mejor performance */
 .reduce-motion * {
   transition: none !important;
   animation-duration: 0.01ms !important;
@@ -20,7 +19,7 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
- 
+  font-size: 14px;
 }
 
 /* ====================================
@@ -30,8 +29,8 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: var(--bg-primary);
   display: flex;
   justify-content: center;
@@ -40,14 +39,13 @@ body {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  padding: 1rem;
 }
 
-/* Modo oscuro */
 [data-theme="dark"] #wallet-loader-overlay {
   background: #1a1f2e;
 }
 
-/* Modo claro */
 :root:not([data-theme="dark"]) #wallet-loader-overlay {
   background: var(--bg-primary);
 }
@@ -63,31 +61,31 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+  max-width: 300px;
 }
 
 .loading-logo-container {
   position: relative;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   display: inline-block;
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
 }
 
 .brand-mark {
-  width: 80px;
-  height: 80px;
+  width: 100%;
+  height: 100%;
   filter: drop-shadow(0 0 20px var(--text-accent));
   z-index: 2;
   position: relative;
   display: block;
 }
 
-/* Modo claro - filtro más sutil */
 :root:not([data-theme="dark"]) .brand-mark {
   filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.3));
 }
 
-/* Modo oscuro - filtro más intenso */
 [data-theme="dark"] .brand-mark {
   filter: drop-shadow(0 0 20px var(--cyber-blue));
 }
@@ -113,10 +111,10 @@ body {
 
 .spinner-circle {
   position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
   border: 2px solid transparent;
   border-top: 2px solid var(--text-accent);
   border-radius: 50%;
@@ -125,7 +123,7 @@ body {
 }
 
 .loading-brand h1 {
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
@@ -137,14 +135,13 @@ body {
 
 .loading-text {
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 3vw, 1rem);
   opacity: 0.8;
 }
 
 /* ====================================
    DASHBOARD CONTAINER
    ==================================== */
-
 .dashboard-container::before {
   content: '';
   position: fixed;
@@ -154,22 +151,11 @@ body {
   bottom: 0;
   pointer-events: none;
   z-index: 0;
-  /* Sin animaciones ni transiciones */
 }
 
-/* Keyframes eliminados para mejor performance */
-
-/* Sin animaciones para mejor performance */
-
-/* Keyframes eliminados para mejor performance */
-
-/* Modo oscuro para el overlay de efectos */
 [data-theme='dark'] .dashboard-container::before {
   background: linear-gradient(135deg, rgba(10, 15, 25, 0.9) 0%, rgba(5, 10, 20, 0.95) 100%);
-  /* Sin animaciones ni mouse tracking */
 }
-
-/* Keyframes eliminados para mejor performance */
 
 .dashboard-container.loaded {
   opacity: 1;
@@ -186,32 +172,32 @@ body {
   z-index: 100;
   background: transparent;
   backdrop-filter: blur(5px);
-  padding: 1rem 2rem;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: all 0.4s ease;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
-
-/* Modo oscuro para la navegación */
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .nav-logo {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
 }
 
 .nav-title {
-  font-size: 1.5rem;
+  font-size: clamp(1.125rem, 4vw, 1.5rem);
   font-weight: 700;
-}
-
-.nav-title {
   color: var(--text-primary);
 }
 
@@ -226,24 +212,25 @@ body {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
-  flex-wrap: flex-end;
-  flex-grow: 1;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  flex: 1;
 }
 
 .theme-toggle {
   background: none;
   border: 2px solid var(--border-color);
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--text-accent);
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .theme-toggle:hover {
@@ -255,8 +242,8 @@ body {
 .admin-panel-btn {
   border: 2px solid var(--border-color);
   border-radius: 25px;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -267,6 +254,7 @@ body {
   white-space: nowrap;
   backdrop-filter: blur(10px);
   box-shadow: var(--glass-shadow-light);
+  flex-shrink: 0;
 }
 
 .admin-panel-btn::before {
@@ -294,48 +282,19 @@ body {
   transform: translateY(0) scale(1.01);
 }
 
-/* Responsive para pantallas pequeñas */
-@media (max-width: 768px) {
-  .admin-panel-btn {
-    font-size: 0.8rem;
-    padding: 0.6rem 1.2rem;
-  }
-}
-
-/* Muy pequeñas - solo iniciales */
-@media (max-width: 480px) {
-  .admin-panel-btn {
-    font-size: 0.75rem;
-    padding: 0.5rem 1rem;
-  }
-
-  .admin-panel-btn::after {
-    content: 'Admin';
-  }
-
-  .admin-panel-btn {
-    text-indent: -9999px;
-    line-height: 0;
-  }
-
-  .admin-panel-btn::after {
-    text-indent: 0;
-    display: block;
-    line-height: initial;
-  }
-}
-
 .user-menu {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
   background: var(--glass-bg-light);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .user-menu::before {
@@ -374,15 +333,14 @@ body {
   transition: transform 0.1s;
 }
 
-/* Modo oscuro para user-menu */
 [data-theme='dark'] .user-menu {
   background: rgba(26, 26, 46, 0.3);
   border: 1px solid rgba(57, 255, 204, 0.25);
 }
 
 .user-avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   background: var(--tech-gradient-primary);
   border-radius: 50%;
   display: flex;
@@ -390,9 +348,10 @@ body {
   justify-content: center;
   color: white;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   position: relative;
   z-index: 2;
+  flex-shrink: 0;
 }
 
 .user-info {
@@ -400,26 +359,34 @@ body {
   flex-direction: column;
   position: relative;
   z-index: 2;
+  min-width: 0;
 }
 
 .user-name {
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-role {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .logout-btn {
   background: none;
   border: 2px solid var(--plasma-pink);
   border-radius: 8px;
-  padding: 0.5rem;
+  padding: 0.4rem;
   color: var(--plasma-pink);
   cursor: pointer;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .logout-btn:hover {
@@ -432,24 +399,24 @@ body {
    MAIN CONTENT
    ==================================== */
 .main-content {
-  padding: 2rem;
+  padding: 1rem;
   max-width: 1400px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
-   padding-bottom: 8rem;
+  padding-bottom: 6rem;
 }
 
 /* ====================================
    WELCOME SECTION
    ==================================== */
 .welcome-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   animation: fadeInUp 0.8s ease 0.2s both;
 }
 
 .welcome-title {
-  font-size: 2.5rem;
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
   font-weight: 700;
   margin-bottom: 0.5rem;
   color: var(--text-primary);
@@ -457,6 +424,7 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  line-height: 1.2;
 }
 
 .highlight {
@@ -464,31 +432,31 @@ body {
 }
 
 .welcome-subtitle {
-  font-size: 1.125rem;
+  font-size: clamp(0.9rem, 3vw, 1.125rem);
   color: var(--text-secondary);
   opacity: 0.8;
+  line-height: 1.4;
 }
 
 /* ====================================
    BALANCE CARD
    ==================================== */
 .balance-section {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   animation: fadeInUp 0.8s ease 0.4s both;
 }
 
 .balance-card {
   background: var(--glass-bg-light);
   border: 1px solid var(--glass-border-light);
-  border-radius: 20px;
-  padding: 2rem;
+  border-radius: 16px;
+  padding: 1.5rem;
   position: relative;
   overflow: hidden;
   box-shadow: var(--glass-shadow-light);
   transition: all 0.3s ease;
 }
 
-/* Modo oscuro para balance-card */
 [data-theme='dark'] .balance-card {
   background: rgba(26, 26, 46, 0.3);
   border: 1px solid rgba(57, 255, 204, 0.25);
@@ -501,29 +469,30 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%);
 }
 
 .balance-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0, 212, 255, 0.2);
 }
 
-/* Hover específico para modo oscuro */
 [data-theme='dark'] .balance-card:hover {
-  box-shadow: 0 20px 40px rgba(57, 255, 204, 0.3);
+  box-shadow: 0 15px 30px rgba(57, 255, 204, 0.3);
 }
 
 .balance-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .balance-header h2 {
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 4vw, 1.25rem);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -533,10 +502,11 @@ body {
   border: none;
   color: var(--text-accent);
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.4rem;
   border-radius: 8px;
   transition: all 0.3s ease;
-  border-radius: 20px;
+  border-radius: 16px;
+  flex-shrink: 0;
 }
 
 .balance-toggle:hover {
@@ -548,105 +518,112 @@ body {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .currency {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: 300;
   color: var(--text-accent);
 }
 
 .amount {
-  font-size: 3rem;
+  font-size: clamp(2rem, 7vw, 3rem);
   font-weight: 700;
   color: var(--text-primary);
+  line-height: 1;
 }
 
 .amount-hidden {
-  font-size: 3rem;
+  font-size: clamp(2rem, 7vw, 3rem);
   font-weight: 700;
   color: var(--text-primary);
+  line-height: 1;
 }
 
 .account-info {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
 }
 
 .account-detail {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
 }
 
 .account-detail .label {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .account-detail .value {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-primary);
   font-family: 'Courier New', monospace;
+  word-break: break-all;
 }
 
 /* ====================================
    ACTIONS SECTION
    ==================================== */
 .actions-section {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   animation: fadeInUp 0.8s ease 0.6s both;
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
   font-weight: 600;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: var(--text-primary);
 }
 
 .actions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
 }
 
 .action-card {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid var(--glass-border-light);
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 12px;
+  padding: 1.25rem;
   cursor: pointer;
-  /* Sin efectos complejos */
+  transition: all 0.3s ease;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .action-card:hover {
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
+  transform: translateY(-5px);
   box-shadow: var(--glass-shadow-light);
 }
 
-/* Modo oscuro para action-cards - simplificado */
 [data-theme='dark'] .action-card {
   background: rgba(26, 26, 46, 0.5);
   border: 1px solid rgba(57, 255, 204, 0.25);
 }
 
-/* Sin efectos hover para mejor performance */
-
 .action-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   color: white;
+  flex-shrink: 0;
 }
 
 .action-icon.deposit {
@@ -665,17 +642,23 @@ body {
   background: linear-gradient(135deg, var(--neural-orange) 0%, var(--hologram-blue) 100%);
 }
 
+.action-icon.favorites {
+  background: linear-gradient(135deg, var(--plasma-pink) 0%, var(--electric-purple) 100%);
+  box-shadow: 0 4px 20px rgba(255, 0, 110, 0.3);
+}
+
 .action-card h3 {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: var(--text-primary);
 }
 
 .action-card p {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   opacity: 0.8;
+  line-height: 1.4;
 }
 
 /* ====================================
@@ -689,29 +672,31 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .view-all-btn {
   border: 2px solid var(--cyber-blue);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
 .transactions-container {
   background: var(--glass-bg-light);
-
   border: 1px solid var(--glass-border-light);
-  border-radius: 16px;
+  border-radius: 12px;
   overflow-y: auto;
-  max-height: 400px;
+  max-height: 350px;
   box-shadow: var(--glass-shadow-light);
 }
 
-/* Modo oscuro para transactions-container */
 [data-theme='dark'] .transactions-container {
   background: rgba(26, 26, 46, 0.3);
   border: 1px solid rgba(57, 255, 204, 0.25);
@@ -719,24 +704,28 @@ body {
 }
 
 .no-transactions {
-  padding: 3rem;
+  padding: 2rem;
   text-align: center;
   color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
 .no-transactions svg {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   opacity: 0.5;
+  width: 48px;
+  height: 48px;
 }
 
 .transaction-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
   border-bottom: 1px solid var(--border-light);
   cursor: pointer;
   transition: all 0.3s ease;
+  flex-wrap: wrap;
 }
 
 .transaction-item:last-child {
@@ -748,13 +737,14 @@ body {
 }
 
 .transaction-icon {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
+  flex-shrink: 0;
 }
 
 .transaction-icon.income {
@@ -767,17 +757,21 @@ body {
 
 .transaction-details {
   flex: 1;
+  min-width: 0;
 }
 
 .transaction-description {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 0.25rem;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .transaction-date {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   opacity: 0.7;
 }
@@ -785,15 +779,17 @@ body {
 .transaction-status.failed {
   background: var(--plasma-pink);
   color: white;
-  padding: 0.125rem 0.5rem;
+  padding: 0.125rem 0.4rem;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 500;
+  margin-top: 0.25rem;
 }
 
 .transaction-amount {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .transaction-amount.income {
@@ -810,7 +806,7 @@ body {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -828,110 +824,44 @@ body {
 }
 
 /* ====================================
-   RESPONSIVE DESIGN
-   ==================================== */
-@media (max-width: 768px) {
-  .top-nav {
-    padding: 1rem;
-  }
-
-  .nav-title {
-    font-size: 1.25rem;
-  }
-
-  .user-info {
-    display: none;
-  }
-
- 
-
-  .welcome-title {
-    font-size: 2rem;
-  }
-
-  .balance-amount .amount {
-    font-size: 2.5rem;
-  }
-
-  .actions-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .account-info {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .balance-card {
-    padding: 1.5rem;
-  }
-
-  .action-card {
-    padding: 1rem;
-  }
-
-  .transaction-item {
-    padding: 0.75rem 1rem;
-  }
-}
-
-/* ================================
    MODAL STYLES
-   ================================ */
-
+   ==================================== */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  /* Sin animaciones para mejor performance */
+  padding: 1rem;
 }
 
-/* Keyframes removidos para mejor performance */
-
 .modal-content {
-  background: rgba(20, 25, 35, 0.95);
+  background: var(--bg-primary);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  padding: 30px;
-  max-width: 90vw;
-  width: 450px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 450px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  /* Sin sombras complejas ni animaciones */
+  contain: layout style paint;
 }
 
 .modal-content p > span {
   color: var(--text-primary);
 }
 
-/* Keyframes removidos para mejor performance */
-
-/* Optimización: Usar contain para limitar el scope de rendering */
-.modal-content {
-  contain: layout style paint;
-}
-
-/* Clase para deshabilitar animaciones durante scroll/interacciones intensivas */
-.reduce-motion .modal,
-.reduce-motion .modal-content {
-  animation: none !important;
-  transition: none !important;
-}
-
 .modal-content h2 {
   color: var(--cyber-blue);
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
   font-weight: 600;
-  margin-bottom: 25px;
+  margin-bottom: 1.25rem;
   text-align: center;
   background: linear-gradient(45deg, var(--cyber-blue), var(--neon-cyan));
   -webkit-background-clip: text;
@@ -941,74 +871,92 @@ body {
 
 .close-button {
   position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 28px;
+  top: 12px;
+  right: 15px;
+  font-size: 24px;
   font-weight: bold;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--love-red);
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 35px;
-  height: 35px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  padding: 1rem;
 }
 
-/* Botón Volver Atrás */
-.back-button {
+/*
+Boton de cerrar el modal de taxes
+*/
+.close-tax-button{
   position: absolute;
-  top: 15px;
-  left: 20px !important;
-  width: 35px !important;
-  height: 35px !important;
+  top: -25px;
+  right: -20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--love-red);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  flex-shrink: 0;
+  padding: 1rem;
+}
+
+.close-tax-button:hover{
+  background-color: rgba(80, 80, 80, 0.068);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+
+
+.close-button-favorite{
+    position: absolute;
+  top: -25px;
+  right: -20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--love-red);
   cursor: pointer;
   transition: all 0.3s ease;
-  padding: 0;
-  box-sizing: border-box;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  padding: 1rem;
 }
 
-.back-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  transition: left 0.5s;
+.close-button-favorite:hover{
+    background-color: rgba(80, 80, 80, 0.068);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }
 
-.back-button:hover {
-  transform: translateX(-2px);
-  box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+
+.close-button:hover{
+  background-color: rgba(80, 80, 80, 0.068);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }
 
-.back-button:hover::before {
-  left: 100%;
-}
-
-.back-button:active {
-  transform: translateY(0);
-  transition: transform 0.1s;
-}
-
-.back-button i {
-  font-size: 18px;
-  pointer-events: none;
-}
-
+.back-button,
 .back-button-list {
   position: absolute;
-  top: 15px;
-  left: 20px !important;
-  width: 35px !important;
-  height: 35px !important;
+  top: 12px;
+  left: 15px !important;
+  width: 30px !important;
+  height: 30px !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1017,44 +965,34 @@ body {
   transition: all 0.3s ease;
   padding: 0;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
-.back-button-list::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  transition: left 0.5s;
-}
-
+.back-button:hover,
 .back-button-list:hover {
   transform: translateX(-2px);
   box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
 }
 
-.back-button:hover::before {
-  left: 100%;
-}
-
+.back-button:active,
 .back-button-list:active {
   transform: translateY(0);
   transition: transform 0.1s;
 }
 
+.back-button i,
 .back-button-list i {
-  font-size: 18px;
+  font-size: 16px;
   pointer-events: none;
 }
 
-/* Modal header para dar espacio al botón de volver */
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
+  min-height: 30px;
 }
 
 .modal-header h2 {
@@ -1068,33 +1006,30 @@ body {
   align-items: center;
   justify-content: space-between;
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
   padding: 0;
-  height: 35px;
+  height: 30px;
   width: 100%;
 }
+
 .modal-header-info button {
   background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%) !important;
 }
 
-/* Sin efectos hover para mejor performance */
-
-/* Form Elements in Modals */
 .modal-content input[type='text'],
 .modal-content input[type='number'],
 .modal-content input[type='email'] {
   width: 100%;
-  padding: 15px 20px;
+  padding: 12px 15px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 10px;
   color: #ffffff;
-  font-size: 16px;
-  margin-bottom: 20px;
+  font-size: 14px;
+  margin-bottom: 1rem;
   transition: all 0.3s ease;
 }
 
-/* Mejor contraste para inputs de modal en modo claro */
 :not([data-theme="dark"]) .modal-content input[type='text'],
 :not([data-theme="dark"]) .modal-content input[type='number'],
 :not([data-theme="dark"]) .modal-content input[type='email'] {
@@ -1120,7 +1055,7 @@ body {
 .modal-content input:focus {
   outline: none;
   border-color: var(--cyber-blue);
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -1130,16 +1065,16 @@ body {
 
 .modal-content button {
   width: 100%;
-  padding: 15px;
+  padding: 12px;
   background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%);
   color: var(--text-primary);
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 10px;
+  margin-bottom: 0.75rem;
   position: relative;
   overflow: hidden;
 }
@@ -1165,19 +1100,15 @@ body {
   left: 100%;
 }
 
-modal-content button:active {
+.modal-content button:active {
   transform: translateY(0);
   transition: transform 0.1s;
 }
-
-/* Sin efectos hover para mejor performance */
 
 .modal-content button.secondary {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
-
-/* Sin efectos hover para mejor performance */
 
 .modal-content button:disabled {
   opacity: 0.5;
@@ -1185,7 +1116,6 @@ modal-content button:active {
   transform: none;
 }
 
-/* Estados de carga para botones - Efecto barra de progreso */
 .modal-content button.loading {
   position: relative;
   overflow: hidden;
@@ -1204,7 +1134,6 @@ modal-content button:active {
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* Barra de progreso que se llena */
 .progress-bar {
   position: absolute;
   top: 0;
@@ -1212,7 +1141,7 @@ modal-content button:active {
   height: 100%;
   width: 0;
   background: linear-gradient(45deg, var(--cyber-blue), var(--electric-purple));
-  border-radius: 12px;
+  border-radius: 10px;
   animation: fillProgress 4s ease-in-out forwards;
   z-index: 1;
 }
@@ -1234,46 +1163,20 @@ modal-content button:active {
 }
 
 @keyframes fillProgress {
-  0% {
-    width: 0%;
-    opacity: 0.8;
-  }
-  15% {
-    width: 20%;
-    opacity: 0.85;
-  }
-  30% {
-    width: 35%;
-    opacity: 0.9;
-  }
-  50% {
-    width: 55%;
-    opacity: 0.95;
-  }
-  70% {
-    width: 75%;
-    opacity: 1;
-  }
-  85% {
-    width: 90%;
-    opacity: 1;
-  }
-  100% {
-    width: 100%;
-    opacity: 1;
-  }
+  0% { width: 0%; opacity: 0.8; }
+  15% { width: 20%; opacity: 0.85; }
+  30% { width: 35%; opacity: 0.9; }
+  50% { width: 55%; opacity: 0.95; }
+  70% { width: 75%; opacity: 1; }
+  85% { width: 90%; opacity: 1; }
+  100% { width: 100%; opacity: 1; }
 }
 
 @keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(300%);
-  }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
 }
 
-/* Efecto de actualización del saldo */
 .amount {
   transition: all 0.3s ease;
 }
@@ -1287,60 +1190,21 @@ modal-content button:active {
 }
 
 @keyframes balanceUpdate {
-  0% {
-    transform: scale(1);
-    color: inherit;
-  }
-  25% {
-    transform: scale(1.1);
-    color: var(--laser-green);
-    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-  }
-  50% {
-    transform: scale(1.15);
-    color: var(--laser-green);
-    text-shadow: 0 0 15px rgba(0, 255, 136, 0.7);
-  }
-  75% {
-    transform: scale(1.05);
-    color: var(--laser-green);
-    text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
-  }
-  100% {
-    transform: scale(1);
-    color: inherit;
-    text-shadow: none;
-  }
+  0% { transform: scale(1); color: inherit; }
+  25% { transform: scale(1.1); color: var(--laser-green); text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+  50% { transform: scale(1.15); color: var(--laser-green); text-shadow: 0 0 15px rgba(0, 255, 136, 0.7); }
+  75% { transform: scale(1.05); color: var(--laser-green); text-shadow: 0 0 8px rgba(0, 255, 136, 0.4); }
+  100% { transform: scale(1); color: inherit; text-shadow: none; }
 }
 
 @keyframes balanceDecrease {
-  0% {
-    transform: scale(1);
-    color: inherit;
-  }
-  25% {
-    transform: scale(1.1);
-    color: var(--plasma-pink);
-    text-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
-  }
-  50% {
-    transform: scale(1.15);
-    color: var(--plasma-pink);
-    text-shadow: 0 0 15px rgba(255, 20, 147, 0.7);
-  }
-  75% {
-    transform: scale(1.05);
-    color: var(--plasma-pink);
-    text-shadow: 0 0 8px rgba(255, 20, 147, 0.4);
-  }
-  100% {
-    transform: scale(1);
-    color: inherit;
-    text-shadow: none;
-  }
+  0% { transform: scale(1); color: inherit; }
+  25% { transform: scale(1.1); color: var(--plasma-pink); text-shadow: 0 0 10px rgba(255, 20, 147, 0.5); }
+  50% { transform: scale(1.15); color: var(--plasma-pink); text-shadow: 0 0 15px rgba(255, 20, 147, 0.7); }
+  75% { transform: scale(1.05); color: var(--plasma-pink); text-shadow: 0 0 8px rgba(255, 20, 147, 0.4); }
+  100% { transform: scale(1); color: inherit; text-shadow: none; }
 }
 
-/* Efecto de resplandor para toda la tarjeta de saldo */
 .balance-card {
   transition: all 0.3s ease;
 }
@@ -1354,42 +1218,19 @@ modal-content button:active {
 }
 
 @keyframes cardGlow {
-  0% {
-    box-shadow: inherit;
-  }
-  25% {
-    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3), 0 0 20px rgba(0, 255, 136, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-  50% {
-    box-shadow: 0 12px 40px rgba(0, 255, 136, 0.4), 0 0 30px rgba(0, 255, 136, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-  100% {
-    box-shadow: inherit;
-  }
+  0% { box-shadow: inherit; }
+  25% { box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3), 0 0 20px rgba(0, 255, 136, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  50% { box-shadow: 0 12px 40px rgba(0, 255, 136, 0.4), 0 0 30px rgba(0, 255, 136, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  100% { box-shadow: inherit; }
 }
 
 @keyframes cardGlowRed {
-  0% {
-    box-shadow: inherit;
-  }
-  25% {
-    box-shadow: 0 8px 32px rgba(255, 20, 147, 0.3), 0 0 20px rgba(255, 20, 147, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-  50% {
-    box-shadow: 0 12px 40px rgba(255, 20, 147, 0.4), 0 0 30px rgba(255, 20, 147, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-  100% {
-    box-shadow: inherit;
-  }
+  0% { box-shadow: inherit; }
+  25% { box-shadow: 0 8px 32px rgba(255, 20, 147, 0.3), 0 0 20px rgba(255, 20, 147, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  50% { box-shadow: 0 12px 40px rgba(255, 20, 147, 0.4), 0 0 30px rgba(255, 20, 147, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  100% { box-shadow: inherit; }
 }
 
-/* Removemos los estilos del spinner que ya no usamos */
-
-/* Overlay de carga para búsqueda de cuenta */
 .search-loading-overlay {
   position: absolute;
   top: 0;
@@ -1402,7 +1243,7 @@ modal-content button:active {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .search-loading-content {
@@ -1411,15 +1252,15 @@ modal-content button:active {
 }
 
 .search-loading-content p {
-  margin-top: 20px;
-  font-size: 16px;
+  margin-top: 1rem;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
 }
 
 .search-spinner {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border: 3px solid rgba(255, 255, 255, 0.2);
   border-top: 3px solid var(--cyber-blue);
   border-radius: 50%;
@@ -1428,32 +1269,26 @@ modal-content button:active {
 }
 
 @keyframes searchSpin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Form Group for Floating Labels */
 .form-group {
   position: relative;
-  margin-bottom: 10px;
-  
+  margin-bottom: 0.75rem;
 }
+
 
 .form-group input {
   width: 100%;
-  padding: 20px 15px 10px 15px;
+  padding: 16px 12px 8px 12px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  font-size: 16px;
+  border-radius: 10px;
+  font-size: 14px;
   transition: all 0.3s ease;
 }
 
-/* Mejor contraste para form-group inputs en modo claro */
 :not([data-theme="dark"]) .form-group input {
   color: #1a1a1a;
   background: rgba(255, 255, 255, 0.9);
@@ -1466,10 +1301,10 @@ modal-content button:active {
 
 .form-group label {
   position: absolute;
-  top: 30px;
-  left: 15px;
+  top: 16px;
+  left: 12px;
   color: transparent;
-  font-size: 16px;
+  font-size: 14px;
   transition: all 0.3s ease;
   pointer-events: none;
 }
@@ -1477,21 +1312,20 @@ modal-content button:active {
 .form-group input:focus + label,
 .form-group input:not(:placeholder-shown) + label {
   top: 2px;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-accent);
   font-weight: 600;
   transform: translateY(-2px);
 }
 
-/* Alias Modal Specific Styles */
 .alias-modal .modal-content {
-  width: 500px;
+  max-width: 500px;
 }
 
 .info-alias-cvu {
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
-  padding: 25px;
+  border-radius: 12px;
+  padding: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -1499,8 +1333,10 @@ modal-content button:active {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .info-line:last-child {
@@ -1510,25 +1346,27 @@ modal-content button:active {
 .info-text {
   flex: 1;
   color: #ffffff;
+  min-width: 0;
 }
 
 .info-text strong {
   color: var(--cyber-blue);
-  margin-right: 10px;
+  margin-right: 0.5rem;
 }
 
 .info-text span {
   color: var(--text-primary);
   font-family: 'Courier New', monospace;
   background: rgba(255, 255, 255, 0.1);
-  padding: 5px 10px;
+  padding: 0.25rem 0.5rem;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 12px;
+  word-break: break-all;
 }
 
 .copy-button {
-  width: 40px !important;
-  height: 40px;
+  width: 35px !important;
+  height: 35px;
   padding: 0 !important;
   margin: 0 !important;
   background: rgba(0, 212, 255, 0.2) !important;
@@ -1537,6 +1375,7 @@ modal-content button:active {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .copy-button:hover {
@@ -1546,17 +1385,18 @@ modal-content button:active {
 
 .copy-button svg {
   color: var(--cyber-blue);
+  width: 16px;
+  height: 16px;
 }
 
-/* Currency Selection */
 #currency-selection {
   text-align: center;
 }
 
 #currency-selection p {
   color: var(--text-primary);
-  margin-bottom: 25px;
-  font-size: 18px;
+  margin-bottom: 1.25rem;
+  font-size: 1rem;
 }
 
 .currency-button {
@@ -1570,75 +1410,75 @@ modal-content button:active {
   box-shadow: 0 8px 25px rgba(139, 95, 191, 0.4);
 }
 
-/* Tax Form */
 #tax-form label {
   display: block;
-  color: var(--cyber-blue);
-  margin-bottom: 10px;
+  color: var(--text-accent);
+  margin-bottom: 0.5rem;
   font-weight: 600;
+  font-size: 0.9rem;
 }
 
-/* Estilos específicos para el input del monto en modo claro */
 #tax-form input[type='number'] {
-  color: var(--obsidian); /* Asegura que el texto sea oscuro */
-  background-color: rgba(var(--platinum-rgb), 0.8); /* Fondo ligeramente transparente */
-  border: 1px solid var(--border-color); /* Borde sutil */
-  /* Puedes agregar otros estilos como padding, border-radius si querés */
-  padding: 12px 15px;
+  color: var(--obsidian);
+  background-color: rgba(var(--platinum-rgb), 0.8);
+  border: 1px solid var(--border-color);
+  padding: 10px 12px;
   border-radius: 8px;
-
-  width: 100%; /* Ocupar el ancho */
-  margin-bottom: 20px; /* Espacio abajo */
+  width: 100%;
+  margin-bottom: 1rem;
+  font-size: 14px;
 }
 
-/* Estilos para el placeholder en modo claro (opcional) */
 #tax-form input[type='number']::placeholder {
-  color: rgba(var(--carbon-rgb), 0.4); /* Placeholder un poco más claro */
+  color: rgba(var(--carbon-rgb), 0.4);
 }
 
-/* Estilos cuando el input está enfocado en modo claro */
 #tax-form input[type='number']:focus {
   outline: none;
   border-color: var(--cyber-blue);
-  box-shadow: 0 0 0 3px rgba(var(--cyber-blue-rgb), 0.3); /* Usa el RGB de --cyber-blue */
+  box-shadow: 0 0 0 3px rgba(var(--cyber-blue-rgb), 0.3);
 }
 
 #tax-result {
-  margin-top: 25px;
-  padding: 20px;
+  margin-top: 1.25rem;
+  padding: 1rem;
   background: rgba(57, 255, 204, 0.1);
   border: 1px solid rgba(57, 255, 204, 0.3);
-  border-radius: 12px;
-  color: #ffffff;
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
 }
 
-/* Profile Modal */
 .profile-details {
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
-  padding: 25px;
+  border-radius: 12px;
+  padding: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .profile-photo {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 1.25rem;
 }
 
 .profile-photo svg {
   border-radius: 50%;
-  border: 3px solid var(--cyber-blue);
-  padding: 10px;
+  border: 2px solid var(--cyber-blue);
+  padding: 8px;
   background: rgba(0, 212, 255, 0.1);
+  width: 80px;
+  height: 80px;
 }
 
 .profile-details p {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .profile-details p:last-child {
@@ -1647,12 +1487,14 @@ modal-content button:active {
 
 .profile-details strong {
   color: var(--cyber-blue);
-  min-width: 150px;
+  min-width: 120px;
+  font-size: 0.9rem;
 }
 
 .profile-details span {
   flex: 1;
   text-align: right;
+  font-size: 0.9rem;
 }
 
 .profile-details input {
@@ -1662,11 +1504,11 @@ modal-content button:active {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 6px;
-  padding: 5px 10px;
+  padding: 4px 8px;
   color: #ffffff;
+  font-size: 0.9rem;
 }
 
-/* Mejor contraste para profile-details inputs en modo claro */
 :not([data-theme="dark"]) .profile-details input {
   color: #1a1a1a;
   background: rgba(255, 255, 255, 0.9);
@@ -1679,46 +1521,53 @@ modal-content button:active {
 
 .profile-details button {
   width: auto !important;
-  padding: 5px 10px !important;
-  margin: 0 0 0 10px !important;
+  padding: 4px 8px !important;
+  margin: 0 0 0 0.5rem !important;
   background: rgba(0, 212, 255, 0.2) !important;
-  font-size: 14px !important;
+  font-size: 12px !important;
 }
 
-/* Transaction Details Modal */
 .transfer-details {
   list-style: none;
   padding: 0;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
-  padding: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: none;
 }
+
+
 
 .transfer-details li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: var(--text-primary);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
+
+
 
 .transfer-details li:last-child {
   border-bottom: none;
 }
 
 .transfer-details b {
-  color: var(--cyber-blue);
-  min-width: 120px;
+  color: var(--text-accent);
+  min-width: 100px;
+  font-size: 0.9rem;
 }
 
 .transfer-details span {
   text-align: right;
   font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  word-break: break-word;
 }
 
-/* Colores para los montos en el modal */
 .transfer-details span.income {
   color: var(--laser-green) !important;
   font-weight: 600;
@@ -1730,7 +1579,7 @@ modal-content button:active {
 }
 
 .estado-completed {
-  color: var(--neon-cyan) !important;
+  color: var(--laser-green) !important;
   font-weight: 600;
 }
 
@@ -1744,59 +1593,60 @@ modal-content button:active {
   font-weight: 600;
 }
 
-/* Transfer Modal Steps */
 #search-account-step,
 #confirm-account-step,
 #amount-step {
   text-align: center;
 }
 
-/* Estilos específicos para el input del monto en modo claro */
 #amount-step input[type='number'] {
-  color: var(--bg-primary); /* Asegura que el texto sea oscuro */
-  background-color: rgba(var(--platinum-rgb), 0.8); /* Fondo ligeramente transparente */
-  border: 1px solid var(--border-color); /* Borde sutil */
+  color: var(--bg-primary);
+  background-color: rgba(var(--platinum-rgb), 0.8);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  width: 100%; /* Ocupar el ancho */
-  margin-top: 1rem;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 10px 12px;
+  font-size: 14px;
 }
 
-/* Estilos para el placeholder en modo claro (opcional) */
 #amount-step input[type='number']::placeholder {
-  color: rgba(var(--carbon-rgb), 0.4); /* Placeholder un poco más claro */
+  color: rgba(var(--carbon-rgb), 0.4);
 }
 
-/* Estilos cuando el input está enfocado en modo claro */
 #amount-step input[type='number']:focus {
   outline: none;
   border-color: var(--cyber-blue);
-  box-shadow: 0 0 0 3px rgba(var(--cyber-blue-rgb), 0.3); /* Usa el RGB de --cyber-blue */
+  box-shadow: 0 0 0 3px rgba(var(--cyber-blue-rgb), 0.3);
 }
 
 #account-details {
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 20px;
-  margin: 20px 0;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #account-details p {
   color: var(--text-primary);
-  margin: 10px 0;
+  margin: 0.5rem 0;
   text-align: left;
+  font-size: 0.9rem;
 }
 
 #account-details strong {
   color: var(--cyber-blue);
 }
 
-/* Responsive Design for Modals */
+/* ====================================
+   RESPONSIVE DESIGN
+   ==================================== */
 @media (max-width: 768px) {
   .modal-content {
     width: 95vw;
-    padding: 20px;
-    margin: 20px;
+    padding: 1.25rem;
+    margin: 1rem;
   }
 
   .alias-modal .modal-content {
@@ -1805,13 +1655,13 @@ modal-content button:active {
 
   .currency-button {
     width: 100% !important;
-    margin: 0 0 10px 0 !important;
+    margin: 0 0 0.75rem 0 !important;
   }
 
   .info-line {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 0.5rem;
   }
 
   .info-text {
@@ -1820,7 +1670,7 @@ modal-content button:active {
 
   .info-text span {
     display: block;
-    margin-top: 5px;
+    margin-top: 0.25rem;
     word-break: break-all;
   }
 
@@ -1831,7 +1681,7 @@ modal-content button:active {
   .profile-details p {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 0.5rem;
   }
 
   .profile-details span,
@@ -1839,13 +1689,115 @@ modal-content button:active {
     text-align: left;
     width: 100%;
   }
+
+  .transfer-details li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 0.75rem 0;
+  }
+
+  .transfer-details b,
+  .transfer-details span {
+    text-align: left;
+    width: 100%;
+  }
+
+  .transfer-details b {
+    min-width: auto;
+    margin-bottom: 0.25rem;
+  }
+
+  
+
+  .transaction-item-modal {
+    padding: 0.75rem;
+  }
+
+  .transaction-icon-modal {
+    width: 35px;
+    height: 35px;
+    margin-right: 0.75rem;
+  }
+
+  .transaction-description-modal {
+    font-size: 0.8rem;
+  }
+
+  .amount-value-modal {
+    font-size: 0.875rem;
+  }
+
+  .favorites-modal,
+  .favorite-details-modal,
+  .add-favorite-modal,
+  .edit-favorite-modal {
+    min-width: 90vw;
+    max-width: 95vw;
+    margin: 1rem;
+  }
+
+  .favorite-card {
+    padding: 0.75rem;
+  }
+
+  .favorite-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+    margin-right: 0.75rem;
+  }
+
+  .favorite-alias {
+    font-size: 1rem;
+  }
+
+  .favorite-actions-buttons {
+    flex-direction: column;
+  }
+
+  .favorite-actions-buttons button {
+    min-width: auto;
+  }
+
+
+
+  .favorite-option button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .balance-card {
+    padding: 1rem;
+  }
+
+  .action-card {
+    padding: 1rem;
+  }
+
+  .transaction-item {
+    padding: 0.75rem;
+  }
+
+  .user-info {
+    display: none;
+  }
+
+  .nav-title {
+    font-size: 1.125rem;
+  }
+
+  .admin-panel-btn {
+    font-size: 0.7rem;
+    padding: 0.5rem 0.75rem;
+  }
 }
 
 /* ====================================
    ESTILOS ESPECÍFICOS PARA TEMAS
    ==================================== */
-
-/* Estilos base para los elementos del logo */
 .vault-shape {
   fill: none;
   stroke: var(--text-accent);
@@ -1867,7 +1819,6 @@ modal-content button:active {
   transition: all 0.4s ease;
 }
 
-/* Estilos específicos para tema oscuro */
 [data-theme='dark'] .vault-shape {
   fill: var(--bg-secondary);
   stroke: var(--text-accent);
@@ -1881,7 +1832,6 @@ modal-content button:active {
   stroke: var(--text-primary);
 }
 
-/* Navegación específica para tema oscuro */
 [data-theme='dark'] .top-nav {
   background: rgba(26, 26, 46, 0.95) !important;
   border-bottom: 1px solid var(--border-color) !important;
@@ -1908,7 +1858,6 @@ modal-content button:active {
   opacity: 0.8;
 }
 
-/* Spinner y elementos de carga específicos */
 [data-theme='dark'] .spinner-circle {
   border-top-color: var(--text-accent);
 }
@@ -1934,7 +1883,6 @@ modal-content button:active {
   transition: all 0.4s ease;
 }
 
-/* Modo oscuro para taglines */
 [data-theme='dark'] .nav-tagline {
   color: var(--text-accent);
   opacity: 0.8;
@@ -1945,32 +1893,12 @@ modal-content button:active {
   opacity: 0.8;
 }
 
-/* Centrar el logo con el contenido de texto */
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.nav-logo {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-}
-
 .nav-brand-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
   justify-content: center;
-  min-height: 40px; /* Asegurar que tenga la misma altura que el logo */
-}
-
-.nav-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0;
+  min-height: 35px;
 }
 
 .nav-tagline {
@@ -1986,247 +1914,11 @@ modal-content button:active {
 }
 
 /* ====================================
-   ANIMACIONES
+   MODALES ADICIONALES
    ==================================== */
-
-/* Animación de rotación para el spinner */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Animación de aparición desde abajo */
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Animación de pulsación para elementos de carga */
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* Animación de escalado suave */
-@keyframes scaleIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Aplicar animaciones a los elementos de carga */
-.wallet-loader-container {
-  animation: fadeInUp 1s ease;
-}
-
-.spinner-circle {
-  animation: spin 2s linear infinite;
-}
-
-.loading-brand {
-  animation: fadeInUp 1.2s ease 0.3s both;
-}
-
-.loading-text {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-/* ====================================
-   ESTILOS BÁSICOS PARA MODALES
-   ==================================== */
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 500px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-/* Modo oscuro para modal */
-[data-theme='dark'] .modal-content {
-  background: var(--obsidian);
-  border: 1px solid rgba(57, 255, 204, 0.3);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-.close-button {
-  position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color 0.3s ease;
-  line-height: 1;
-}
-
-.close-button:hover {
-  color: var(--cyber-blue);
-}
-
-.modal h2 {
-  margin: 0 0 1.5rem 0;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-/* ====================================
-   ESTILOS PARA MODAL DE TRANSACCIONES
-   ==================================== */
-
-.transfer-details {
-  list-style: none;
-  padding: 0;
-  margin: 1.5rem 0;
-}
-
-.transfer-details li {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.95rem;
-  gap: 1rem;
-}
-
-.transfer-details li:last-child {
-  border-bottom: none;
-}
-
-.transfer-details b {
-  color: var(--text-secondary);
-  font-weight: 600;
-  flex: 0 0 auto;
-  min-width: 120px;
-}
-
-.transfer-details span {
-  color: var(--text-primary);
-  font-weight: 500;
-  text-align: right;
-  flex: 1;
-  word-break: break-word;
-}
-
-/* Modo oscuro para transfer-details */
-[data-theme='dark'] .transfer-details b {
-  color: var(--neon-cyan);
-}
-
-[data-theme='dark'] .transfer-details span {
-  color: var(--platinum);
-}
-
-[data-theme='dark'] .transfer-details li {
-  border-bottom-color: rgba(57, 255, 204, 0.2);
-}
-
-/* Estados de transacciones */
-.estado-completed {
-  color: var(--success-color, #10b981) !important;
-  font-weight: 600;
-}
-
-.estado-failed {
-  color: var(--error-color, #ef4444) !important;
-  font-weight: 600;
-}
-
-/* Estados específicos para modo oscuro */
-[data-theme='dark'] .estado-completed {
-  color: #34d399 !important;
-}
-
-[data-theme='dark'] .estado-failed {
-  color: #f87171 !important;
-}
-
-/* Responsive para móviles */
-@media (max-width: 768px) {
-  .transfer-details li {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-    padding: 0.75rem 0;
-  }
-
-  .transfer-details b,
-  .transfer-details span {
-    text-align: left;
-    width: 100%;
-  }
-
-  .transfer-details b {
-    min-width: auto;
-    margin-bottom: 0.25rem;
-  }
-
-  .modal-content {
-    width: 95%;
-    padding: 1.5rem;
-    margin: 1rem;
-  }
-}
-
-/* Optimizaciones de performance */
-.modal * {
-  will-change: auto;
-}
-
-.modal.show * {
-  will-change: transform, opacity;
-}
-
-/* ====================================
-   MODAL DE TODAS LAS TRANSACCIONES
-   ==================================== */
-
 .all-transactions-modal {
   max-width: 700px !important;
-  max-height: 80vh !important;
+  max-height: 900px !important;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -2236,21 +1928,21 @@ modal-content button:active {
   flex: 1;
   overflow-y: auto;
   padding-right: 5px;
-  margin-top: 20px;
+  margin-top: 1rem;
 }
 
 .all-transactions-container::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .all-transactions-container::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .all-transactions-container::-webkit-scrollbar-thumb {
   background: var(--cyber-blue);
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .all-transactions-container::-webkit-scrollbar-thumb:hover {
@@ -2259,46 +1951,49 @@ modal-content button:active {
 
 .no-transactions-message {
   text-align: center;
-  padding: 40px 20px;
+  padding: 2rem 1rem;
   color: var(--text-secondary);
 }
 
 .no-transactions-message svg {
   color: var(--cyber-blue);
-  margin-bottom: 15px;
+  margin-bottom: 0.75rem;
   opacity: 0.6;
+  width: 48px;
+  height: 48px;
 }
 
 .no-transactions-message p {
-  font-size: 16px;
+  font-size: 14px;
   margin: 0;
 }
 
 .transactions-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.5rem;
 }
 
 .transaction-item-modal {
   display: flex;
   align-items: center;
-  padding: 15px;
+  padding: 0.75rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(139, 233, 253, 0.2);
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: default;
   transition: all 0.3s ease;
+  flex-wrap: wrap;
 }
 
 .transaction-icon-modal {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 15px;
+  margin-right: 0.75rem;
   flex-shrink: 0;
 }
 
@@ -2318,23 +2013,23 @@ modal-content button:active {
 }
 
 .transaction-description-modal {
-  font-size: 14px;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 4px 0;
+  margin: 0 0 2px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .transaction-date-modal {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   margin: 0;
 }
 
 .transaction-status-modal.failed {
-  font-size: 11px;
+  font-size: 0.7rem;
   color: var(--plasma-pink);
   font-weight: 600;
   margin-top: 2px;
@@ -2346,7 +2041,7 @@ modal-content button:active {
 }
 
 .amount-value-modal {
-  font-size: 16px;
+  font-size: 0.9rem;
   font-weight: 700;
   font-family: 'Courier New', monospace;
 }
@@ -2359,34 +2054,30 @@ modal-content button:active {
   color: var(--plasma-pink);
 }
 
-/* Botón de cargar más transacciones */
 .load-more-container {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
-  padding-top: 15px;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
   border-top: 1px solid rgba(139, 233, 253, 0.2);
 }
 
 .load-more-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
   background: linear-gradient(135deg, var(--cyber-blue) 0%, var(--neon-cyan) 100%);
   color: white;
   border: none;
-  border-radius: 25px;
-  font-size: 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
 }
 
-/* Sin efectos hover para mejor performance */
-
-/* Modo oscuro para el modal de todas las transacciones */
 [data-theme='dark'] .transaction-item-modal {
   background: rgba(0, 0, 0, 0.3);
   border-color: rgba(139, 233, 253, 0.3);
@@ -2404,78 +2095,30 @@ modal-content button:active {
   color: var(--text-secondary-dark);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .all-transactions-modal {
-    max-width: 95% !important;
-    margin: 20px auto !important;
-    max-height: 85vh !important;
-  }
-
-  .transaction-item-modal {
-    padding: 12px;
-  }
-
-  .transaction-icon-modal {
-    width: 35px;
-    height: 35px;
-    margin-right: 12px;
-  }
-
-  .transaction-description-modal {
-    font-size: 13px;
-  }
-
-  .amount-value-modal {
-    font-size: 14px;
-  }
-}
-
-/* Mejorar contraste para accesibilidad */
-.transfer-details span {
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-[data-theme='dark'] .transfer-details span {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* ====================================
-   ESTILOS PARA CONTACTOS FAVORITOS
-   ==================================== */
-
-/* Icono de favoritos en las acciones rápidas */
-.action-icon.favorites {
-  background: linear-gradient(135deg, var(--plasma-pink) 0%, var(--electric-purple) 100%);
-  box-shadow: 0 4px 20px rgba(255, 0, 110, 0.3);
-}
-
-
-
-/* Modal de lista de favoritos */
 .favorites-modal {
-  min-width: 500px;
-  max-width: 700px;
+  min-width: 300px;
+  max-width: 600px;
   max-height: 80vh;
 }
 
 .favorites-list {
-  max-height: 500px;
+  max-height: 400px;
   overflow-y: auto;
-  padding: 8px 10px 0 0;
+  padding: 4px 5px 0 0;
 }
 
 .favorite-card {
   display: flex;
   align-items: center;
-  padding: 16px;
-  margin: 4px 0 12px 0;
+  padding: 0.75rem;
+  margin: 2px 0 0.5rem 0;
   background: rgba(var(--platinum-rgb), 0.1);
   border: 1px solid var(--border-light);
-  border-radius: 16px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+  flex-wrap: wrap;
+  animation: slideInUp 0.3s ease;
 }
 
 [data-theme='dark'] .favorite-card {
@@ -2496,8 +2139,8 @@ modal-content button:active {
 }
 
 .favorite-avatar {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--tech-gradient-primary);
   display: flex;
@@ -2505,16 +2148,16 @@ modal-content button:active {
   justify-content: center;
   color: white;
   font-weight: 600;
-  font-size: 16px;
-  margin-right: 16px;
+  font-size: 14px;
+  margin-right: 0.75rem;
   flex-shrink: 0;
   box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
 }
 
 .favorite-avatar.large {
-  width: 64px;
-  height: 64px;
-  font-size: 20px;
+  width: 50px;
+  height: 50px;
+  font-size: 16px;
 }
 
 .favorite-info {
@@ -2523,30 +2166,30 @@ modal-content button:active {
 }
 
 .favorite-alias {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .favorite-owner {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--text-accent);
-  margin-bottom: 2px;
+  margin-bottom: 1px;
   font-weight: 500;
 }
 
 .favorite-account {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .favorite-description {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: var(--text-primary);
   opacity: 0.7;
   font-style: italic;
@@ -2559,94 +2202,100 @@ modal-content button:active {
   color: var(--text-accent);
   display: flex;
   align-items: center;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 0.5rem;
+  border-radius: 6px;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .favorite-card:hover .favorite-actions {
   background: rgba(var(--text-accent), 0.1);
-  transform: translateX(5px);
+  transform: translateX(3px);
 }
 
-/* Estado vacío de favoritos */
 .empty-favorites {
   text-align: center;
-  padding: 60px 20px;
+  padding: 3rem 1rem;
   color: var(--text-primary);
   opacity: 0.7;
 }
 
 .empty-icon {
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
   opacity: 0.5;
 }
 
 .empty-icon svg {
   stroke: var(--text-accent);
+  width: 48px;
+  height: 48px;
 }
 
 .empty-favorites h3 {
-  font-size: 1.2rem;
-  margin-bottom: 8px;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
   color: var(--text-primary);
 }
 
 .empty-favorites p {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
-  max-width: 300px;
+  max-width: 250px;
   margin: 0 auto;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
-/* Modal de detalles de favorito */
 .favorite-details-modal {
-  min-width: 500px;
-  max-width: 600px;
+  min-width: 300px;
+  max-width: 500px;
 }
 
 .favorite-details {
-  padding: 20px 0;
+  padding: 1rem 0;
 }
 
 .favorite-profile {
   display: flex;
   align-items: center;
-  padding: 20px;
+  padding: 1rem;
   background: rgba(var(--text-accent), 0.05);
-  border-radius: 16px;
-  margin-bottom: 24px;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
   border: 1px solid rgba(var(--text-accent), 0.15);
+  flex-wrap: wrap;
 }
 
 .favorite-profile-info {
-  margin-left: 20px;
+  margin-left: 1rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .favorite-profile-info h3 {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: var(--text-primary);
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .owner-name {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--text-accent);
   font-weight: 500;
 }
 
 .favorite-account-info {
-  margin-bottom: 24px;
+  margin-bottom: 1.25rem;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid var(--border-light);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .info-row:last-child {
@@ -2656,7 +2305,7 @@ modal-content button:active {
 .info-row .label {
   font-weight: 500;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .info-row .value {
@@ -2665,35 +2314,38 @@ modal-content button:active {
   max-width: 60%;
   text-align: right;
   word-break: break-all;
+  font-size: 0.8rem;
 }
 
-/* Botones de acciones de favoritos */
 .favorite-actions-buttons {
   display: flex;
-  gap: 12px;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .favorite-actions-buttons button {
   flex: 1;
-  min-width: 140px;
-  padding: 12px 16px;
+  min-width: 120px;
+  padding: 0.75rem 1rem;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .transfer-btn {
   background: linear-gradient(135deg, var(--text-accent) 0%, var(--text-secondary) 100%) !important;
   color: white;
 }
+
 .transfer-btn::before {
   content: '';
   position: absolute;
@@ -2706,7 +2358,7 @@ modal-content button:active {
 }
 
 .transfer-btn:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
   background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
 }
@@ -2726,30 +2378,10 @@ modal-content button:active {
   border: 1px solid rgba(var(--electric-purple), 0.3);
 }
 
-.edit-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
 .edit-btn:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
   background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
-}
-
-.edit-btn:hover::before {
-  left: 100%;
-}
-
-.edit-btn:active {
-  transform: translateY(0);
-  transition: transform 0.1s;
 }
 
 .remove-btn {
@@ -2758,47 +2390,26 @@ modal-content button:active {
   border: 1px solid rgba(var(--plasma-pink), 0.3);
 }
 
-.remove-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
 .remove-btn:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(255, 0, 110, 0.3);
   background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
 }
 
-.remove-btn:hover::before {
-  left: 100%;
-}
-
-.remove-btn:active {
-  transform: translateY(0);
-  transition: transform 0.1s;
-}
-
-/* Modales de agregar/editar favorito */
 .add-favorite-modal,
 .edit-favorite-modal {
-  min-width: 450px;
-  max-width: 500px;
+  min-width: 300px;
+  max-width: 450px;
 }
 
 .add-favorite-form,
 .edit-favorite-form {
-  padding: 20px 0;
+  padding: 1rem 0;
 }
 
 .add-favorite-form .form-group,
 .edit-favorite-form .form-group {
-  margin-bottom: 24px;
+  margin-bottom: 1.25rem;
   position: relative;
 }
 
@@ -2807,18 +2418,17 @@ modal-content button:active {
 .edit-favorite-form input,
 .edit-favorite-form textarea {
   width: 100%;
-  padding: 16px;
+  padding: 12px;
   border: 2px solid var(--border-light);
-  border-radius: 12px;
+  border-radius: 10px;
   background: rgba(var(--platinum-rgb), 0.05);
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
   font-family: inherit;
   resize: vertical;
 }
 
-/* Mejor contraste para formularios de favoritos en modo claro */
 :not([data-theme="dark"]) .add-favorite-form input,
 :not([data-theme="dark"]) .add-favorite-form textarea,
 :not([data-theme="dark"]) .edit-favorite-form input,
@@ -2864,10 +2474,10 @@ modal-content button:active {
 .add-favorite-form label,
 .edit-favorite-form label {
   position: absolute;
-  left: 16px;
-  top: 16px;
+  left: 12px;
+  top: 12px;
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
   pointer-events: none;
   background: var(--bg-primary);
@@ -2882,30 +2492,34 @@ modal-content button:active {
 .edit-favorite-form input:not(:placeholder-shown) + label,
 .edit-favorite-form textarea:focus + label,
 .edit-favorite-form textarea:not(:placeholder-shown) + label {
-  transform: translateY(-28px) scale(0.85);
+  transform: translateY(-20px) scale(0.85);
   color: var(--text-accent);
   font-weight: 600;
 }
 
 .form-actions {
   display: flex;
-  gap: 12px;
+  gap: 0.5rem;
   justify-content: flex-end;
-  padding-top: 20px;
+  padding-top: 1rem;
   border-top: 1px solid var(--border-light);
+  flex-wrap: wrap;
 }
 
 .form-actions button {
-  padding: 12px 24px;
+  padding: 0.75rem 1.25rem;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  flex: 1;
+  min-width: 100px;
+  justify-content: center;
 }
 
 .form-actions .primary {
@@ -2937,22 +2551,21 @@ modal-content button:active {
   transform: translateY(-2px);
 }
 
-/* Paso 4: Agregar a favoritos después de transferencia */
 #add-favorite-step {
   text-align: center;
-  padding: 20px;
+  padding: 1rem;
 }
 
 .transfer-success {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 1rem;
 }
 
 .success-icon {
-  width: 64px;
-  height: 64px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: var(--tech-gradient-accent);
   display: flex;
@@ -2963,7 +2576,9 @@ modal-content button:active {
 
 .success-icon svg {
   stroke: white;
-  stroke-width: 3;
+  stroke-width: 2.5;
+  width: 24px;
+  height: 24px;
 }
 
 @keyframes successPulse {
@@ -2974,40 +2589,47 @@ modal-content button:active {
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 0 0 20px rgba(57, 255, 204, 0);
+    box-shadow: 0 0 0 15px rgba(57, 255, 204, 0);
   }
 }
 
 .transfer-success h3 {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: var(--text-primary);
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .transfer-success p {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  margin-bottom: 24px;
+  margin-bottom: 1.25rem;
 }
 
 .favorite-option {
   display: flex;
-  gap: 12px;
+  gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-direction: row;
+  width: 100%;
 }
 
 .favorite-option button {
-  padding: 12px 20px;
+  
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  flex: 1;
+  min-width: 120px;
+  justify-content: center;
 }
 
 .favorite-option .primary {
@@ -3016,16 +2638,21 @@ modal-content button:active {
   box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
 }
 
+.favorite-option .primary svg{
+  width: 8px;
+  height: 8px;
+}
+
 .favorite-option .primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
 }
 
 .favorite-option .secondary {
-  padding: 20px;
   background: rgba(var(--text-secondary), 0.1);
   color: var(--text-secondary);
   border: 1px solid rgba(var(--text-secondary), 0.3);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
 }
 
 .favorite-option .secondary:hover {
@@ -3033,60 +2660,10 @@ modal-content button:active {
   transform: translateY(-2px);
 }
 
-/* Responsividad para favoritos */
-@media (max-width: 768px) {
-  .favorites-modal,
-  .favorite-details-modal,
-  .add-favorite-modal,
-  .edit-favorite-modal {
-    min-width: 90vw;
-    max-width: 95vw;
-    margin: 20px;
-  }
-
-  .favorite-card {
-    padding: 12px;
-  }
-
-  .favorite-avatar {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
-    margin-right: 12px;
-  }
-
-  .favorite-alias {
-    font-size: 1rem;
-  }
-
-  .favorite-actions-buttons {
-    flex-direction: column;
-  }
-
-  .favorite-actions-buttons button {
-    min-width: auto;
-  }
-
-  .favorite-option {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .favorite-option button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Animaciones de entrada para favoritos */
-.favorite-card {
-  animation: slideInUp 0.3s ease;
-}
-
 @keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;
@@ -3094,35 +2671,218 @@ modal-content button:active {
   }
 }
 
-/* ====================================
-   ESTILOS PARA EL QR
-   ==================================== */
-
-/* Dale un tamaño mínimo al modal del QR SOLO cuando está cargando */
 .modal-content.loading-qr {
-  min-height: 300px; /* Ajusta este valor si querés más o menos espacio */
-  display: flex; /* Ayuda a centrar el overlay si es necesario */
+  min-height: 200px;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Asegúrate de que el overlay siga funcionando bien dentro */
 .modal-content.loading-qr .search-loading-overlay {
-  /* Si ya tenías position: absolute, top:0, etc. no necesitas repetir */
-  /* Pero asegúrate de que cubra bien el espacio */
-  border-radius: 12px; /* Mantiene los bordes redondeados */
+  border-radius: 10px;
 }
 
-/* Cuando ya no está cargando, quita el min-height para que se ajuste al QR */
 .modal-content:not(.loading-qr) {
-  min-height: auto; /* O el valor por defecto que tuviera */
+  min-height: auto;
 }
 
-/* Estilos para el contenedor del QR (cuando ya cargó) */
 .qr-container {
-  text-align: center; /* Centra el QR y el texto */
+  text-align: center;
 }
 
 .qr-footer {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+}
+
+/* ====================================
+   RESPONSIVE ADAPTACIONES ESPECÍFICAS
+   ==================================== */
+@media (max-width: 360px) {
+  .main-content {
+    padding: 0.5rem;
+  }
+  
+  .top-nav {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+  
+  .nav-brand {
+    gap: 0.5rem;
+  }
+  
+  .nav-logo {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .nav-actions {
+    gap: 0.5rem;
+  }
+  
+  .theme-toggle {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .admin-panel-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.7rem;
+  }
+  
+  .user-menu {
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .balance-card {
+    padding: 1rem;
+  }
+  
+  .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .action-card {
+    padding: 1rem;
+    min-height: 100px;
+  }
+  
+  .modal-content {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 480px) {
+  .actions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .account-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+  
+  .top-nav {
+    padding: 1.25rem;
+  }
+  
+  .actions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (min-width: 769px) {
+  .main-content {
+    padding: 2rem;
+  }
+  
+  .top-nav {
+    padding: 1rem 2rem;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .main-content {
+    padding-bottom: 4rem;
+  }
+  
+  .balance-card {
+    padding: 1rem;
+  }
+  
+  .action-card {
+    padding: 1rem;
+    min-height: 100px;
+  }
+  
+  .modal {
+    align-items: flex-start;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  
+  .modal-content {
+    max-height: 85vh;
+  }
+}
+
+@media (max-width: 320px) {
+  body {
+    font-size: 13px;
+  }
+  
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+  
+  .amount, .amount-hidden {
+    font-size: 1.75rem;
+  }
+}
+
+@supports(padding: max(0px)) {
+  .main-content {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(6rem, env(safe-area-inset-bottom));
+  }
+  
+  .top-nav {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+.transaction-actions-modal {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding-left: 10px;
+}
+
+
+
+/* Ajusta el layout del item de transacción para acomodar el botón */
+.transaction-item-modal {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.transaction-item-modal:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.transaction-info-modal {
+  flex: 1;
+  min-width: 0;
+  margin: 0 12px;
+}
+
+.transaction-amount-modal {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+
+
+[data-theme="dark"] .transaction-item-modal:hover {
+  background-color: #2a2a2a;
 }

@@ -49,33 +49,6 @@
   }
 }
 
-.theme-control {
-  position: fixed;
-  top: 2rem;
-  right: 2rem;
-  z-index: 1000;
-}
-
-#theme-switcher {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 0.7rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px var(--shadow-primary);
-  backdrop-filter: blur(12px);
-}
-
-#theme-switcher:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px var(--shadow-primary);
-}
-
-#theme-switcher svg {
-  color: var(--text-accent);
-  transition: all 0.3s ease;
-}
 
 .error-container {
   display: flex;

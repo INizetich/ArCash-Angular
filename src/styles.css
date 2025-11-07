@@ -298,7 +298,7 @@ button, input, .access-btn {
 /* Estilos específicos para inputs tipo button y submit - excluye logout, password toggle y elementos toast */
 :root:not([data-theme="dark"]) input[type="button"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):not(.toast-close):not([class*="toast"]),
 :root:not([data-theme="dark"]) input[type="submit"]:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):not(.toast-close):not([class*="toast"]) {
-    
+    color: var(--carbon) !important;
     background: transparent !important;
     border: 1px solid rgba(44, 62, 80, 0.2) !important;
 }
@@ -354,6 +354,11 @@ button, input, .access-btn {
 /* Modo oscuro - logo QR blanco */
 [data-theme="dark"] .action-icon.QR {
     color: #FFFFFF !important; /* Blanco en modo oscuro */
+}
+
+[data-theme="dark"] .form-group textarea{
+    color: var(--platinum) !important;
+    background-color: transparent !important;
 }
 
 /* * =================================================================
@@ -450,27 +455,39 @@ button, input, .access-btn {
  * y lo reemplaza por un brillo "celeste" en modo claro.
  */
 
-:root:not([data-theme="dark"]) .formulario button[type="submit"]::before,
-:root:not([data-theme="dark"]) .access-btn::before,
-:root:not([data-theme="dark"]) .users-btn::before,
-:root:not([data-theme="dark"]) .admin-btn::before,
-:root:not([data-theme="dark"]) .habilitar-btn::before,
-:root:not([data-theme="dark"]) .inhabilitar-btn::before,
-:root:not([data-theme="dark"]) .confirm-btn::before,
-:root:not([data-theme="dark"]) .cancel-btn::before,
-:root:not([data-theme="dark"]) .nav-button::before {
-    
-    /* * Anulamos el gradiente blanco (rgba(255,255,255,0.2)) 
-     * y lo reemplazamos con el "celeste" (cyber-blue).
-     * Usamos 0.3 de opacidad para que sea un poco más visible.
-     */
+:root:not([data-theme="dark"]) button::before,
+:root:not([data-theme="dark"]) .btn::before,
+:root:not([data-theme="dark"]) [class*="btn"]::before,
+:root:not([data-theme="dark"]) [class*="button"]::before,
+:root:not([data-theme="dark"]) [type="button"]::before,
+:root:not([data-theme="dark"]) [type="submit"]::before,
+:root:not([data-theme="dark"]) [type="reset"]::before,
+:root:not([data-theme="dark"]) input[type="button"]::before,
+:root:not([data-theme="dark"]) input[type="submit"]::before {
     background: linear-gradient(
         90deg, 
         transparent, 
-        rgba(var(--cyber-blue-rgb), 0.3), /* <-- ¡Color Celeste! */
+        rgba(var(--cyber-blue-rgb), 0.3),
         transparent
-    ) !important; /* Usamos !important para asegurar que pise la regla del componente */
+    ) !important;
 }
+
+:root:not([data-theme="dark"]) .transfer-details{
+    background: rgba(212, 212, 212, 0.281);
+}
+
+:root:not([data-theme="dark"]) .transfer-details li{
+   border-bottom: 1px solid rgba(201, 200, 200, 0.74) !important;
+}
+
+:root:not([data-theme="dark"]) .form-group input{
+    color: var(--carbon) !important;
+}
+
+:root:not([data-theme="dark"]) .transaction-item-modal:hover{
+  background-color: rgba(110, 110, 110, 0.11) !important;
+}
+
 
 
 

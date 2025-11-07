@@ -24,66 +24,6 @@
     }
 }
 
-/* Control de tema */
-.theme-control {
-    position: fixed;
-    top: 2rem;
-    right: 2rem;
-    z-index: 9999;
-}
-
-#theme-switcher {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.75rem;
-    position: relative;
-    z-index: 9999;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#theme-switcher:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.1);
-}
-
-#theme-switcher:active {
-    transform: scale(0.95);
-}
-
-#theme-switcher svg {
-    width: 22px;
-    height: 22px;
-}
-
-.sun {
-    fill: var(--text-primary);
-    opacity: 0.7;
-    transition: opacity 0.3s;
-}
-
-.sun-ray {
-    stroke: var(--text-primary);
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-#theme-switcher:hover .sun {
-    opacity: 1;
-}
-
-#theme-switcher:hover .sun-ray {
-    opacity: 0.4;
-}
-
 /* Identidad de marca */
 .brand-identity {
     padding-top: 10rem;

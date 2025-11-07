@@ -1,10 +1,5 @@
 /* Estilos específicos para la página login */
 
-:root {
-    --cyber-blue-rgb: 0, 212, 255;
-    --quantum-violet-rgb: 108, 92, 231;
-    --neon-cyan-rgb: 57, 255, 204;
-}
 
 html, body {
     height: 100%;
@@ -33,6 +28,8 @@ body {
     place-items: center;
     height: 100vh;
     text-align: center;
+    padding: 2rem;
+    min-width: 0;
 }
 
 .right-panel {
@@ -40,77 +37,19 @@ body {
     place-items: center;
     height: 100vh;
     padding: 2rem;
+    min-width: 0;
 }
 
-.logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-}
-
-.logo h1 {
-    color: var(--text-primary);
-    font-family: 'Unna', serif;
-    font-size: 48px;
-    font-weight: bold;
-    margin: 0;
-    transition: all 0.4s ease;
-}
-
-.logo span {
-    color: var(--text-accent);
-    transition: all 0.4s ease;
-}
-
-.logo h4 {
-    color: var(--text-primary);
-    font-family: 'Manrope', sans-serif;
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 300;
-    letter-spacing: 2px;
-    opacity: 0.8;
-    transition: all 0.4s ease;
-}
-
-/* Estilos del logo SVG */
-.brand-mark {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 1rem;
-}
-
-.vault-shape {
-    fill: none;
-    stroke: var(--text-accent);
-    stroke-width: 2.5;
-    transition: stroke 0.4s ease;
-}
-
-.security-core {
-    fill: var(--text-accent);
-    stroke: var(--bg-primary);
-    stroke-width: 2;
-    transition: fill 0.4s ease, stroke 0.4s ease;
-}
-
-.access-cross {
-    stroke: var(--bg-primary);
-    stroke-width: 2;
-    stroke-linecap: round;
-    transition: stroke 0.4s ease;
-}
 
 /* Animaciones mejoradas y optimizadas */
 .formulario {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 3rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
     border-radius: 24px;
     width: 100%;
-    max-width: 500px;
+    max-width: min(500px, 90vw);
     position: relative;
     overflow: hidden;
     box-shadow: 
@@ -160,7 +99,7 @@ body {
     text-align: center;
     margin-bottom: 16px;
     font-weight: 600;
-    font-size: 22px;
+    font-size: clamp(1.25rem, 3vw, 1.375rem);
     color: var(--text-primary);
     position: relative;
     z-index: 1;
@@ -168,13 +107,14 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1.3;
 }
 
 label {
     display: block;
     margin-bottom: 6px;
     color: var(--text-primary);
-    font-size: 13px;
+    font-size: clamp(0.75rem, 2vw, 0.8125rem);
     font-weight: 500;
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -193,7 +133,7 @@ input[type="password"] {
     border: none;
     border-bottom: 2px solid var(--text-primary);
     color: var(--text-primary);
-    font-size: 18px;
+    font-size: clamp(1rem, 3vw, 1.125rem);
     outline: none;
 }
 
@@ -205,9 +145,9 @@ input[type="password"]:focus {
 
 button[type="submit"] {
     width: 100%;
-    padding: 10px;
+    padding: clamp(0.75rem, 2vw, 0.875rem);
     margin-top: 12px;
-    font-size: 14px;
+    font-size: clamp(0.8rem, 2vw, 0.875rem);
     font-weight: 600;
     border: none;
     border-radius: 12px;
@@ -270,64 +210,6 @@ button[type="submit"]:active {
     transition: transform 0.1s;
 }
 
-.theme-control {
-    position: fixed;
-    top: 1rem;
-    right: 2rem;
-    z-index: 9999;
-}
-
-#theme-switcher {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.75rem;
-    position: relative;
-    z-index: 9999;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#theme-switcher:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.1);
-}
-
-#theme-switcher:active {
-    transform: scale(0.95);
-}
-
-#theme-switcher svg {
-    width: 22px;
-    height: 22px;
-}
-
-.sun {
-    fill: var(--text-primary);
-    opacity: 0.7;
-    transition: opacity 0.3s;
-}
-
-.sun-ray {
-    stroke: var(--text-primary);
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-#theme-switcher:hover .sun {
-    opacity: 1;
-}
-
-#theme-switcher:hover .sun-ray {
-    opacity: 0.4;
-}
 
 .global-footer {
     position: fixed;
@@ -335,12 +217,12 @@ button[type="submit"]:active {
     left: 0;
     width: 100%;
     text-align: center;
-    padding: 20px;
+    padding: clamp(1rem, 3vw, 1.25rem);
     background: transparent;
     backdrop-filter: blur(20px);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: clamp(0.8rem, 2vw, 0.875rem);
     font-weight: 500;
     display: flex;
     flex-direction: column;
@@ -388,6 +270,9 @@ button[type="submit"]:active {
     gap: 8px;
     position: relative;
     margin-bottom: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
 }
 
 /* Separador tecnológico */
@@ -474,99 +359,6 @@ button[type="submit"]:active {
     opacity: 1;
 }
 
-@media (max-width: 768px) {
-    .main {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-        padding: 20px 10px;
-    }
-
-    .left-panel, .right-panel {
-        height: auto;
-        padding: 1rem;
-    }
-
-    .left-panel {
-        grid-row: 1;
-    }
-
-    .right-panel {
-        grid-row: 2;
-    }
-
-    .logo h1 {
-        font-size: 36px;
-    }
-
-    .formulario {
-        padding: 25px 20px;
-        max-width: 100%;
-        box-shadow: none;
-        border-radius: 0;
-    }
-
-    .theme-control {
-        top: 1rem;
-        right: 1rem;
-    }
-
-    .global-footer {
-        position: static;
-        padding: 20px 15px;
-        font-size: 13px;
-        flex-direction: column;
-        gap: 12px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        background: transparent;
-    }
-
-    /* Modo claro responsive */
-    :not([data-theme="dark"]) .global-footer {
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    /* Ajustes responsive para el texto del footer */
-    .global-footer p::before,
-    .global-footer p::after {
-        width: 15px;
-        margin: 0 6px;
-    }
-
-    .global-footer a {
-        padding: 6px 10px;
-        font-size: 13px;
-    }
-}
-
-#back-button {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    z-index: 1000;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-#back-button svg {
-    width: 100%;
-    height: 100%;
-}
-
-
-
-.back-arrow {
-    stroke: var(--back-arrow-color);
-    transition: stroke 0.4s ease;
-}
 
 /* EFECTOS EN EL INPUT NO TOCAR, TUCU lcdtm */
 .input-container {
@@ -613,8 +405,8 @@ button[type="submit"]:active {
     outline: none;
     background: transparent;
     width: 100%;
-    padding: 10px 14px;
-    font-size: 14px;
+    padding: clamp(0.75rem, 2vw, 0.875rem) clamp(0.875rem, 2vw, 1rem);
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
     color: var(--text-primary);
     border-radius: 12px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -718,10 +510,11 @@ button[type="submit"]:active {
 
 .error-message {
     color: #e74c3c;
-    font-size: 0.8rem;
+    font-size: clamp(0.75rem, 2vw, 0.8rem);
     display: block;
     margin: 1px 0;
     font-weight: 500;
+    line-height: 1.3;
 }
 
 input[type="text"],
@@ -734,7 +527,7 @@ input[type="password"] {
     border: none;
     border-bottom: 2px solid var(--border-color);
     color: var(--text-primary);
-    font-size: 18px;
+    font-size: clamp(1rem, 3vw, 1.125rem);
     outline: none;
 }
 
@@ -751,7 +544,6 @@ input[type="email"]:focus,
 input[type="password"]:focus {
     border-bottom-color: transparent;
 }
-
 
 button:disabled {
     cursor: not-allowed !important;
@@ -790,16 +582,7 @@ button:disabled::before {
     will-change: transform, opacity;
 }
 
-.logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    animation: logoFadeIn 0.6s ease-out 0.2s forwards;
-    opacity: 0;
-    transform: translateY(-20px);
-    will-change: transform, opacity;
-}
+
 
 @keyframes logoFadeIn {
     0% {
@@ -878,7 +661,7 @@ button:disabled::before {
 .access-link {
     display: block;
     text-align: center;
-    font-size: 0.875rem;
+    font-size: clamp(0.8rem, 2vw, 0.875rem);
     color: var(--text-accent);
     text-decoration: none;
     margin-top: 1rem;
@@ -894,4 +677,275 @@ button:disabled::before {
     opacity: 1;
     color: var(--cobalt);
     cursor: pointer;
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 1024px) {
+    .main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .left-panel {
+        height: auto;
+        padding: 2rem 1rem;
+        min-height: 30vh;
+    }
+
+    .right-panel {
+        height: auto;
+        padding: 1rem;
+        min-height: 70vh;
+    }
+
+    .formulario {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        grid-template-rows: auto 1fr;
+        padding: 0;
+    }
+
+    .left-panel, .right-panel {
+        padding: 1.5rem 1rem;
+    }
+
+    .left-panel {
+        min-height: 25vh;
+    }
+
+    .right-panel {
+        min-height: 75vh;
+    }
+
+    .logo h1 {
+        font-size: 2rem;
+    }
+
+    .formulario {
+        padding: 1.5rem;
+        max-width: 100%;
+        box-shadow: none;
+        border-radius: 16px;
+    }
+
+    .theme-control {
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+
+    .global-footer {
+        position: static;
+        padding: 1rem;
+        font-size: 0.8rem;
+        flex-direction: column;
+        gap: 0.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: transparent;
+    }
+
+    /* Modo claro responsive */
+    :not([data-theme="dark"]) .global-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    /* Ajustes responsive para el texto del footer */
+    .global-footer p::before,
+    .global-footer p::after {
+        width: 15px;
+        margin: 0 6px;
+    }
+
+    .global-footer a {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    #back-button {
+        top: 0.5rem;
+        left: 0.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .left-panel,
+    .right-panel {
+        padding: 1rem 0.75rem;
+    }
+
+    .formulario {
+        padding: 1.25rem;
+        border-radius: 12px;
+    }
+
+    .logo h1 {
+        font-size: 1.75rem;
+    }
+
+    .logo h4 {
+        font-size: 0.8rem;
+    }
+
+    .brand-mark {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .left-panel,
+    .right-panel {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .formulario {
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .logo h1 {
+        font-size: 1.5rem;
+    }
+
+    .logo h4 {
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+    .global-footer {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .global-footer p::before,
+    .global-footer p::after {
+        width: 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .left-panel,
+    .right-panel {
+        padding: 0.5rem 0.25rem;
+    }
+
+    .formulario {
+        padding: 0.75rem;
+    }
+
+    .logo h1 {
+        font-size: 1.25rem;
+    }
+
+    .logo h4 {
+        font-size: 0.7rem;
+    }
+
+    .brand-mark {
+        width: 40px;
+        height: 40px;
+    }
+
+    .effect-1 {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Soporte para orientación landscape en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+    .main {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+        height: 100vh;
+    }
+
+    .left-panel,
+    .right-panel {
+        height: 100vh;
+        padding: 1rem;
+    }
+
+    .logo h1 {
+        font-size: 1.5rem;
+    }
+
+    .formulario {
+        padding: 1rem;
+        max-width: 100%;
+    }
+
+    .global-footer {
+        position: fixed;
+        padding: 0.5rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Mejoras de accesibilidad para texto muy pequeño */
+@media (max-width: 320px) {
+    .logo h1 {
+        font-size: 1.1rem;
+    }
+
+    .logo h4 {
+        font-size: 0.65rem;
+    }
+
+    .formulario h2 {
+        font-size: 1.1rem;
+    }
+
+    .effect-1 {
+        font-size: 0.85rem;
+    }
+
+    .access-link {
+        font-size: 0.75rem;
+    }
+}
+
+/* Soporte para dispositivos con notch */
+@supports(padding: max(0px)) {
+    .left-panel,
+    .right-panel {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+    }
+
+    .theme-control {
+        right: max(1rem, env(safe-area-inset-right));
+    }
+
+    #back-button {
+        left: max(1rem, env(safe-area-inset-left));
+    }
+
+    .global-footer {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+
+    @media (max-width: 768px) {
+        .left-panel,
+        .right-panel {
+            padding-left: max(0.5rem, env(safe-area-inset-left));
+            padding-right: max(0.5rem, env(safe-area-inset-right));
+        }
+
+        .theme-control {
+            right: max(0.5rem, env(safe-area-inset-right));
+        }
+
+        #back-button {
+            left: max(0.5rem, env(safe-area-inset-left));
+        }
+    }
 }

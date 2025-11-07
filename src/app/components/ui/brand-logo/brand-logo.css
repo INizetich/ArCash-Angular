@@ -66,3 +66,46 @@
     transform: translateY(-10px);
   }
 }
+
+/* Media queries específicas para el logo */
+@media (max-width: 768px) {
+    .logo {
+        gap: 12px;
+    }
+    
+    .logo h1 {
+        font-size: 36px;
+    }
+    
+    .logo h4 {
+        font-size: 0.9rem;
+        letter-spacing: 1.5px;
+    }
+    
+    .brand-mark {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        gap: 10px;
+    }
+    
+    .logo h1 {
+        font-size: 32px;
+    }
+    
+    .logo h4 {
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+    }
+    
+    .brand-mark {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 0.6rem;
+    }
+}

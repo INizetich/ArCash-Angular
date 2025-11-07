@@ -363,14 +363,24 @@
                             @if (user.active) {
                             <button 
                                 class="inhabilitar-btn"
-                                (click)="openConfirmModal(user)">
-                                Deshabilitar
+                                (click)="openConfirmModal(user)"
+                                [disabled]="loadingUserAction === user.id">
+                                @if (loadingUserAction === user.id) {
+                                    <div class="spinner"></div>
+                                } @else {
+                                    Deshabilitar
+                                }
                             </button>
                             } @else {
                             <button 
                                 class="habilitar-btn"
-                                (click)="openConfirmModal(user)">
-                                Habilitar
+                                (click)="openConfirmModal(user)"
+                                [disabled]="loadingUserAction === user.id">
+                                @if (loadingUserAction === user.id) {
+                                    <div class="spinner"></div>
+                                } @else {
+                                    Habilitar
+                                }
                             </button>
                             }
                         </div>
@@ -391,66 +401,13 @@
     </div>
 </div>
 
-<!-- Modal de Información de Usuario -->
-@if (selectedUser) {
-<div class="modal user-modal" [class.show]="showUserModal">
-    <div class="modal-content user-modal-content">
-        <button class="close-modal" (click)="closeUserModal()">×</button>
-        <h3>Información del Usuario</h3>
-        
-        <div class="user-info">
-            <div class="user-info-item">
-                <span class="user-info-label">Nombre Completo:</span>
-                <span class="user-info-value">{{selectedUser.name}} {{selectedUser.lastName}}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">Nombre de Usuario:</span>
-                <span class="user-info-value">{{selectedUser.username}}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">DNI:</span>
-                <span class="user-info-value">{{selectedUser.dni}}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">Email:</span>
-                <span class="user-info-value">{{selectedUser.email}}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">ID de Cuenta:</span>
-                <span class="user-info-value">{{selectedUser.idAccount || 'No asignado'}}</span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">Estado:</span>
-                <span class="user-info-value" [class]="selectedUser.active ? 'estado-si' : 'estado-no'">
-                    {{selectedUser.active ? 'Activo' : 'Inactivo'}}
-                </span>
-            </div>
-            <div class="user-info-item">
-                <span class="user-info-label">Habilitado:</span>
-                <span class="user-info-value" [class]="selectedUser.enabled ? 'estado-si' : 'estado-no'">
-                    {{selectedUser.enabled ? 'Sí' : 'No'}}
-                </span>
-            </div>
-        </div>
-        
-        <div class="modal-actions">
-            @if (selectedUser.active) {
-            <button 
-                class="inhabilitar-btn"
-                (click)="openConfirmModal(selectedUser)">
-                Deshabilitar Usuario
-            </button>
-            } @else {
-            <button 
-                class="habilitar-btn"
-                (click)="openConfirmModal(selectedUser)">
-                Habilitar Usuario
-            </button>
-            }
-        </div>
-    </div>
-</div>
-}
+<!-- Componente de Información de Usuario -->
+<app-authenticated-info
+    [user]="selectedUser"
+    [showModal]="showUserModal"
+    (closeModal)="resetUserModal()"  
+    (toggleUserStatus)="onToggleUserStatus($event)">
+</app-authenticated-info>
 
 <!-- Modal de Confirmación Personalizado -->
 @if (userToToggle) {
@@ -462,10 +419,18 @@
             al usuario <strong>{{userToToggle.name}} {{userToToggle.lastName}}</strong>?
         </p>
         <div class="confirmation-buttons">
-            <button class="confirm-btn" (click)="confirmToggleUser()">
-                {{userToToggle.active ? 'Deshabilitar' : 'Habilitar'}}
+            <button class="confirm-btn" 
+                    (click)="confirmToggleUser()"
+                    [disabled]="loadingUserAction === userToToggle.id">
+                @if (loadingUserAction === userToToggle.id) {
+                    <div class="spinner"></div>
+                } @else {
+                    {{userToToggle.active ? 'Deshabilitar' : 'Habilitar'}}
+                }
             </button>
-            <button class="cancel-btn" (click)="closeConfirmModal()">
+            <button class="cancel-btn" 
+                    (click)="closeConfirmModal()"
+                    [disabled]="loadingUserAction === userToToggle.id">
                 Cancelar
             </button>
         </div>

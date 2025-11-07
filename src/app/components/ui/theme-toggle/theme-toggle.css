@@ -27,7 +27,7 @@
 }
 
 #theme-switcher:hover svg {
-  color: white;
+  color: var(--text-accent);
 }
 
 #theme-switcher svg {

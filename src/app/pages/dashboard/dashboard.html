@@ -1,925 +1,887 @@
-<!-- Loading Screen Elegante -->
 <div id="wallet-loader-overlay" [class.loaded]="!isLoading">
-    <div class="wallet-loader-container">
-        <div class="loading-logo-container">
-            <svg class="brand-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape"/>
-                <circle cx="60" cy="60" r="18" class="security-core"/>
-                <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross"/>
-            </svg>
-            <div class="spinner-circle"></div>
-        </div>
-        <div class="loading-brand">
-            <h1>AR<span>Cash</span></h1>
-            <p class="brand-tagline">The best virtual wallet</p>
-            <p class="loading-text">Cargando tu billetera...</p>
-        </div>
+  <div class="wallet-loader-container">
+    <div class="loading-logo-container">
+      <svg class="brand-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape" />
+        <circle cx="60" cy="60" r="18" class="security-core" />
+        <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross" />
+      </svg>
+      <div class="spinner-circle"></div>
     </div>
+    <div class="loading-brand">
+      <h1>AR<span>Cash</span></h1>
+      <p class="brand-tagline">The best virtual wallet</p>
+      <p class="loading-text">Cargando tu billetera...</p>
+    </div>
+  </div>
 </div>
 
-<!-- Dashboard Principal -->
 <div class="dashboard-container" [class.loaded]="!isLoading">
-    
-    <!-- Top Navigation Bar -->
-    <nav class="top-nav">
-        <div class="nav-brand">
-            <svg class="nav-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape"/>
-                <circle cx="60" cy="60" r="18" class="security-core"/>
-                <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross"/>
+
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <svg class="nav-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape" />
+        <circle cx="60" cy="60" r="18" class="security-core" />
+        <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross" />
+      </svg>
+      <div class="nav-brand-text">
+        <div class="nav-title">
+          <span class="brand-primary">AR</span><span class="brand-secondary">Cash</span>
+        </div>
+        <div class="nav-tagline">The best virtual wallet</div>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      @if(isAdmin){
+
+      <button
+        class="admin-panel-btn"
+        (click)="goToAdminPanel()"
+        title="Acceder al Panel de Administración">
+        Panel de Administración
+      </button>
+
+      }
+
+
+      <button class="theme-toggle" (click)="toggleTheme()" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path class="sun" d="M12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0-2a8 8 0 1 0 0 16 8 8 0 0 0 0-16" />
+          <path class="sun-ray" d="M12 2v2m0 16v2M4 12H2m20 0h-2m3-7l-2 2m-13 13l-2 2m17-15l2 2M3 19l2 2" />
+        </svg>
+      </button>
+
+      <div class="user-menu" (click)="openProfileModal()">
+        <div class="user-avatar">
+          <span>{{userData.name.charAt(0)}}{{userData.lastName.charAt(0)}}</span>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{userData.name}} {{userData.lastName}}</span>
+          <span class="user-role">{{userData.username}}</span>
+        </div>
+      </div>
+
+      <button class="logout-btn" (click)="logout()" [disabled]="isLoading" title="Cerrar sesión">
+        @if (isLoading) {
+        Cerrando...
+        } @else {
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        }
+      </button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <section class="welcome-section">
+      <div class="welcome-content">
+        <h1 class="welcome-title">
+          Bienvenido, <span class="highlight">{{userData.name}}</span>
+        </h1>
+        <p class="welcome-subtitle">Gestiona tu dinero de forma inteligente</p>
+      </div>
+    </section>
+
+    <section class="balance-section">
+      <div class="balance-card" [class.balance-updated]="isBalanceUpdating"
+        [class.balance-decreased]="isBalanceDecreasing">
+        <div class="balance-header">
+          <h2>Saldo Disponible</h2>
+          <button class="balance-toggle" (click)="toggleBalance()" [title]="balanceVisible ? 'Ocultar saldo' : 'Mostrar saldo'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              @if (balanceVisible) {
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" />
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+              } @else {
+              <path
+                d="m1 1 22 22M6.5 6.5C5.2 7.8 4 10 4 12s2.8 5.2 8 5.2c1.7 0 3.2-.5 4.5-1.3M17.5 17.5C18.8 16.2 20 14 20 12s-2.8-5.2-8-5.2c-1.7 0-3.2.5-4.5 1.3"
+                stroke="currentColor" stroke-width="2" />
+              }
             </svg>
-            <div class="nav-brand-text">
-                <div class="nav-title">
-                    <span class="brand-primary">AR</span><span class="brand-secondary">Cash</span>
-                </div>
-                <div class="nav-tagline">The best virtual wallet</div>
-            </div>
+          </button>
         </div>
-        
-        <div class="nav-actions">
-            <!-- Botón de admin (solo para administradores) -->
-             @if(isAdmin){      
 
-            <button      
-                class="admin-panel-btn" 
-                (click)="goToAdminPanel()" 
-                title="Acceder al Panel de Administración">
-                Panel de Administración
-            </button>
-
-             }
-         
-            
-            <button class="theme-toggle" (click)="toggleTheme()" type="button">
-                <svg width="20" height="20" viewBox="0 0 24 24">
-                    <path class="sun" d="M12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0-2a8 8 0 1 0 0 16 8 8 0 0 0 0-16"/>
-                    <path class="sun-ray" d="M12 2v2m0 16v2M4 12H2m20 0h-2m3-7l-2 2m-13 13l-2 2m17-15l2 2M3 19l2 2"/>
-                </svg>
-            </button>
-            
-            <div class="user-menu" (click)="openProfileModal()">
-                <div class="user-avatar">
-                    <span>{{userData.name.charAt(0)}}{{userData.lastName.charAt(0)}}</span>
-                </div>
-                <div class="user-info">
-                    <span class="user-name">{{userData.name}} {{userData.lastName}}</span>
-                    <span class="user-role">{{userData.username}}</span>
-                </div>
-            </div>
-            
-            <button class="logout-btn" (click)="logout()" [disabled]="isLoading" title="Cerrar sesión">
-                @if (isLoading) {
-                    Cerrando...
-                } @else {
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                }
-            </button>
+        <div class="balance-amount">
+          <span class="currency">$</span>
+          @if (balanceVisible) {
+          <span class="amount" [class.updating]="isBalanceUpdating"
+            [class.decreasing]="isBalanceDecreasing">{{formatMoney(userData.balance)}}</span>
+          } @else {
+          <span class="amount-hidden">•••••••</span>
+          }
         </div>
-    </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        
-        <!-- Welcome Section -->
-        <section class="welcome-section">
-            <div class="welcome-content">
-                <h1 class="welcome-title">
-                    Bienvenido, <span class="highlight">{{userData.name}}</span>
-                </h1>
-                <p class="welcome-subtitle">Gestiona tu dinero de forma inteligente</p>
-            </div>
-        </section>
-
-        <!-- Balance Card -->
-        <section class="balance-section">
-            <div class="balance-card" 
-                 [class.balance-updated]="isBalanceUpdating"
-                 [class.balance-decreased]="isBalanceDecreasing">
-                <div class="balance-header">
-                    <h2>Saldo Disponible</h2>
-                    <button class="balance-toggle" (click)="toggleBalance()" [title]="balanceVisible ? 'Ocultar saldo' : 'Mostrar saldo'">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            @if (balanceVisible) {
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
-                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                            } @else {
-                                <path d="m1 1 22 22M6.5 6.5C5.2 7.8 4 10 4 12s2.8 5.2 8 5.2c1.7 0 3.2-.5 4.5-1.3M17.5 17.5C18.8 16.2 20 14 20 12s-2.8-5.2-8-5.2c-1.7 0-3.2.5-4.5 1.3" stroke="currentColor" stroke-width="2"/>
-                            }
-                        </svg>
-                    </button>
-                </div>
-                
-                <div class="balance-amount">
-                    <span class="currency">$</span>
-                    @if (balanceVisible) {
-                        <span class="amount" 
-                              [class.updating]="isBalanceUpdating"
-                              [class.decreasing]="isBalanceDecreasing">{{formatMoney(userData.balance)}}</span>
-                    } @else {
-                        <span class="amount-hidden">•••••••</span>
-                    }
-                </div>
-                
-                <div class="account-info">
-                    <div class="account-detail">
-                        <span class="label">Alias</span>
-                        <span class="value">{{userData.alias}}</span>
-                    </div>
-                    <div class="account-detail">
-                        <span class="label">CVU</span>
-                        <span class="value">{{userData.cvu}}</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Quick Actions -->
-        <section class="actions-section">
-            <h2 class="section-title">Acciones Rápidas</h2>
-            <div class="actions-grid">
-                
-                <div class="action-card" (click)="openIngresarModal()">
-                    <div class="action-icon deposit">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2v20M5 9l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <h3>Ingresar Dinero</h3>
-                    <p>Agregar fondos a tu cuenta</p>
-                </div>
-
-               
-
-                <div class="action-card" (click)="openTransferModal()">
-                    <div class="action-icon transfer">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M21 12H3M16 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <h3>Transferir</h3>
-                    <p>Enviar dinero a otros usuarios</p>
-                </div>
-
-                <div class="action-card" (click)="openAliasModal()">
-                    <div class="action-icon info">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/>
-                            <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                    </div>
-                    <h3>Mi CVU</h3>
-                    <p>Ver datos de la cuenta</p>
-                </div>
-
-                <div class="action-card" (click)="openFavoritesModal()">
-                    <div class="action-icon favorites">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <h3>Favoritos</h3>
-                    <p>Mis contactos favoritos</p>
-                </div>
-
-                <div class="action-card" (click)="openTaxModal()">
-                    <div class="action-icon calculator">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
-                            <path d="M8 6h8M8 10h8M8 14h8M8 18h8" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                    </div>
-                    <h3>Calculadora</h3>
-                    <p>Calcular impuestos</p>
-                </div>
-
-                 <div class="action-card" (click)="openMyQrModal()">
-                    <div class="action-icon QR">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="3" y="3" width="7" height="7" rx="1"/>
-                            <rect x="14" y="3" width="7" height="7" rx="1"/>
-                            <rect x="3" y="14" width="7" height="7" rx="1"/>
-                            <rect x="17" y="17" width="4" height="4" rx="1"/>
-                            <rect x="17" y="12" width="2" height="2" rx="1"/>
-                            <rect x="12" y="17" width="2" height="2" rx="1"/>
-                            <rect x="12" y="12" width="2" height="2" rx="1"/>
-                        </svg>
-                    </div>
-                    <h3>Mi QR</h3>
-                    <p>Recibir transferencia por QR</p>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Recent Transactions -->
-        <section class="transactions-section">
-            <div class="transactions-header">
-                <h2 class="section-title">Movimientos Recientes</h2>
-                <button class="view-all-btn" (click)="openAllTransactionsModal()">Ver todos</button>
-            </div>
-            
-            <div class="transactions-container">
-                @if (recentTransactions.length === 0) {
-                    <div class="no-transactions">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        <p>No hay transacciones recientes</p>
-                    </div>
-                }
-                
-                @for (transaction of recentTransactions; track trackTransaction($index, transaction)) {
-                    <div class="transaction-item" (click)="openTransactionModal(transaction)">
-                        
-                        <div class="transaction-icon" [class]="transaction.type">
-                            @if (transaction.type === 'income') {
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 2v20M5 9l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            } @else if (transaction.type === 'expense') {
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 22V2M19 15l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            }
-                        </div>
-                        
-                        <div class="transaction-details">
-                            <h4 class="transaction-description">{{transaction.description}}</h4>
-                            <p class="transaction-date">{{formatDate(transaction.date)}}</p>
-                            @if (transaction.status === 'FAILED') {
-                                <span class="transaction-status failed">Fallida</span>
-                            }
-                        </div>
-                    
-                        <div class="transaction-amount" [class]="transaction.type">
-                            <span class="amount-value">
-                                {{transaction.type === 'income' ? '+' : '-'}}{{formatAmount(transaction.amount)}}
-                            </span>
-                        </div>
-                    </div>
-                }
-            </div>
-        </section>
-
-    </main>
-</div>
-
-<!-- Modal para ingresar dinero -->
-@if (showIngresarModal) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'ingresar')">
-        <div class="modal-content">
-            <span class="close-button" (click)="closeIngresarModal()">&times;</span>
-            <h2>Ingresar dinero</h2>
-            <form (ngSubmit)="ingresarDinero()" #ingresarForm="ngForm">
-                <input 
-                    type="number" 
-                    [(ngModel)]="montoIngresar" 
-                    name="montoIngresar"
-                    placeholder="Monto a ingresar" 
-                    required 
-                    min="1" 
-                    step="0.01"
-                    [disabled]="isIngresandoDinero">
-                <button 
-                    type="submit" 
-                    [disabled]="!ingresarForm.valid || isIngresandoDinero"
-                    [class.loading]="isIngresandoDinero">
-                    <span class="button-text">
-                        {{ isIngresandoDinero ? 'Procesando...' : 'Confirmar' }}
-                    </span>
-                    @if (isIngresandoDinero) {
-                        <div class="progress-bar"></div>
-                    }
-                </button>
-            </form>
-        </div>
-    </div>
-}
-
-<!-- Modal para transferencias -->
-@if (showTransferModal) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'transfer')">
-        <div class="modal-content">
-            @if (isBuscandoCuenta && !isScanning) { <div class="search-loading-overlay">
-                    <div class="search-loading-content">
-                        <div class="search-spinner"></div>
-                        <p>Buscando cuenta...</p>
-                    </div>
-                </div>
-            }
-            
-            <span class="close-button" (click)="closeTransferModal()">&times;</span>
-            <h2>Transferir Dinero</h2>
-
-            @if (transferStep === 1) {
-              
-              @if (!isScanning) {
-                <div id="search-account-step">
-                  <div class="form-group"> 
-                    <input 
-                      type="text" 
-                      [(ngModel)]="destinatarioInput"
-                      placeholder=" "
-                      required>
-                    <label>Alias o CVU</label>
-                  </div>
-
-                  <button 
-                    class="primary" (click)="buscarCuenta()" 
-                    [disabled]="!destinatarioInput.trim() || isBuscandoCuenta"
-                    [class.loading]="isBuscandoCuenta">
-                    <span class="button-text">
-                      {{ isBuscandoCuenta ? 'Buscando...' : 'Buscar cuenta' }}
-                    </span>
-                    @if (isBuscandoCuenta) {
-                      <div class="progress-bar"></div>
-                    }
-                  </button>
-
-                  <button class="secondary qr-scan-button" (click)="startScanning()" title="Escanear QR"> 
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path d="M3 7V3h4M17 3h4v4M21 17v4h-4M7 21H3v-4"/>
-                      <path d="M7 12h10"/>
-                    </svg>
-                    Escanear QR
-                  </button>
-                </div>
-              }
-
-              @if (isScanning) {
-                <div class="scanner-view">
-                  <h2>Apuntá al código QR</h2>
-                  <zxing-scanner 
-                    (scanSuccess)="handleScanSuccess($event)"
-                    (scanError)="handleScanError($event)"
-                    (permissionResponse)="handlePermissionResponse($event)">
-                  </zxing-scanner>
-                  
-                  @if (hasPermission === false) {
-                    <div class="permission-denied">
-                      <p>⚠️ No diste permiso para usar la cámara.</p>
-                      <p>Revisá la configuración del navegador.</p>
-                    </div>
-                  }
-                  <button (click)="cancelScanning()" class="secondary">Ingresar Alias/CVU</button> 
-                </div>
-              }
-            }
-
-            @if (transferStep === 2) {
-                <div id="confirm-account-step">
-                    <h3>Datos de la cuenta destino:</h3>
-                    @if (cuentaDestinoData) {
-                        <div id="account-details">
-                            <p><strong>Alias:</strong> {{cuentaDestinoData.alias}}</p>
-                            @if(cuentaDestinoData.cvu !== 'Obtenido por QR') {
-                               <p><strong>CVU:</strong> {{cuentaDestinoData.cvu}}</p> 
-                            }
-                            <p><strong>Titular:</strong> {{cuentaDestinoData.user.nombre}} {{cuentaDestinoData.user.apellido}}</p>
-                            <p><strong>DNI:</strong> {{cuentaDestinoData.user.dni}}</p>
-                            <p><strong>Email:</strong> {{cuentaDestinoData.user.email}}</p>
-                        </div>
-                    } @else {
-                        <p>No se encontraron datos.</p> }
-                    <button class="primary" (click)="confirmarCuenta()">Confirmar cuenta</button>
-                    <button (click)="cancelarBusqueda()" class="secondary">Cancelar</button> 
-                </div>
-            }
-
-            @if (transferStep === 3) {
-                <div id="amount-step">
-                  <h3>¿Cuánto querés transferir?</h3>
-                  @if(cuentaDestinoData) {
-                    <p class="transfer-recipient-info">A: {{cuentaDestinoData.user.nombre}} {{cuentaDestinoData.user.apellido}} ({{cuentaDestinoData.alias}})</p>
-                  }
-                  <form (ngSubmit)="realizarTransferencia()" #transferForm="ngForm">
-                    <div class="form-group">
-                      <input 
-                          type="number" 
-                          [(ngModel)]="montoTransfer"
-                          name="montoTransfer"
-                          min="1" 
-                          step="1" 
-                          placeholder=" " 
-                          required>
-                      <label>Monto $</label>
-                    </div>
-                    <button 
-                        class="primary"
-                        type="submit" 
-                        [disabled]="!transferForm.valid || montoTransfer === null || montoTransfer <= 0 || isTransfiriendo"
-                        [class.loading]="isTransfiriendo">
-                        <span class="button-text">
-                            {{ isTransfiriendo ? 'Transfiriendo...' : 'Transferir' }}
-                        </span>
-                        @if (isTransfiriendo) {
-                            <div class="progress-bar"></div>
-                        }
-                    </button>
-                    <button type="button" (click)="volverAConfirmacion()" class="secondary">Volver</button> 
-                  </form>
-                </div>
-            }
-
-            @if (transferStep === 4) {
-                <div id="add-favorite-step">
-                    <div class="transfer-success">
-                        <div class="success-icon">
-                           <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h3>¡Transferencia exitosa!</h3>
-                        <p>¿Querés agregar este contacto a tus favoritos?</p>
-                        <div class="favorite-option">
-                            <button class="primary" (click)="openAddFavoriteModal()">
-                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                                Agregar a favoritos
-                            </button>
-                            <button class="secondary" (click)="skipAddToFavorites()">No, gracias</button>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
-}
-
-<!-- Modal para ver alias y CVU -->
-@if (showAliasModal) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'alias')">
-        <div class="modal-content alias-modal">
-            <span class="close-button" (click)="closeAliasModal()">&times;</span>
-            <h2>Mi Alias y CVU</h2>
-            
-            <div class="info-alias-cvu">
-                <div class="info-line">
-                    <div class="info-text">
-                        <strong>Alias:</strong> <span>{{userData.alias}}</span>
-                    </div>
-                    <button class="copy-button" (click)="copyToClipboard(userData.alias, 'Alias')" title="Copiar Alias">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 9h-9c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm0 11h-9v-9h9v9zm-4-17H6c-1.1 0-2 .9-2 2v9h2V5h10V3z" fill="currentColor"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="info-line">
-                    <div class="info-text">
-                        <strong>CVU:</strong> <span>{{userData.cvu}}</span>
-                    </div>
-                    <button class="copy-button" (click)="copyToClipboard(userData.cvu, 'CVU')" title="Copiar CVU">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 9h-9c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm0 11h-9v-9h9v9zm-4-17H6c-1.1 0-2 .9-2 2v9h2V5h10V3z" fill="currentColor"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Modal para calculadora de impuestos -->
-@if (showTaxModal) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'tax')">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="close-button" (click)="closeTaxModal()">&times;</span>
-                <h2>Calculadora de Impuestos</h2>
-            </div>
-
-            @if (!showTaxForm) {
-                <div id="currency-selection">
-                    <p>¿En qué moneda querés calcular?</p>
-                    <button class="currency-button" (click)="selectCurrency('ARS')">Pesos (ARS)</button>
-                    <button class="currency-button" (click)="selectCurrency('USD')">Dólares (USD)</button>
-                </div>
-            }
-
-            @if (showTaxForm) {
-                <div id="tax-form">
-                    <label>Monto en {{selectedCurrency}}:</label>
-                    <input 
-                        type="number" 
-                        [(ngModel)]="taxMonto"
-                        min="0" 
-                        step="0.01" 
-                        placeholder="0.00">
-                    <button (click)="calcularImpuestos()">Calcular</button>
-                    @if (taxResult) {
-                        <div id="tax-result" [innerHTML]="taxResult"></div>
-                    }
-                </div>
-            }
-        </div>
-    </div>
-}
-
-<!-- Modal de perfil -->
-@if (showProfileModal) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'profile')">
-        <div class="modal-content">
-            <span class="close-button" (click)="closeProfileModal()">&times;</span>
-            <h2>Perfil de Usuario</h2>
-            <div class="profile-details">
-                <div class="profile-photo">
-                    <svg width="50" height="50" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="12" fill="#ccc"/>
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#666"/>
-                    </svg>
-                </div>
-                <p><strong>Nombre:</strong> <span>{{userData.name}}</span></p>
-                <p><strong>Apellido:</strong> <span>{{userData.lastName}}</span></p>
-                <p><strong>Correo:</strong> <span>{{userData.email}}</span></p>
-                <p><strong>DNI:</strong> <span>{{userData.dni}}</span></p>
-                
-                <p>
-                    <strong>Nombre de usuario:</strong>
-                    @if (!editingUsername) {
-                        <span>{{userData.username}}</span>
-                    }
-                    @if (editingUsername) {
-                        <input 
-                            type="text" 
-                            [(ngModel)]="newUsername"
-                            (keydown.enter)="saveUsername()"
-                            (keydown.escape)="cancelEditUsername()"
-                            maxlength="25"/>
-                    }
-                    @if (!editingUsername) {
-                        <button (click)="startEditUsername()" title="Editar nombre de usuario">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                    }
-                </p>
-                
-                <p>
-                    <strong>Alias:</strong>
-                    @if (!editingAlias) {
-                        <span>{{userData.alias}}</span>
-                    }
-                    @if (editingAlias) {
-                        <input 
-                            type="text" 
-                            [(ngModel)]="newAlias"
-                            (keydown.enter)="saveAlias()"
-                            (keydown.escape)="cancelEditAlias()"
-                            maxlength="25"/>
-                    }
-                    @if (!editingAlias) {
-                        <button (click)="startEditAlias()" title="Editar alias">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                    }
-                </p>
-                
-                <p><strong>CVU:</strong> <span>{{userData.cvu}}</span></p>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Modal para detalles de transacción -->
-@if (showTransactionModal) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'transaction')">
-        <div class="modal-content">
-            <span class="close-button" (click)="closeTransactionModal()">&times;</span>
-            <h2>Detalle de la Transferencia</h2>
-            @if (selectedTransaction) {
-                <ul class="transfer-details">
-                    <li><b>ID Operación:</b> <span>{{selectedTransaction.id}}</span></li>
-                    <li><b>Origen:</b> <span>{{getTransactionOrigin(selectedTransaction)}}</span></li>
-                    <li><b>Destino:</b> <span>{{getTransactionDestination(selectedTransaction)}}</span></li>
-                    <li><b>Monto:</b> <span [class]="selectedTransaction.type">
-                        {{selectedTransaction.type === 'income' ? '+' : '-'}}{{formatAmount(selectedTransaction.amount)}}
-                    </span></li>
-                    <li><b>Estado:</b> <span [class]="'estado-' + selectedTransaction.status?.toLowerCase()">{{selectedTransaction.status}}</span></li>
-                    <li><b>Fecha y hora:</b> <span>{{formatDateDetailed(selectedTransaction.date)}}</span></li>
-                </ul>
-            }
-        </div>
-    </div>
-}
-
-<!-- Modal para ver todas las transacciones -->
-@if (showAllTransactionsModal) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'allTransactions')">
-        <div class="modal-content all-transactions-modal">
-            <span class="close-button" (click)="closeAllTransactionsModal()">&times;</span>
-            <h2>Todas las Transacciones</h2>
-            
-            <div class="all-transactions-container">
-                @if (allTransactions.length === 0) {
-                    <div class="no-transactions-message">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                            <path d="M8 12h8" stroke="currentColor" stroke-width="2"/>
-                            <path d="M12 8v8" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                        <p>No hay transacciones para mostrar</p>
-                    </div>
-                } @else {
-                <div class="transactions-list">
-                    @for (transaction of displayedTransactions; track trackTransaction($index, transaction)) {
-                        <div class="transaction-item-modal">
-                            
-                            <div class="transaction-icon-modal" [class]="transaction.type">
-                                @if (transaction.type === 'income') {
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                        <path d="M12 5l7 7-7 7" stroke="currentColor" stroke-width="2"/>
-                                        <path d="M19 12H5" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                }
-                                @if (transaction.type === 'expense') {
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                        <path d="M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2"/>
-                                        <path d="M5 12h14" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                }
-                            </div>
-                            
-                            <div class="transaction-info-modal">
-                                <h4 class="transaction-description-modal">{{transaction.description}}</h4>
-                                <p class="transaction-date-modal">{{formatDate(transaction.date)}}</p>
-                                @if (transaction.status === 'FAILED') {
-                                    <span class="transaction-status-modal failed">Fallida</span>
-                                }
-                            </div>
-                            
-                            <div class="transaction-amount-modal" [class]="transaction.type">
-                                <span class="amount-value-modal">
-                                    {{transaction.type === 'income' ? '+' : '-'}}{{formatAmount(transaction.amount)}}
-                                </span>
-                            </div>
-                        </div>
-                    }
-                
-                    @if (hasMoreTransactions) {
-                        <div class="load-more-container">
-                            <button class="load-more-btn" (click)="loadMoreTransactions()">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 2v20M5 9l7-7 7 7" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                                Cargar más transacciones
-                            </button>
-                        </div>
-                    }
-                </div>
-                }
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Modal de lista de favoritos -->
-@if (showFavoritesModal) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'favorites')">
-        <div class="modal-content favorites-modal">
-            <div class="modal-header">
-                <h2>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                    Contactos Favoritos
-                </h2>
-                <span class="close-button" (click)="closeFavoritesModal()">&times;</span>
-            </div>
-
-            @if (favoriteContacts.length > 0) {
-                <div class="favorites-list">
-                    @for (favorite of favoriteContacts; track trackFavorite($index, favorite)) {
-                        <div class="favorite-card" (click)="openFavoriteDetailsModal(favorite)">
-                            <div class="favorite-avatar">
-                                <span>{{favorite.accountOwnerName.split(' ')[0]?.charAt(0)}}{{favorite.accountOwnerName.split(' ')[1]?.charAt(0) || ''}}</span>
-                            </div>
-                            <div class="favorite-info">
-                                <h3 class="favorite-alias">{{favorite.contactAlias}}</h3>
-                                <p class="favorite-owner">{{favorite.accountOwnerName}}</p>
-                                <p class="favorite-account">{{favorite.accountAlias}}</p>
-                                @if (favorite.description) {
-                                    <p class="favorite-description">{{favorite.description}}</p>
-                                }
-                            </div>
-                            <div class="favorite-actions">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-
-            @if (favoriteContacts.length === 0) {
-                <div class="empty-favorites">
-                    <div class="empty-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                    </div>
-                    <h3>No tienes favoritos</h3>
-                    <p>Cuando realices transferencias, podrás agregar contactos a tus favoritos</p>
-                </div>
-            }
-        </div>
-    </div>
-}
-
-<!-- Modal de detalles de favorito -->
-@if (showFavoriteDetailsModal && selectedFavoriteContact) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'favoriteDetails')">
-        <div class="modal-content favorite-details-modal">
-            <div class="modal-header-info">
-                <button class="back-button-list" (click)="backToFavoritesList()" title="Volver a la lista">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-               
-                <span class="close-button" (click)="closeFavoriteDetailsModal()">&times;</span>
-            </div>
-
-            <div class="favorite-details">
-                <div class="favorite-profile">
-                    <div class="favorite-avatar large">
-                        <span>{{selectedFavoriteContact.accountOwnerName.split(' ')[0]?.charAt(0)}}{{selectedFavoriteContact.accountOwnerName.split(' ')[1]?.charAt(0) || ''}}</span>
-                    </div>
-                    <div class="favorite-profile-info">
-                        <h3>{{selectedFavoriteContact.contactAlias}}</h3>
-                        <p class="owner-name">{{selectedFavoriteContact.accountOwnerName}}</p>
-                    </div>
-                </div>
-
-                <div class="favorite-account-info">
-                    <div class="info-row">
-                        <span class="label">Alias de cuenta:</span>
-                        <span class="value">{{selectedFavoriteContact.accountAlias}}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label">CBU:</span>
-                        <span class="value">{{selectedFavoriteContact.accountCbu}}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Tipo de cuenta:</span>
-                        <span class="value">{{selectedFavoriteContact.accountType}}</span>
-                    </div>
-                    @if (selectedFavoriteContact.description) {
-                        <div class="info-row">
-                            <span class="label">Descripción:</span>
-                            <span class="value">{{selectedFavoriteContact.description}}</span>
-                        </div>
-                    }
-                    <div class="info-row">
-                        <span class="label">Agregado:</span>
-                        <span class="value">{{selectedFavoriteContact.creationDate}}</span>
-                    </div>
-                    @if (selectedFavoriteContact.lastUsed) {
-                        <div class="info-row">
-                            <span class="label">Última transferencia:</span>
-                            <span class="value">{{selectedFavoriteContact.lastUsed}}</span>
-                        </div>
-                    }
-                </div>
-
-                <div class="favorite-actions-buttons">
-                    <button class="primary transfer-btn" (click)="transferToFavorite(selectedFavoriteContact)">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M21 12H3M16 17l5-5-5-5" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                        Transferir
-                    </button>
-                    <button class="secondary edit-btn" (click)="openEditFavoriteModal(selectedFavoriteContact)">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                        Editar
-                    </button>
-                    <button class="danger remove-btn" (click)="removeFavoriteContact(selectedFavoriteContact)">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                        Eliminar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Modal para agregar a favoritos -->
-@if (showAddFavoriteModal) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'addFavorite')">
-        <div class="modal-content add-favorite-modal">
-            <div class="modal-header">
-                <h2>Agregar a Favoritos</h2>
-                <span class="close-button" (click)="closeAddFavoriteModal()">&times;</span>
-            </div>
-
-            <div class="add-favorite-form">
-                <div class="form-group">
-                    <input 
-                        type="text" 
-                        [(ngModel)]="favoriteContactAlias"
-                        placeholder=" "
-                        required
-                        maxlength="50">
-                    <label>Nombre para agendar *</label>
-                </div>
-
-                <div class="form-group">
-                    <textarea 
-                        [(ngModel)]="favoriteContactDescription"
-                        placeholder=" "
-                        maxlength="200"
-                        rows="3"></textarea>
-                    <label>Descripción (opcional)</label>
-                </div>
-
-                <div class="form-actions">
-                    <button class="primary" (click)="addToFavorites()" [disabled]="!favoriteContactAlias.trim()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                        Guardar favorito
-                    </button>
-                    <button class="secondary" (click)="closeAddFavoriteModal()">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Modal para editar favorito -->
-@if (showEditFavoriteModal && selectedFavoriteContact) {
-    <div class="modal" (click)="onModalBackdropClick($event, 'editFavorite')">
-        <div class="modal-content edit-favorite-modal">
-            <div class="modal-header">
-                <h2>Editar Favorito</h2>
-                <span class="close-button" (click)="closeEditFavoriteModal()">&times;</span>
-            </div>
-
-            <div class="edit-favorite-form">
-                <div class="form-group">
-                    <input 
-                        type="text" 
-                        [(ngModel)]="favoriteContactAlias"
-                        placeholder=" "
-                        required
-                        maxlength="50">
-                    <label>Nombre para agendar *</label>
-                </div>
-
-                <div class="form-group">
-                    <textarea 
-                        [(ngModel)]="favoriteContactDescription"
-                        placeholder=" "
-                        maxlength="200"
-                        rows="3"></textarea>
-                    <label>Descripción (opcional)</label>
-                </div>
-
-                <div class="form-actions">
-                    <button class="primary" (click)="updateFavoriteContact()" [disabled]="!favoriteContactAlias.trim()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                        Guardar cambios
-                    </button>
-                    <button class="secondary" (click)="closeEditFavoriteModal()">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-@if (showQrModal) {
-  <div class="modal" (click)="onModalBackdropClick($event, 'myQr')">
-    <div class="modal-content" [class.loading-qr]="isLoadingQr" (click)="$event.stopPropagation()">
-      <span class="close-button" (click)="cerrarModalQr()">&times;</span>
-      
-      @if (isLoadingQr) { <div class="search-loading-overlay"> 
-          <div class="search-loading-content">
-            <div class="search-spinner"></div> 
-            <p>Cargando QR...</p> 
+        <div class="account-info">
+          <div class="account-detail">
+            <span class="label">Alias</span>
+            <span class="value">{{userData.alias}}</span>
+          </div>
+          <div class="account-detail">
+            <span class="label">CVU</span>
+            <span class="value">{{userData.cvu}}</span>
           </div>
         </div>
-      }
-      @if (qrCodeDataString && qrCodeDataObject && !isLoadingQr) {
-        <div class="qr-container">
-            <h2>Recibi dinero con tu QR</h2>
-            
-            <qrcode 
-                [qrdata]="qrCodeDataString" 
-                [width]="256" 
-                [errorCorrectionLevel]="'M'">
-            </qrcode>
-            
-            <h5 class="qr-footer">Tu QR para recibir transferencias en {{ qrCodeDataObject.currency }}</h5>
+      </div>
+    </section>
+
+    <section class="actions-section">
+      <h2 class="section-title">Acciones Rápidas</h2>
+      <div class="actions-grid">
+
+        <div class="action-card" (click)="openIngresarModal()">
+          <div class="action-icon deposit">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2v20M5 9l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h3>Ingresar Dinero</h3>
+          <p>Agregar fondos a tu cuenta</p>
         </div>
+
+
+
+        <div class="action-card" (click)="openTransferModal()">
+          <div class="action-icon transfer">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M21 12H3M16 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h3>Transferir</h3>
+          <p>Enviar dinero a otros usuarios</p>
+        </div>
+
+        <div class="action-card" (click)="openAliasModal()">
+          <div class="action-icon info">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor"
+                stroke-width="2" />
+              <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="2" />
+            </svg>
+          </div>
+          <h3>Mi CVU</h3>
+          <p>Ver datos de la cuenta</p>
+        </div>
+
+        <div class="action-card" (click)="openFavoritesModal()">
+          <div class="action-icon favorites">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h3>Favoritos</h3>
+          <p>Mis contactos favoritos</p>
+        </div>
+
+        <div class="action-card" (click)="openTaxModal()">
+          <div class="action-icon calculator">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="2" />
+              <path d="M8 6h8M8 10h8M8 14h8M8 18h8" stroke="currentColor" stroke-width="2" />
+            </svg>
+          </div>
+          <h3>Calculadora</h3>
+          <p>Calcular impuestos</p>
+        </div>
+
+        <div class="action-card" (click)="openMyQrModal()">
+          <div class="action-icon QR">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="17" y="17" width="4" height="4" rx="1" />
+              <rect x="17" y="12" width="2" height="2" rx="1" />
+              <rect x="12" y="17" width="2" height="2" rx="1" />
+              <rect x="12" y="12" width="2" height="2" rx="1" />
+            </svg>
+          </div>
+          <h3>Mi QR</h3>
+          <p>Recibir transferencia por QR</p>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="transactions-section">
+      <div class="transactions-header">
+        <h2 class="section-title">Movimientos Recientes</h2>
+        <button class="view-all-btn" (click)="openAllTransactionsModal()">Ver todos</button>
+      </div>
+
+      <div class="transactions-container">
+        @if (recentTransactions.length === 0) {
+        <div class="no-transactions">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <p>No hay transacciones recientes</p>
+        </div>
+        }
+
+        @for (transaction of recentTransactions; track trackTransaction($index, transaction)) {
+        <div class="transaction-item" (click)="openTransactionModal(transaction)">
+
+          <div class="transaction-icon" [class]="transaction.type">
+            @if (transaction.type === 'income') {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2v20M5 9l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            } @else if (transaction.type === 'expense') {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 22V2M19 15l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            }
+          </div>
+
+          <div class="transaction-details">
+            <h4 class="transaction-description">{{transaction.description}}</h4>
+            <p class="transaction-date">{{formatDate(transaction.date)}}</p>
+            @if (transaction.status === 'FAILED') {
+            <span class="transaction-status failed">Fallida</span>
+            }
+          </div>
+
+          <div class="transaction-amount" [class]="transaction.type">
+            <span class="amount-value">
+              {{transaction.type === 'income' ? '+' : '-'}}{{formatAmount(transaction.amount)}}
+            </span>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+  </main>
+</div>
+
+@if (showIngresarModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'ingresar')">
+  <div class="modal-content">
+    <span class="close-button" (click)="closeIngresarModal()">&times;</span>
+    <h2>Ingresar dinero</h2>
+    <form (ngSubmit)="ingresarDinero()" #ingresarForm="ngForm">
+      <input type="number" [(ngModel)]="montoIngresar" name="montoIngresar" placeholder="Monto a ingresar" required
+        min="1" step="0.01" [disabled]="isIngresandoDinero">
+      <button type="submit" [disabled]="!ingresarForm.valid || isIngresandoDinero"
+        [class.loading]="isIngresandoDinero">
+        <span class="button-text">
+          {{ isIngresandoDinero ? 'Procesando...' : 'Confirmar' }}
+        </span>
+        @if (isIngresandoDinero) {
+        <div class="progress-bar"></div>
+        }
+      </button>
+    </form>
+  </div>
+</div>
+}
+
+@if (showTransferModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'transfer')">
+  <div class="modal-content">
+    @if (isBuscandoCuenta && !isScanning) { <div class="search-loading-overlay">
+      <div class="search-loading-content">
+        <div class="search-spinner"></div>
+        <p>Buscando cuenta...</p>
+      </div>
+    </div>
+    }
+
+    <span class="close-button" (click)="closeTransferModal()">&times;</span>
+    <h2>Transferir Dinero</h2>
+
+    @if (transferStep === 1) {
+
+    @if (!isScanning) {
+    <div id="search-account-step">
+      <div class="form-group">
+        <input type="text" [(ngModel)]="destinatarioInput" placeholder=" " required>
+        <label>Alias o CVU</label>
+      </div>
+
+      <button class="primary" (click)="buscarCuenta()" [disabled]="!destinatarioInput.trim() || isBuscandoCuenta"
+        [class.loading]="isBuscandoCuenta">
+        <span class="button-text">
+          {{ isBuscandoCuenta ? 'Buscando...' : 'Buscar cuenta' }}
+        </span>
+        @if (isBuscandoCuenta) {
+        <div class="progress-bar"></div>
+        }
+      </button>
+
+      <button class="secondary qr-scan-button" (click)="startScanning()" title="Escanear QR">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M3 7V3h4M17 3h4v4M21 17v4h-4M7 21H3v-4" />
+          <path d="M7 12h10" />
+        </svg>
+        Escanear QR
+      </button>
+    </div>
+    }
+
+    @if (isScanning) {
+    <div class="scanner-view">
+      <h2>Apuntá al código QR</h2>
+      <zxing-scanner (scanSuccess)="handleScanSuccess($event)" (scanError)="handleScanError($event)"
+        (permissionResponse)="handlePermissionResponse($event)">
+      </zxing-scanner>
+
+      @if (hasPermission === false) {
+      <div class="permission-denied">
+        <p>No diste permiso para usar la cámara.</p>
+        <p>Revisá la configuración del navegador.</p>
+      </div>
+      }
+      <button (click)="cancelScanning()" class="secondary">Ingresar Alias/CVU</button>
+    </div>
+    }
+    }
+
+    @if (transferStep === 2) {
+    <div id="confirm-account-step">
+      <h3>Datos de la cuenta destino:</h3>
+      @if (cuentaDestinoData) {
+      <div id="account-details">
+        <p><strong>Alias:</strong> {{cuentaDestinoData.alias}}</p>
+        @if(cuentaDestinoData.cvu !== 'Obtenido por QR') {
+        <p><strong>CVU:</strong> {{cuentaDestinoData.cvu}}</p>
+        }
+        <p><strong>Titular:</strong> {{cuentaDestinoData.user.nombre}} {{cuentaDestinoData.user.apellido}}</p>
+        <p><strong>DNI:</strong> {{cuentaDestinoData.user.dni}}</p>
+        <p><strong>Email:</strong> {{cuentaDestinoData.user.email}}</p>
+      </div>
+      } @else {
+      <p>No se encontraron datos.</p> }
+      <button class="primary" (click)="confirmarCuenta()">Confirmar cuenta</button>
+      <button (click)="cancelarBusqueda()" class="secondary">Cancelar</button>
+    </div>
+    }
+
+    @if (transferStep === 3) {
+    <div id="amount-step">
+      <h3>¿Cuánto querés transferir?</h3>
+      @if(cuentaDestinoData) {
+      <p class="transfer-recipient-info">A: {{cuentaDestinoData.user.nombre}} {{cuentaDestinoData.user.apellido}}
+        ({{cuentaDestinoData.alias}})</p>
+      }
+      <form (ngSubmit)="realizarTransferencia()" #transferForm="ngForm">
+        <div class="form-group">
+          <input type="number" [(ngModel)]="montoTransfer" name="montoTransfer" min="1" step="1" placeholder=" "
+            required>
+          <label>Monto $</label>
+        </div>
+        <button class="primary" type="submit"
+          [disabled]="!transferForm.valid || montoTransfer === null || montoTransfer <= 0 || isTransfiriendo"
+          [class.loading]="isTransfiriendo">
+          <span class="button-text">
+            {{ isTransfiriendo ? 'Transfiriendo...' : 'Transferir' }}
+          </span>
+          @if (isTransfiriendo) {
+          <div class="progress-bar"></div>
+          }
+        </button>
+        
+        @if (!isTransfiriendo) {
+        <button type="button" (click)="volverAConfirmacion()" class="secondary">Volver</button>
+        }
+        </form>
+    </div>
+    }
+
+    @if (transferStep === 4) {
+    <div id="add-favorite-step">
+      <div class="transfer-success">
+        <div class="success-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <h3>¡Transferencia exitosa!</h3>
+        <p>¿Querés agregar este contacto a tus favoritos?</p>
+        <div class="favorite-option">
+          <button class="primary" (click)="openAddFavoriteModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                stroke="currentColor" stroke-width="2" />
+            </svg>
+            Agregar a favoritos
+          </button>
+          <button class="secondary" (click)="skipAddToFavorites()">No, gracias</button>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+}
+
+@if (showAliasModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'alias')">
+  <div class="modal-content alias-modal">
+    <span class="close-button" (click)="closeAliasModal()">&times;</span>
+    <h2>Mi Alias y CVU</h2>
+
+    <div class="info-alias-cvu">
+      <div class="info-line">
+        <div class="info-text">
+          <strong>Alias:</strong> <span>{{userData.alias}}</span>
+        </div>
+        <button class="copy-button" (click)="copyToClipboard(userData.alias, 'Alias')" title="Copiar Alias">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M20 9h-9c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm0 11h-9v-9h9v9zm-4-17H6c-1.1 0-2 .9-2 2v9h2V5h10V3z"
+              fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+      <div class="info-line">
+        <div class="info-text">
+          <strong>CVU:</strong> <span>{{userData.cvu}}</span>
+        </div>
+        <button class="copy-button" (click)="copyToClipboard(userData.cvu, 'CVU')" title="Copiar CVU">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M20 9h-9c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2v-9c0-1.1-.9-2-2-2zm0 11h-9v-9h9v9zm-4-17H6c-1.1 0-2 .9-2 2v9h2V5h10V3z"
+              fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (showTaxModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'tax')">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close-tax-button" (click)="closeTaxModal()">&times;</span>
+      <h2>Calculadora de Impuestos</h2>
+    </div>
+
+    @if (!showTaxForm) {
+    <div id="currency-selection">
+      <p>¿En qué moneda querés calcular?</p>
+      <button class="currency-button" (click)="selectCurrency('ARS')">Pesos (ARS)</button>
+      <button class="currency-button" (click)="selectCurrency('USD')">Dólares (USD)</button>
+    </div>
+    }
+
+    @if (showTaxForm) {
+    <div id="tax-form">
+      <label>Monto en {{selectedCurrency}}:</label>
+      <input type="number" [(ngModel)]="taxMonto" min="0" step="0.01" placeholder="0.00">
+      <button (click)="calcularImpuestos()">Calcular</button>
+      @if (taxResult) {
+      <div id="tax-result" [innerHTML]="taxResult"></div>
+      }
+    </div>
+    }
+  </div>
+</div>
+}
+
+@if (showProfileModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'profile')">
+  <div class="modal-content">
+    <span class="close-button" (click)="closeProfileModal()">&times;</span>
+    <h2>Perfil de Usuario</h2>
+    <div class="profile-details">
+      <div class="profile-photo">
+        <svg width="50" height="50" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="12" fill="#ccc" />
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+            fill="#666" />
+        </svg>
+      </div>
+      <p><strong>Nombre:</strong> <span>{{userData.name}}</span></p>
+      <p><strong>Apellido:</strong> <span>{{userData.lastName}}</span></p>
+      <p><strong>Correo:</strong> <span>{{userData.email}}</span></p>
+      <p><strong>DNI:</strong> <span>{{userData.dni}}</span></p>
+
+      <p>
+        <strong>Nombre de usuario:</strong>
+        @if (!editingUsername) {
+        <span>{{userData.username}}</span>
+        }
+        @if (editingUsername) {
+        <input type="text" [(ngModel)]="newUsername" (keydown.enter)="saveUsername()"
+          (keydown.escape)="cancelEditUsername()" maxlength="25" />
+        }
+        @if (!editingUsername) {
+        <button (click)="startEditUsername()" title="Editar nombre de usuario">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        }
+      </p>
+
+      <p>
+        <strong>Alias:</strong>
+        @if (!editingAlias) {
+        <span>{{userData.alias}}</span>
+        }
+        @if (editingAlias) {
+        <input type="text" [(ngModel)]="newAlias" (keydown.enter)="saveAlias()" (keydown.escape)="cancelEditAlias()"
+          maxlength="25" />
+        }
+        @if (!editingAlias) {
+        <button (click)="startEditAlias()" title="Editar alias">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        }
+      </p>
+
+      <p><strong>CVU:</strong> <span>{{userData.cvu}}</span></p>
+    </div>
+  </div>
+</div>
+}
+
+@if (showTransactionModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'transaction')">
+  <div class="modal-content">
+    <span class="close-button" (click)="closeTransactionModal()">&times;</span>
+    <h2>Detalle de la Transferencia</h2>
+    @if (selectedTransaction) {
+    <ul class="transfer-details">
+      <li><b>ID Operación:</b> <span>{{selectedTransaction.id}}</span></li>
+      <li><b>Origen:</b> <span>{{getTransactionOrigin(selectedTransaction)}}</span></li>
+      <li><b>Destino:</b> <span>{{getTransactionDestination(selectedTransaction)}}</span></li>
+      <li><b>Monto:</b> <span [class]="selectedTransaction.type">
+          {{selectedTransaction.type === 'income' ? '+' : '-'}}{{formatAmount(selectedTransaction.amount)}}
+        </span></li>
+      <li><b>Estado:</b> <span
+          [class]="'estado-' + selectedTransaction.status?.toLowerCase()">{{selectedTransaction.status}}</span></li>
+      <li><b>Fecha y hora:</b> <span>{{formatDateDetailed(selectedTransaction.date)}}</span></li>
+    </ul>
+    }
+  </div>
+</div>
+}
+
+@if (showAllTransactionsModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'allTransactions')">
+  <div class="modal-content all-transactions-modal">
+    <span class="close-button" (click)="closeAllTransactionsModal()">&times;</span>
+    <h2>Todas las Transacciones</h2>
+
+    <div class="all-transactions-container">
+      @if (allTransactions.length === 0) {
+      <div class="no-transactions-message">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+          <path d="M8 12h8" stroke="currentColor" stroke-width="2" />
+          <path d="M12 8v8" stroke="currentColor" stroke-width="2" />
+        </svg>
+        <p>No hay transacciones para mostrar</p>
+      </div>
+      } @else {
+      <div class="transactions-list">
+        @for (transaction of displayedTransactions; track trackTransaction($index, transaction)) {
+        <div class="transaction-item-modal">
+
+          <div class="transaction-icon-modal" [class]="transaction.type">
+            @if (transaction.type === 'income') {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" />
+              <path d="M19 12H5" stroke="currentColor" stroke-width="2" />
+            </svg>
+            }
+            @if (transaction.type === 'expense') {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" />
+              <path d="M5 12h14" stroke="currentColor" stroke-width="2" />
+            </svg>
+            }
+          </div>
+
+          <div class="transaction-info-modal">
+            <h4 class="transaction-description-modal">{{transaction.description}}</h4>
+            <p class="transaction-date-modal">{{formatDate(transaction.date)}}</p>
+            @if (transaction.status === 'FAILED') {
+            <span class="transaction-status-modal failed">Fallida</span>
+            }
+          </div>
+
+          <div class="transaction-amount-modal" [class]="transaction.type">
+            <span class="amount-value-modal">
+              {{transaction.type === 'income' ? '+' : '-'}}{{formatAmount(transaction.amount)}}
+            </span>
+          </div>
+
+          <div class="transaction-actions-modal">
+            <button class="delete-transaction-btn" (click)="removeTransactionFromList(transaction)"
+              title="Eliminar de la lista">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  stroke="currentColor" stroke-width="2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        }
+
+        @if (hasMoreTransactions) {
+        <div class="load-more-container">
+          <button class="load-more-btn" (click)="loadMoreTransactions()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2v20M5 9l7-7 7 7" stroke="currentColor" stroke-width="2" />
+            </svg>
+            Cargar más transacciones
+          </button>
+        </div>
+        }
+      </div>
       }
     </div>
   </div>
+</div>
+}
+
+@if (showFavoritesModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'favorites')">
+  <div class="modal-content favorites-modal">
+    <div class="modal-header">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+            stroke="currentColor" stroke-width="2" />
+        </svg>
+        Contactos Favoritos
+      </h2>
+      <span class="close-button-favorite" (click)="closeFavoritesModal()">&times;</span>
+    </div>
+
+    @if (favoriteContacts.length > 0) {
+    <div class="favorites-list">
+      @for (favorite of favoriteContacts; track trackFavorite($index, favorite)) {
+      <div class="favorite-card" (click)="openFavoriteDetailsModal(favorite)">
+        <div class="favorite-avatar">
+          <span>{{favorite.accountOwnerName.split(' ')[0]?.charAt(0)}}{{favorite.accountOwnerName.split(' ')[1]?.charAt(0)
+            || ''}}</span>
+        </div>
+        <div class="favorite-info">
+          <h3 class="favorite-alias">{{favorite.contactAlias}}</h3>
+          <p class="favorite-owner">{{favorite.accountOwnerName}}</p>
+          <p class="favorite-account">{{favorite.accountAlias}}</p>
+          @if (favorite.description) {
+          <p class="favorite-description">{{favorite.description}}</p>
+          }
+        </div>
+        <div class="favorite-actions">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    @if (favoriteContacts.length === 0) {
+    <div class="empty-favorites">
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+            stroke="currentColor" stroke-width="2" />
+        </svg>
+      </div>
+      <h3>No tienes favoritos</h3>
+      <p>Cuando realices transferencias, podrás agregar contactos a tus favoritos</p>
+    </div>
+    }
+  </div>
+</div>
+}
+
+@if (showFavoriteDetailsModal && selectedFavoriteContact) {
+<div class="modal" (click)="onModalBackdropClick($event, 'favoriteDetails')">
+  <div class="modal-content favorite-details-modal">
+    <div class="modal-header-info">
+      <button class="back-button-list" (click)="backToFavoritesList()" title="Volver a la lista">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+
+      <span class="close-button" (click)="closeFavoriteDetailsModal()">&times;</span>
+    </div>
+
+    <div class="favorite-details">
+      <div class="favorite-profile">
+        <div class="favorite-avatar large">
+          <span>{{selectedFavoriteContact.accountOwnerName.split(' ')[0]?.charAt(0)}}{{selectedFavoriteContact.accountOwnerName.split(' ')[1]?.charAt(0)
+            || ''}}</span>
+        </div>
+        <div class="favorite-profile-info">
+          <h3>{{selectedFavoriteContact.contactAlias}}</h3>
+          <p class="owner-name">{{selectedFavoriteContact.accountOwnerName}}</p>
+        </div>
+      </div>
+
+      <div class="favorite-account-info">
+        <div class="info-row">
+          <span class="label">Alias de cuenta:</span>
+          <span class="value">{{selectedFavoriteContact.accountAlias}}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">CBU:</span>
+          <span class="value">{{selectedFavoriteContact.accountCbu}}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Tipo de cuenta:</span>
+          <span class="value">{{selectedFavoriteContact.accountType}}</span>
+        </div>
+        @if (selectedFavoriteContact.description) {
+        <div class="info-row">
+          <span class="label">Descripción:</span>
+          <span class="value">{{selectedFavoriteContact.description}}</span>
+        </div>
+        }
+        <div class="info-row">
+          <span class="label">Agregado:</span>
+          <span class="value">{{selectedFavoriteContact.creationDate}}</span>
+        </div>
+        @if (selectedFavoriteContact.lastUsed) {
+        <div class="info-row">
+          <span class="label">Última transferencia:</span>
+          <span class="value">{{selectedFavoriteContact.lastUsed}}</span>
+        </div>
+        }
+      </div>
+
+      <div class="favorite-actions-buttons">
+        <button class="primary transfer-btn" (click)="transferToFavorite(selectedFavoriteContact)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M21 12H3M16 17l5-5-5-5" stroke="currentColor" stroke-width="2" />
+          </svg>
+          Transferir
+        </button>
+        <button class="secondary edit-btn" (click)="openEditFavoriteModal(selectedFavoriteContact)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" />
+          </svg>
+          Editar
+        </button>
+        <button class="danger remove-btn" (click)="removeFavoriteContact(selectedFavoriteContact)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              stroke="currentColor" stroke-width="2" />
+          </svg>
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (showAddFavoriteModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'addFavorite')">
+  <div class="modal-content add-favorite-modal">
+    <div class="modal-header">
+      <h2>Agregar a Favoritos</h2>
+      <span class="close-button" (click)="closeAddFavoriteModal()">&times;</span>
+    </div>
+
+    <div class="add-favorite-form">
+      <div class="form-group">
+        <input type="text" [(ngModel)]="favoriteContactAlias" placeholder=" " required maxlength="50">
+        <label>Nombre para agendar *</label>
+      </div>
+
+      <div class="form-group">
+        <textarea [(ngModel)]="favoriteContactDescription" placeholder=" " maxlength="200" rows="3"></textarea>
+        <label>Descripción (opcional)</label>
+      </div>
+
+      <div class="form-actions">
+        <button class="primary" (click)="addToFavorites()" [disabled]="!favoriteContactAlias.trim()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              stroke="currentColor" stroke-width="2" />
+          </svg>
+          Guardar favorito
+        </button>
+        <button class="secondary" (click)="closeAddFavoriteModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (showEditFavoriteModal && selectedFavoriteContact) {
+<div class="modal" (click)="onModalBackdropClick($event, 'editFavorite')">
+  <div class="modal-content edit-favorite-modal">
+    <div class="modal-header">
+      <h2>Editar Favorito</h2>
+      <span class="close-button" (click)="closeEditFavoriteModal()">&times;</span>
+    </div>
+
+    <div class="edit-favorite-form">
+      <div class="form-group">
+        <input type="text" [(ngModel)]="favoriteContactAlias" placeholder=" " required maxlength="50">
+        <label>Nombre para agendar *</label>
+      </div>
+
+      <div class="form-group">
+        <textarea [(ngModel)]="favoriteContactDescription" placeholder=" " maxlength="200" rows="3"></textarea>
+        <label>Descripción (opcional)</label>
+      </div>
+
+      <div class="form-actions">
+        <button class="primary" (click)="updateFavoriteContact()" [disabled]="!favoriteContactAlias.trim()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" />
+          </svg>
+          Guardar cambios
+        </button>
+        <button class="secondary" (click)="closeEditFavoriteModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (showQrModal) {
+<div class="modal" (click)="onModalBackdropClick($event, 'myQr')">
+  <div class="modal-content" [class.loading-qr]="isLoadingQr" (click)="$event.stopPropagation()">
+    <span class="close-button" (click)="cerrarModalQr()">&times;</span>
+
+    @if (isLoadingQr) { <div class="search-loading-overlay">
+      <div class="search-loading-content">
+        <div class="search-spinner"></div>
+        <p>Cargando QR...</p>
+      </div>
+    </div>
+    }
+    @if (qrCodeDataString && qrCodeDataObject && !isLoadingQr) {
+    <div class="qr-container">
+      <h2>Recibi dinero con tu QR</h2>
+
+      <qrcode [qrdata]="qrCodeDataString" [width]="256" [errorCorrectionLevel]="'M'">
+      </qrcode>
+
+      <h5 class="qr-footer">Tu QR para recibir transferencias en {{ qrCodeDataObject.currency }}</h5>
+    </div>
+    }
+  </div>
+</div>
 }
