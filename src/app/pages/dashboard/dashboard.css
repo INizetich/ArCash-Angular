@@ -319,8 +319,9 @@ body {
 
 .user-menu:hover {
   transform: translateY(-3px);
-  background: linear-gradient(135deg, var(--text-secondary) 0%, var(--text-accent) 100%);
-  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+  color: var(--carbon);
+  background: linear-gradient(135deg, var(--text-primary), var(--text-accent));
+ 
 }
 
 .user-menu:hover::before {
@@ -341,7 +342,7 @@ body {
 .user-avatar {
   width: 32px;
   height: 32px;
-  background: var(--tech-gradient-primary);
+  background: linear-gradient(135deg, var(--text-primary), var(--text-accent));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -448,7 +449,7 @@ body {
 
 .balance-card {
   background: var(--glass-bg-light);
-  border: 1px solid var(--glass-border-light);
+  border: 1px solid var(--tech-gradiant-god);
   border-radius: 16px;
   padding: 1.5rem;
   position: relative;
@@ -858,12 +859,12 @@ body {
 }
 
 .modal-content h2 {
-  color: var(--cyber-blue);
+  color: var(--text-primary);
   font-size: clamp(1.25rem, 4vw, 1.5rem);
   font-weight: 600;
   margin-bottom: 1.25rem;
   text-align: center;
-  background: linear-gradient(45deg, var(--cyber-blue), var(--neon-cyan));
+  background: linear-gradient(135deg, var(--text-primary), var(--text-accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1350,7 +1351,7 @@ Boton de cerrar el modal de taxes
 }
 
 .info-text strong {
-  color: var(--cyber-blue);
+  color: var(--text-accent);
   margin-right: 0.5rem;
 }
 
@@ -1384,7 +1385,7 @@ Boton de cerrar el modal de taxes
 }
 
 .copy-button svg {
-  color: var(--cyber-blue);
+  color: var(--text-accent);
   width: 16px;
   height: 16px;
 }
@@ -1463,7 +1464,7 @@ Boton de cerrar el modal de taxes
 
 .profile-photo svg {
   border-radius: 50%;
-  border: 2px solid var(--cyber-blue);
+  border: 2px solid var(--text-accent);
   padding: 8px;
   background: rgba(0, 212, 255, 0.1);
   width: 80px;
@@ -1486,7 +1487,7 @@ Boton de cerrar el modal de taxes
 }
 
 .profile-details strong {
-  color: var(--cyber-blue);
+  color: var(--text-accent);
   min-width: 120px;
   font-size: 0.9rem;
 }

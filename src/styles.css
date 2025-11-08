@@ -11,7 +11,7 @@
     --titanium: #E8EAF6;
     --platinum: rgba(248, 250, 255, 0.98);
     --platinum-rgb: 248, 250, 255;
-    --cyber-blue-rgb: 0, 212, 255; /* <-- AÑADE ESTA LÍNEA */
+    --cyber-blue-rgb: 0, 212, 255;
     
     /* Paleta neón tecnológica */
     --cyber-blue: #00D4FF;
@@ -29,7 +29,7 @@
     --tech-gradient-primary: linear-gradient(135deg, var(--cyber-blue) 0%, var(--quantum-violet) 100%);
     --tech-gradient-secondary: linear-gradient(135deg, var(--electric-purple) 0%, var(--plasma-pink) 100%);
     --tech-gradient-accent: linear-gradient(135deg, var(--neon-cyan) 0%, var(--laser-green) 100%);
-
+    --tech-gradient-god:  linear-gradient(135deg, var(--text-primary), var(--text-accent) 100%);
     /* Modo claro - elegante y tecnológico */
     --bg-primary: var(--platinum);
     --bg-secondary: rgba(248, 250, 255, 0.9);
@@ -255,7 +255,7 @@ body::before {
 
 /* Efectos de transición optimizados */
 .smooth-transitions {
-    transition: all 0.4s ease !important;
+    transition: all 0.6s ease !important;
 }
 
 /* Transiciones específicas para elementos interactivos */
@@ -312,6 +312,15 @@ button, input, .access-btn {
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
+
+
+
+
+
+
+
+
+
 /* Estilos de botones en modo oscuro - excluye logout, password toggle y elementos toast */
 [data-theme="dark"] button:not(.logout-btn):not([class*="logout"]):not([id*="logout"]):not(.password-toggle):not(.toast-close-btn):not(.toast-close):not([class*="toast"]) {
     color: #39FFCC !important; /* Neon verde/cyan en estado normal */
@@ -345,6 +354,8 @@ button, input, .access-btn {
     box-shadow: 0 8px 25px rgba(57, 255, 204, 0.4);
 }
 
+
+
 /* Estilos para el logo QR según el tema */
 /* Modo claro - logo QR negro */
 :root:not([data-theme="dark"]) .action-icon.QR {
@@ -364,12 +375,7 @@ button, input, .access-btn {
 /* * =================================================================
  * FIX: BOTONES DE COLOR DESHABILITADOS (Modo Oscuro)
  * =================================================================
- * Mantiene el color/gradiente original del botón,
- * pero lo "apaga" con un filtro para que se vea grisáceo.
- * Esta regla es más específica, por lo que anula
- * el 'button:disabled' genérico de otros archivos.
- */
-
+*/
 [data-theme="dark"] .formulario button[type="submit"]:disabled,
 [data-theme="dark"] .access-btn:disabled,
 [data-theme="dark"] .users-btn:disabled,
@@ -377,40 +383,17 @@ button, input, .access-btn {
 [data-theme="dark"] .habilitar-btn:disabled,
 [data-theme="dark"] .inhabilitar-btn:disabled,
 [data-theme="dark"] .confirm-btn:disabled {
-    
-    /* * 1. LA MAGIA: Aplicamos un filtro 
-     * saturate(20%) -> Mantiene 20% del color (verde, celeste, rosa)
-     * brightness(70%) -> Lo hace un 30% más oscuro
-     */
     filter: saturate(80%) brightness(70%);
-
-    /* * 2. Anulamos las propiedades genéricas de :disabled
-     * Usamos !important para asegurarnos de "ganar" a la regla
-     * genérica de button:disabled { background: rgba(...) }
-     * que está en tus otros archivos.
-     */
     opacity: 1 !important;
-    background: unset !important; /* Anula el 'background' genérico */
-    
-    /* * 3. Anulamos el color de texto genérico.
-     * El texto (ej. 'Acceder') también se filtra.
-     * Mantenemos el color de texto claro del tema.
-     */
+    background: unset !important; 
     color: var(--text-primary) !important;
-
-    /* 4. Nos aseguramos de que el cursor siga siendo el correcto */
     cursor: not-allowed;
 }
 
 /* * =================================================================
  * FIX: BOTONES DE COLOR DESHABILITADOS (Modo Claro)
  * =================================================================
- * Mantiene el color/gradiente original del botón,
- * pero lo "apaga" con un filtro para que se vea pálido/grisáceo.
- * Esta regla es más específica, por lo que anula
- * el ':root button:disabled' genérico.
- */
-
+*/
 :root:not([data-theme="dark"]) .formulario button[type="submit"]:disabled,
 :root:not([data-theme="dark"]) .access-btn:disabled,
 :root:not([data-theme="dark"]) .users-btn:disabled,
@@ -418,43 +401,18 @@ button, input, .access-btn {
 :root:not([data-theme="dark"]) .habilitar-btn:disabled,
 :root:not([data-theme="dark"]) .inhabilitar-btn:disabled,
 :root:not([data-theme="dark"]) .confirm-btn:disabled {
-    
-    /* * 1. EL FILTRO (diferente al modo oscuro):
-     * saturate(30%) -> Mantiene 30% del color (celeste, rosa, etc.)
-     * brightness(110%) -> Lo hace un 10% más pálido (para "lavar" el color)
-     * opacity(80%) -> Le da un poco de transparencia
-     */
     filter: saturate(80%) brightness(110%) opacity(80%);
-
-    /* * 2. Anulamos las propiedades genéricas de :disabled
-     * Usamos !important para "ganar" a la regla genérica
-     * de ':root button:disabled { background: ... }'
-     */
-    opacity: 1 !important; /* El filtro ya maneja la opacidad */
-    background: unset !important; /* Anula el 'background' genérico */
-    
-    /* * 3. Anulamos el color de texto genérico.
-     * Mantenemos el color de texto que querías (celeste).
-     * El filtro también lo hará un poco más pálido.
-     */
+    opacity: 1 !important; 
+    background: unset !important; 
     color: var(--text-accent) !important;
-
-    /* * 4. Anulamos el borde genérico para mantener el original
-     * (o quitárselo si no tenía)
-     */
     border: unset !important;
-
-    /* 5. Cursor */
     cursor: not-allowed;
 }
 
 /* * =================================================================
  * FIX: EFECTO DE BRILLO "SHINE" (Modo Claro)
  * =================================================================
- * Sobrescribe el brillo blanco por defecto (del modo oscuro) 
- * y lo reemplaza por un brillo "celeste" en modo claro.
- */
-
+*/
 :root:not([data-theme="dark"]) button::before,
 :root:not([data-theme="dark"]) .btn::before,
 :root:not([data-theme="dark"]) [class*="btn"]::before,
@@ -487,7 +445,6 @@ button, input, .access-btn {
 :root:not([data-theme="dark"]) .transaction-item-modal:hover{
   background-color: rgba(110, 110, 110, 0.11) !important;
 }
-
 
 
 
@@ -529,14 +486,9 @@ button, input, .access-btn {
     position: relative;
 }
 
-/* Ajuste para input de password con botón */
-.password-wrapper{
-    padding-right: 45px;
-}
+
 
 /* === ESTILOS MINIMALISTAS PARA BOTONES DE TOAST === */
-
-/* Botón de cerrar toast - estilo minimalista */
 .toast-close, .toast-close-btn {
     background: transparent !important;
     border: none !important;
@@ -571,12 +523,10 @@ button, input, .access-btn {
     transition: transform 0.1s ease !important;
 }
 
-/* Los iconos del toast mantienen su tamaño y estilo */
 .toast svg {
     transition: none !important;
 }
 
-/* Texto en inputs modo oscuro */
 /* Texto en inputs modo oscuro */
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] input[type="email"],
@@ -584,15 +534,17 @@ button, input, .access-btn {
 [data-theme="dark"] .input-wrapper input,
 [data-theme="dark"] .effect-1 {
  
-    /* Texto claro (como lo tenías o usando la variable del tema) */
-color: var(--text-primary);
--webkit-text-fill-color: var(--text-primary);
+    color: var(--text-primary) !important; /* !important AÑADIDO */
+    -webkit-text-fill-color: var(--text-primary) !important; /* !important AÑADIDO */
 
-/* Opcional: un borde claro para que se vea el input */
-border-bottom: 1px solid var(--border-color); 
+    /* Tu borde original (login.css) no lo tenía, 
+       pero el de styles.css sí. Lo unifico: */
+    border-bottom: 1px solid var(--border-color); 
+    
+    /* V--- CORRECCIÓN PARA EL CURSOR (caret) ---V */
+    caret-color: var(--text-primary) !important; 
+    /* ^----------------------------------------^ */
 }
-
-
 
 /* Placeholders modo oscuro */
 [data-theme="dark"] input[type="text"]::placeholder,
@@ -609,12 +561,65 @@ border-bottom: 1px solid var(--border-color);
 [data-theme="dark"] .modal-content input[type="email"],
 [data-theme="dark"] .modal-content input[type="password"] {
     background: var(--glass-bg-dark) !important;
-    /* Usa una de tus variables de color oscuro */
     color: var(--platinum) !important; 
     -webkit-text-fill-color: var(--platinum) !important;
+    /* V--- CORRECCIÓN PARA EL CURSOR (caret) EN MODALES ---V */
+    caret-color: var(--platinum) !important;
+    /* ^-------------------------------------------------^ */
 }
 
 
+/* #################################################################
+   V---               ¡AQUÍ ESTÁ LA SOLUCIÓN!               ---V
+   ################################################################# */
+
+/* * FIX: ESTILOS DE AUTOCOMPLETAR (AUTOFILL) DEL NAVEGADOR
+ * Esto fuerza al navegador a usar TUS colores en lugar de los suyos
+ * cuando sugiere o autocompleta un campo.
+*/
+
+/* --- FIX PARA MODO OSCURO --- */
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover, 
+[data-theme="dark"] input:-webkit-autofill:focus, 
+[data-theme="dark"] input:-webkit-autofill:active {
+    
+    /* 1. Hack para el fondo: 
+       Usamos un box-shadow interno con el color de fondo 
+       de tu .input-wrapper en modo oscuro.
+    */
+    box-shadow: 0 0 0 40px rgba(255, 255, 255, 0.02) inset !important; /* Color de tu .input-wrapper dark */
+    
+    /* 2. Arregla el color del TEXTO autocompletado */
+    -webkit-text-fill-color: var(--text-primary) !important; /* Tu texto claro */
+    
+    /* 3. Arregla el color del CURSOR (caret) */
+    caret-color: var(--text-primary) !important; /* Tu cursor claro */
+    
+    /* 4. Mantiene el borde que le diste al input-wrapper */
+    border: 2px solid var(--quantum-violet) !important; 
+    border-radius: 12px !important;
+}
+
+/* --- FIX PARA MODO CLARO --- */
+:root:not([data-theme="dark"]) input:-webkit-autofill,
+:root:not([data-theme="dark"]) input:-webkit-autofill:hover, 
+:root:not([data-theme="dark"]) input:-webkit-autofill:focus, 
+:root:not([data-theme="dark"]) input:-webkit-autofill:active {
+    
+    /* 1. Hack para el fondo (con el color de fondo claro) */
+    box-shadow: 0 0 0 40px rgba(255, 255, 255, 0.6) inset !important; /* Color de tu .input-wrapper light */
+    
+    /* 2. Arregla el color del TEXTO autocompletado */
+    -webkit-text-fill-color: var(--text-primary) !important; /* Tu texto oscuro */
+    
+    /* 3. Arregla el color del CURSOR (caret) */
+    caret-color: var(--text-primary) !important; /* Tu cursor oscuro */
+    
+    /* 4. Mantiene el borde que le diste al input-wrapper */
+    border: 2px solid var(--electric-purple) !important;
+    border-radius: 12px !important;
+}
 
 /* === GLOBAL FOOTER === */
 .global-footer {
@@ -781,4 +786,3 @@ border-bottom: 1px solid var(--border-color);
         font-size: 11px;
     }
 }
-

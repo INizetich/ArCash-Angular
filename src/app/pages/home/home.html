@@ -1,32 +1,34 @@
 <app-theme-toggle></app-theme-toggle>
 
 <main class="main-container">
-  <div class="brand-identity">
-    <!-- Usamos el componente de logo pero con una estructura personalizada para home -->
-    <svg class="brand-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-      <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape"/>
-      <circle cx="60" cy="60" r="18" class="security-core"/>
-      <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross"/>
-    </svg>
 
-    <div class="brand-typography">
-      <span class="brand-name">AR</span>
-      <span class="brand-name-sub">Cash</span>
-      <p class="brand-tagline">BEST VIRTUAL WALLET</p>
-    </div>
-  </div>
+    <header class="brand-identity">
+        <svg class="brand-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M60 20 L100 40 V80 L60 100 L20 80 V40 Z" class="vault-shape" />
+            <circle cx="60" cy="60" r="18" class="security-core" />
+            <path d="M60 42 L60 78 M48 60 L72 60" class="access-cross" />
+        </svg>
 
-  <div class="access-interface">
-    <button class="access-btn primary" (click)="goTo('login')">
-      <span>Login</span>
-      <svg width="15" height="14" viewBox="0 0 24 24" fill="none">
-        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </button>
-    <button class="access-btn secondary" (click)="goTo('register')">
-      <span>Sign in</span>
-    </button>
-  </div>
+        <div class="brand-typography">
+            <h1>
+                <span class="brand-name">AR</span>
+                <span class="brand-name-sub">Cash</span>
+            </h1>
+            <p class="brand-tagline">BEST VIRTUAL WALLET</p>
+        </div>
+    </header>
 
-  
+    <nav class="access-interface">
+        <button type="button" class="access-btn primary" (click)="goTo('login')">
+            <span>Login</span>
+            <svg width="15" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke-width="2" stroke-linecap="round" />
+            </svg>
+        </button>
+        <button type="button" class="access-btn secondary" (click)="goTo('register')">
+            <span>Sign in</span>
+        </button>
+    </nav>
+
+
 </main>

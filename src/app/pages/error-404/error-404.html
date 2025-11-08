@@ -1,14 +1,18 @@
 <app-theme-toggle></app-theme-toggle>
 
-<div class="error-container">
-  <div class="error-content">
-    <div class="error-number">404</div>
-    <h1 class="error-title">¡Ups! Página no encontrada</h1>
-    <p class="error-message">El recurso que buscas no existe o ha sido movido.</p>
-    <div class="error-actions">
-      <button (click)="goToHome()" class="error-btn secondary">
-        Ir a la Página de Inicio
-      </button>
-    </div>
-  </div>
-</div>
+<main class="error-container">
+    
+    <section class="error-content">
+        
+        <div class="error-number" aria-hidden="true">404</div>
+        
+        <h1 class="error-title">¡Ups! Página no encontrada</h1>
+        <p class="error-message">El recurso que buscas no existe o ha sido movido.</p>
+        
+        <div class="error-actions">
+            <button type="button" (click)="goToHome()" class="error-btn secondary">
+                Ir a la Página de Inicio
+            </button>
+        </div>
+    </section>
+</main>

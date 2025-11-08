@@ -1,58 +1,61 @@
 <div class="modal user-modal" 
      [class.show]="showModal" 
      (click)="onBackdropClick($event)"
-     [attr.aria-hidden]="!showModal">
-     
-  <div class="modal-content user-modal-content" (click)="$event.stopPropagation()">
-    <button class="close-modal" (click)="onCloseModal()" aria-label="Cerrar">×</button>
+     [attr.aria-hidden]="!showModal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="user-modal-title"> <div class="modal-content user-modal-content" (click)="$event.stopPropagation()">
+    <button type="button" class="close-modal" (click)="onCloseModal()" aria-label="Cerrar">×</button>
     
-    <h3>Información del Usuario</h3>
+    <h3 id="user-modal-title">Información del Usuario</h3>
     
     @if (user) {
-      <div class="user-info">
+      <dl class="user-info">
         <div class="user-info-item">
-          <span class="user-info-label">Nombre Completo:</span>
-          <span class="user-info-value">{{ user.name }} {{ user.lastName }}</span>
+          <dt class="user-info-label">Nombre Completo:</dt>
+          <dd class="user-info-value">{{ user.name }} {{ user.lastName }}</dd>
         </div>
         <div class="user-info-item">
-          <span class="user-info-label">Nombre de Usuario:</span>
-          <span class="user-info-value">{{ user.username }}</span>
+          <dt class="user-info-label">Nombre de Usuario:</dt>
+          <dd class="user-info-value">{{ user.username }}</dd>
         </div>
         <div class="user-info-item">
-          <span class="user-info-label">DNI:</span>
-          <span class="user-info-value">{{ user.dni }}</span>
+          <dt class="user-info-label">DNI:</dt>
+          <dd class="user-info-value">{{ user.dni }}</dd>
         </div>
         <div class="user-info-item">
-          <span class="user-info-label">Email:</span>
-          <span class="user-info-value">{{ user.email }}</span>
+          <dt class="user-info-label">Email:</dt>
+          <dd class="user-info-value">{{ user.email }}</dd>
         </div>
         <div class="user-info-item">
-          <span class="user-info-label">ID de Cuenta:</span>
-          <span class="user-info-value">{{ user.idAccount || 'No asignado' }}</span>
+          <dt class="user-info-label">ID de Cuenta:</dt>
+          <dd class="user-info-value">{{ user.idAccount || 'No asignado' }}</dd>
         </div>
         <div class="user-info-item">
-          <span class="user-info-label">Estado:</span>
-          <span class="user-info-value" [class]="user.active ? 'estado-si' : 'estado-no'">
+          <dt class="user-info-label">Estado:</dt>
+          <dd class="user-info-value" [class]="user.active ? 'estado-si' : 'estado-no'">
             {{ user.active ? 'Activo' : 'Inactivo' }}
-          </span>
+          </dd>
         </div>
         <div class="user-info-item">
-          <span class="user-info-label">Habilitado:</span>
-          <span class="user-info-value" [class]="user.enabled ? 'estado-si' : 'estado-no'">
+          <dt class="user-info-label">Habilitado:</dt>
+          <dd class="user-info-value" [class]="user.enabled ? 'estado-si' : 'estado-no'">
             {{ user.enabled ? 'Sí' : 'No' }}
-          </span>
+          </dd>
         </div>
-      </div>
+      </dl>
       
       <div class="modal-actions">
         @if (user.active) {
           <button 
+            type="button"
             class="inhabilitar-btn"
             (click)="onToggleUserStatus()">
             Deshabilitar Usuario
           </button>
         } @else {
           <button 
+            type="button"
             class="habilitar-btn"
             (click)="onToggleUserStatus()">
             Habilitar Usuario
@@ -60,7 +63,7 @@
         }
       </div>
     } @else {
-      <div class="no-user-message">
+      <div class="no-user-message" role="status">
         <p>No se pudo cargar la información del usuario.</p>
       </div>
     }

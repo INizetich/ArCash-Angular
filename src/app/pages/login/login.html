@@ -1,14 +1,16 @@
 <app-theme-toggle></app-theme-toggle>
 <app-back-button [explicitRoute]="'/'"></app-back-button>
 
-<div class="main">
-    <div class="left-panel">
+<main class="main forgot-page"> 
+    <aside class="left-panel">
         <app-brand-logo></app-brand-logo>
-    </div>
+    </aside>
 
     <div class="right-panel">
         <app-login-form (loginSuccess)="onLoginSuccess($event)"></app-login-form>
     </div>
-</div>
+</main>
 
-<app-global-footer></app-global-footer>
+<footer>
+    <app-global-footer></app-global-footer>
+</footer>
