@@ -883,3 +883,13 @@ input:-webkit-autofill:active {
     color: #2C3E50 !important;
     border-color: var(--border-color) !important;
 }
+
+/* Asegurar que se aplique en móviles */
+@media (max-width: 768px) {
+  [data-theme="dark"] body,
+  [data-theme="dark"] .dashboard,
+  [data-theme="dark"] .admin-panel {
+    background: #1A1A2E !important;
+    color: #E8EAF6 !important;
+  }
+}
