@@ -72,7 +72,7 @@ export class ForgotPasswordFormComponent implements OnInit, OnDestroy {
         // Mostrar sección de reenvío después de 10 segundos
         setTimeout(() => {
           this.showResendSection = true;
-        }, 10000);
+        }, 4000);
       },
       error: (error: any) => {
         console.error('Error en recuperación:', error);

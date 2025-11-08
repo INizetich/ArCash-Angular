@@ -4,7 +4,7 @@ import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 // V--- CAMBIO: Importamos forkJoin ---V
-import { Subscription, interval, forkJoin } from 'rxjs';
+import { Subscription, interval, forkJoin, of } from 'rxjs';
 // ^-----------------------------------^
 import { QRCodeComponent } from 'angularx-qrcode';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
@@ -22,14 +22,10 @@ import { DeviceService } from '../../services/device-service/device.service';
 import { CacheService } from '../../services/cache-service/cache.service';
 import { AdminService } from '../../services/admin-service/admin.service';
 
-
 // Models
 import Transaction from '../../models/transaction';
 import UserData from '../../models/user-data';
 import qrData from '../../models/qrData';
-
-
-
 
 @Component({
   selector: 'app-dashboard',
@@ -74,6 +70,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   displayedTransactions: Transaction[] = [];
   transactionPageSize = 20;
   currentTransactionPage = 0;
+  isLoadingMoreTransactions = false;
+  hasLoadedAllTransactions = false;
+  hasMoreTransactions = false; 
+
+  // Nuevas variables para controlar el estado del modal
+  private isInAllTransactionsModal = false;
+  private forceKeepTransactions = false;
 
   // Sistema de modal único
   currentModal: string | null = null;
@@ -90,7 +93,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showAddFavoriteModal = false;
   showFavoriteDetailsModal = false;
   showEditFavoriteModal = false;
-  showQrModal = false; // Asegúrate que esta variable se llame así
+  showQrModal = false;
+  showDeleteFavoriteModal = false;
 
   // Estados del proceso de transferencia
   transferStep = 1;
@@ -114,6 +118,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   favoriteContactAlias = '';
   favoriteContactDescription = '';
   showAddToFavoritesOption = false;
+  isUpdatingFavorite = false;
+  isAddingFavorite = false;
+  
+  isDeletingFavorite = false;
+  favoriteToDelete: any = null;
 
   // Estados de la calculadora de impuestos
   selectedCurrency = 'ARS';
@@ -153,7 +162,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.checkAuthentication();
     this.checkAdminRole();
-    this.setupSubscriptions(); // Se suscribe a userData$, transacciones, modales, etc.
+    this.setupSubscriptions();
 
     // Llamada inicial para cargar datos (sin forzar refresh al inicio)
     this.dataService.loadUserData().subscribe({
@@ -170,8 +179,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.startSimpleLoading();
 
     // V--- CAMBIO: INICIA EL POLLING UNIFICADO ---V
-    if (isPlatformBrowser(this.platformId)) { // Asegúrate de que esto solo corra en el navegador
-      // Usamos 10 segundos como pediste para las transacciones
+    if (isPlatformBrowser(this.platformId)) {
       this.startDataPolling(10000); 
     }
     // ^-----------------------------------------^
@@ -192,26 +200,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.dataPollingSubscription = interval(intervalMs)
       .pipe(
         switchMap(() => {
-          // Usamos forkJoin para ejecutar ambas llamadas en paralelo
-          // Se "sincronizan" aquí, ambas se lanzan al mismo tiempo
+          // Solo cargar transacciones si NO estamos en el modal de todas las transacciones
           return forkJoin([
             this.dataService.loadUserData(true),
-            this.transactionService.loadAllTransactions(true)
+            this.isInAllTransactionsModal ? 
+              of(null) : // No actualizar transacciones si estamos en el modal
+              this.transactionService.loadAllTransactions(true)
           ]);
         })
       )
       .subscribe({
         next: ([userData, transactions]) => {
-          // No necesitamos hacer nada aquí.
-          // Los servicios (DataService y TransactionService) ya
-          // actualizaron sus BehaviorSubjects internos.
-          // Y setupSubscriptions() ya está escuchando esos Subjects.
-          // La UI se actualizará automáticamente.
-          // console.log('>>> Polling: Saldo y Transacciones actualizados.');
+          // Si estamos en el modal, no hacer nada con las transacciones
+          if (this.isInAllTransactionsModal) {
+            return;
+          }
         },
         error: (err) => {
-          // Si CUALQUIERA de las dos llamadas (saldo o tx) falla,
-          // forkJoin emitirá un error.
           console.error(">>> Polling: Error durante la actualización de datos:", err);
         }
       });
@@ -223,17 +228,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private stopDataPolling(): void {
     if (this.dataPollingSubscription) {
       this.dataPollingSubscription.unsubscribe();
-      this.dataPollingSubscription = null; // Limpia la referencia
+      this.dataPollingSubscription = null;
     }
   }
   // ^---- FIN MÉTODOS POLLING UNIFICADOS ----^
 
   private async initializeServices(): Promise<void> {
     try {
-      // Cargar datos iniciales usando los services (con caché si está disponible)
       await Promise.all([
-        this.transactionService.loadAllTransactions(), // Usar caché
-        this.favoriteService.loadFavoriteContacts()    // Usar caché
+        this.transactionService.loadAllTransactions(),
+        this.favoriteService.loadFavoriteContacts()
       ]);
     } catch (error) {
       console.error('Error inicializando services:', error);
@@ -254,6 +258,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.showFavoriteDetailsModal = false;
     this.showEditFavoriteModal = false;
     this.showQrModal = false;
+    this.showDeleteFavoriteModal = false;
 
     // Activar el modal correspondiente
     switch (currentModal) {
@@ -293,43 +298,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
       case 'editFavorite':
         this.showEditFavoriteModal = true;
         break;
+      case 'deleteFavorite':
+        this.showDeleteFavoriteModal = true;
+        break;
     }
   }
 
   private startSimpleLoading(): void {
-    // Carga rápida y simple sin efectos
     setTimeout(() => {
       this.isLoading = false;
-    }, 1500); // Muy rápido
-
-    // Cargar datos en background sin efectos
+    }, 1500);
     this.loadDataInBackground();
   }
-
-
 
   private setupSubscriptions(): void {
     // Suscribirse a los datos del usuario
     const userDataSub = this.dataService.userData$.subscribe(userDataFromService => {
       if (userDataFromService) {
-        this.userData = userDataFromService; // Asigna el objeto COMPLETO
+        this.userData = userDataFromService;
       } else {
-        // Resetea userData si llega null
         this.userData = {
           name: '', lastName: '', dni: '', email: '', alias: '',
           cvu: '', username: '', balance: 0, idAccount: ''
         };
       }
-      // Fuerza la actualización de la vista
-      this.cdr.detectChanges(); // <-- 3. LLAMA a detectChanges()
+      this.cdr.detectChanges();
     });
-    this.subscriptions.push(userDataSub); // Guarda la suscripción para limpiarla después
-
-    // --- Tus otras suscripciones (se mantienen igual) ---
+    this.subscriptions.push(userDataSub);
 
     // Suscribirse a las transacciones usando el service
     const recentTransactionsSub = this.transactionService.recentTransactions$.subscribe((transactions: Transaction[]) => {
-      // Filtrar las transacciones ocultas
       this.recentTransactions = transactions.filter(
         transaction => !this.hiddenTransactionIds.has(transaction.id)
       );
@@ -339,13 +337,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const allTransactionsSub = this.transactionService.allTransactions$.subscribe((transactions: Transaction[]) => {
       this.allTransactions = transactions;
+      
+      // Solo actualizar displayedTransactions si NO estamos en el modal de todas las transacciones
+      // o si no estamos forzando a mantener las transacciones
+      if (!this.isInAllTransactionsModal || !this.forceKeepTransactions) {
+        this.updateDisplayedTransactions();
+      }
       this.cdr.detectChanges();
     });
     this.subscriptions.push(allTransactionsSub);
 
+    // Suscribirse a displayedTransactions del servicio para paginación
     const displayedTransactionsSub = this.transactionService.displayedTransactions$.subscribe((transactions: Transaction[]) => {
-      this.displayedTransactions = transactions;
-      this.cdr.detectChanges();
+      // Cuando estamos en el modal, usar las transacciones paginadas del servicio
+      if (this.isInAllTransactionsModal) {
+        this.displayedTransactions = transactions.filter(
+          transaction => !this.hiddenTransactionIds.has(transaction.id)
+        );
+        this.cdr.detectChanges();
+      }
     });
     this.subscriptions.push(displayedTransactionsSub);
 
@@ -366,7 +376,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const modalSub = this.modalService.modalState$.subscribe(state => {
       this.currentModal = state.currentModal;
       this.updateModalStates(state.currentModal);
-      // Probablemente necesites detectChanges aquí también si los modales no se abren/cierran bien
       this.cdr.detectChanges();
     });
     this.subscriptions.push(modalSub);
@@ -374,32 +383,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private async loadDataInBackground(): Promise<void> {
     try {
-
-
-      // Cargar datos en paralelo para mejor performance
       const promises = [];
 
       const currentUser = this.dataService.getCurrentUserData();
       if (!currentUser) {
-
         promises.push(this.dataService.loadUserData());
       }
 
       const currentTransactions = this.dataService.getCurrentTransactions();
       if (!currentTransactions || currentTransactions.length === 0) {
-
         promises.push(this.dataService.loadTransactions());
       }
 
-      // Ejecutar todas las cargas en paralelo
       await Promise.allSettled(promises);
-
-
     } catch (error) {
       console.error('❌ Error cargando datos:', error);
     }
   }
-
 
   // --- AUTENTICACIÓN ---
   checkAuthentication(): void {
@@ -416,24 +416,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   async goToAdminPanel(): Promise<void> {
-    // Verificar primero en localStorage antes de hacer la llamada
     const role = localStorage.getItem('role');
     if (role !== 'ADMIN') {
       this.utilService.showToast('No tienes permisos para acceder al panel de administración', 'error');
       return;
     }
 
-    // Activar loading
     this.isLoading = true;
 
     try {
-      // Solo hacer la verificación del backend si el rol local es ADMIN
       await this.adminService.checkAccess().toPromise();
       this.router.navigate(['/admin']);
     } catch (error: any) {
       console.error('Error al verificar acceso de admin:', error);
-
-      // Manejar diferentes tipos de errores
       if (error.status === 403 || error.status === 401) {
         this.utilService.showToast('No tienes permisos para acceder al panel de administración', 'error');
       } else if (error.status === 0) {
@@ -453,32 +448,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Activar estado de carga
     this.isIngresandoDinero = true;
 
     try {
       await this.dataService.ingresarDinero(this.montoIngresar);
-
       this.utilService.showToast(`Ingreso exitoso de $${this.montoIngresar}`, 'success');
-
-      // Cerrar el modal primero
       this.closeIngresarModal();
 
-      // Luego activar la animación del saldo (con un pequeño delay para que se vea el saldo actualizado)
       setTimeout(() => {
         this.isBalanceUpdating = true;
-
-        // Desactivar la animación después de que termine
         setTimeout(() => {
           this.isBalanceUpdating = false;
-        }, 1500); // 1.5 segundos, igual que la duración de la animación
+        }, 1500);
       }, 100);
 
     } catch (error) {
       console.error('Error ingresando dinero:', error);
       this.utilService.showToast('Error al ingresar dinero', 'error');
     } finally {
-      // Desactivar estado de carga
       this.isIngresandoDinero = false;
     }
   }
@@ -489,7 +476,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Activar estado de carga
     this.isBuscandoCuenta = true;
 
     try {
@@ -501,6 +487,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return;
       }
 
+      const accountId = parseInt(this.cuentaDestinoData.idaccount.toString());
+      if (!isNaN(accountId)) {
+        const esFavorito = await this.verificarSiEsFavorito(
+          accountId, 
+          this.cuentaDestinoData.cvu
+        );
+        this.cuentaDestinoData.isFromFavorite = esFavorito;
+      }
+
       this.transferStep = 2;
     } catch (error: any) {
       console.error('Error buscando cuenta:', error);
@@ -510,7 +505,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.utilService.showToast('Cuenta no encontrada', 'error');
       }
     } finally {
-      // Desactivar estado de carga
       this.isBuscandoCuenta = false;
     }
   }
@@ -532,7 +526,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Activar efecto de disminución (se mantiene igual)
     setTimeout(() => {
       this.isBalanceDecreasing = true;
     }, 7800);
@@ -543,7 +536,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     let accountIdNumber: number;
 
     try {
-      // --- Obtener el ID de la cuenta destino (lógica sin cambios) ---
       if (this.cuentaDestinoData.isFromFavorite) {
         try {
           const accountData = await this.dataService.buscarCuenta(this.cuentaDestinoData.cvu);
@@ -563,49 +555,54 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (isNaN(accountIdNumber)) throw new Error('ID de cuenta inválido obtenido de búsqueda/QR.');
       }
 
-      // --- Realizar la transferencia ---
-      // Espera a que la transferencia se complete
+      const esFavoritoExistente = await this.verificarSiEsFavorito(
+        accountIdNumber, 
+        this.cuentaDestinoData?.cvu
+      );
+      
       await this.dataService.realizarTransferencia(accountIdForTransfer, this.montoTransfer);
-
-      // V--- ¡AQUÍ ESTÁ EL CAMBIO! ---V
-      // Llama a loadUserData para que actualice el Subject.
-      // El .subscribe() vacío es para activar la ejecución del Observable.
-      // La UI se actualizará sola porque está suscrita a userData$.
       this.dataService.loadUserData(true).subscribe();
-      // ^------------------------------^
 
-      // --- Desactivar animación roja ---
       setTimeout(() => {
         this.isBalanceDecreasing = false;
-      }, 9300); // O tu valor preferido
+      }, 9300);
 
-      // --- Guardar datos y manejar favoritos (lógica sin cambios) ---
       this.transferCompletedData = { ...this.cuentaDestinoData, idaccount: accountIdNumber };
-      const esFavoritoExistente = this.favoriteContacts.some(fav =>
-        fav.favoriteAccount && fav.favoriteAccount.idAccount === accountIdNumber
-      );
 
       if (esFavoritoExistente) {
         this.utilService.showToast('Transferencia realizada con éxito', 'success');
         this.closeTransferModal();
       } else {
         this.transferStep = 4;
-        // this.showAddToFavoritesOption = true; // Si usas esta variable
       }
 
-      // --- Recargar transacciones (lógica sin cambios) ---
-      // Esta llamada forzará una actualización inmediata de transacciones,
-      // independientemente del polling. ¡Lo cual es bueno!
       await this.transactionService.loadAllTransactions(true);
 
     } catch (error) {
       console.error('Error realizando transferencia:', error);
       this.utilService.showToast('Error al realizar la transferencia', 'error');
       this.isBalanceDecreasing = false;
-      // Intenta recargar los datos incluso si falla, por si acaso
       this.dataService.loadUserData(true).subscribe();
     } finally {
       this.isTransfiriendo = false;
+    }
+  }
+
+  private async verificarSiEsFavorito(accountId: number, cvu?: string): Promise<boolean> {
+    try {
+      await this.favoriteService.loadFavoriteContacts();
+      return this.favoriteContacts.some(fav => {
+        if (fav.favoriteAccount && fav.favoriteAccount.idAccount === accountId) {
+          return true;
+        }
+        if (fav.accountCbu && cvu && fav.accountCbu === cvu) {
+          return true;
+        }
+        return false;
+      });
+    } catch (error) {
+      console.error('Error verificando favoritos:', error);
+      return false;
     }
   }
 
@@ -631,7 +628,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         resultData = await this.dataService.calculateTaxesUSD(this.taxMonto);
       }
 
-      // Formatear el resultado para mostrar en HTML
       let result = '';
       if (this.selectedCurrency === 'ARS') {
         result = `
@@ -656,7 +652,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   // --- MÉTODOS OPTIMIZADOS DE MODALES ---
-
   private closeAllModals(): void {
     this.modalService.closeModal();
   }
@@ -672,16 +667,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   openIngresarModal(): void {
     this.montoIngresar = null;
-    this.isIngresandoDinero = false; // Resetear estado de carga
+    this.isIngresandoDinero = false;
     this.openModal('ingresar');
   }
 
   closeIngresarModal(): void {
     this.closeAllModals();
     this.montoIngresar = null;
-    this.isIngresandoDinero = false; // Resetear estado de carga
-    this.isBalanceUpdating = false; // Resetear animación del saldo
-    this.isBalanceDecreasing = false; // Resetear animación de transferencia
+    this.isIngresandoDinero = false;
+    this.isBalanceUpdating = false;
+    this.isBalanceDecreasing = false;
   }
 
   openTransferModal(): void {
@@ -689,15 +684,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.destinatarioInput = '';
     this.montoTransfer = null;
     this.cuentaDestinoData = null;
-    this.isBuscandoCuenta = false; // Resetear estado de búsqueda
-    this.isTransfiriendo = false; // Resetear estado de transferencia
-    this.isBalanceDecreasing = false; // Resetear animación de transferencia
+    this.isBuscandoCuenta = false;
+    this.isTransfiriendo = false;
+    this.isBalanceDecreasing = false;
     this.isScanning = false;
     this.openModal('transfer');
   }
 
   closeTransferModal(): void {
-    // Si la transferencia viene de un favorito, volver al modal de información del favorito
     if (this.cuentaDestinoData?.isFromFavorite && this.selectedFavoriteContact) {
       this.isScanning = false;
       this.transferStep = 1;
@@ -707,23 +701,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.isBuscandoCuenta = false;
       this.isTransfiriendo = false;
       this.isBalanceDecreasing = false;
-      // NO limpiar selectedFavoriteContact aquí porque queremos volver al modal del favorito
       this.closeAllModals();
       this.showFavoriteDetailsModal = true;
       return;
     }
 
-    // Si no viene de favorito, comportamiento normal
     this.closeAllModals();
     this.isScanning = false;
     this.transferStep = 1;
     this.destinatarioInput = '';
     this.montoTransfer = 0;
     this.cuentaDestinoData = null;
-    this.selectedFavoriteContact = null; // Limpiar favorito seleccionado
-    this.isBuscandoCuenta = false; // Resetear estado de búsqueda
-    this.isTransfiriendo = false; // Resetear estado de transferencia
-    this.isBalanceDecreasing = false; // Resetear animación de transferencia
+    this.selectedFavoriteContact = null;
+    this.isBuscandoCuenta = false;
+    this.isTransfiriendo = false;
+    this.isBalanceDecreasing = false;
   }
 
   openAliasModal(): void {
@@ -744,7 +736,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   openMyQrModal(): void {
     const accountId = localStorage.getItem('accountId')
-
     if (!accountId) {
       console.error("No se encontro el ID de la cuenta en el localStorage.")
       return;
@@ -770,7 +761,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ///METODOS PARA ESCANEAR EL QR
   startScanning(): void {
     this.isScanning = true;
-    this.hasPermission = null; // Resetea el estado del permiso
+    this.hasPermission = null;
   }
 
   cancelScanning(): void {
@@ -781,7 +772,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.hasPermission = permission;
     if (!permission) {
       this.utilService.showToast('Permiso de cámara denegado', 'error');
-      this.isScanning = false; // Vuelve al input si se niega
+      this.isScanning = false;
     }
   }
 
@@ -791,26 +782,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   handleScanSuccess(resultString: string): void {
-    this.isScanning = false; // Oculta la cámara
-    this.isBuscandoCuenta = true; // Muestra el spinner "Buscando..."
+    this.isScanning = false;
+    this.isBuscandoCuenta = true;
 
-    setTimeout(() => { // Simula verificación
+    setTimeout(() => {
       try {
         const qrData = JSON.parse(resultString);
 
         if (qrData && qrData.walletApp === 'ArCashV1') {
           const currentUser = this.dataService.getCurrentUserData();
-          // Convertimos ambos a número para comparar
           if (currentUser && parseInt(currentUser.idAccount) === qrData.accountId) {
             this.utilService.showToast('No puedes transferir a tu misma cuenta', 'error');
             this.isBuscandoCuenta = false;
             return;
           }
 
-          // Rellenamos los datos para el Paso 2
           this.cuentaDestinoData = {
             alias: qrData.accountAlias,
-            // El CVU no viene en tu QR, ponemos placeholder
             cvu: 'Obtenido por QR',
             user: {
               nombre: qrData.receiverName.split(' ')[0],
@@ -818,9 +806,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
               dni: qrData.dni,
               email: qrData.email
             },
-            idaccount: qrData.accountId // Guardamos el ID numérico
+            idaccount: qrData.accountId
           };
-          this.transferStep = 2; // Saltamos al Paso 2 (Confirmar)
+          this.transferStep = 2;
         } else {
           throw new Error('QR no válido para ArCash');
         }
@@ -828,7 +816,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.error("Error al procesar QR:", error);
         this.utilService.showToast('El código QR no es válido', 'error');
       } finally {
-        this.isBuscandoCuenta = false; // Oculta el spinner
+        this.isBuscandoCuenta = false;
       }
     }, 500);
   }
@@ -853,7 +841,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   openTransactionModal(transaction: Transaction): void {
     this.selectedTransaction = transaction;
     this.openModal('transaction');
-
   }
 
   closeTransactionModal(): void {
@@ -861,15 +848,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.selectedTransaction = null;
   }
 
-  // Modifica el método openAllTransactionsModal para resetear el filtro si es necesario
+  // Modificado: Control mejorado del modal de todas las transacciones
   async openAllTransactionsModal(): Promise<void> {
     try {
-      await this.transactionService.loadAllTransactions();
+      this.isInAllTransactionsModal = true;
+      this.forceKeepTransactions = true;
+      
+      this.currentTransactionPage = 0;
+      this.hasLoadedAllTransactions = false;
+      this.isLoadingMoreTransactions = false;
+      this.hasMoreTransactions = true;
 
-      // Opcional: puedes decidir si quieres resetear las transacciones ocultas
-      // cuando se abre el modal o mantenerlas
-      // this.hiddenTransactionIds.clear();
-
+      await this.transactionService.loadAllTransactions(false);
       this.updateDisplayedTransactions();
       this.openModal('allTransactions');
     } catch (error) {
@@ -878,34 +868,45 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Modifica el método loadMoreTransactions para que use el filtro
-  loadMoreTransactions(): void {
-    this.currentTransactionPage++;
+  // Modificado: Carga más transacciones sin forzar recarga
+  async loadMoreTransactions(): Promise<void> {
+    if (this.isLoadingMoreTransactions || !this.hasMoreTransactions) {
+      return;
+    }
+
+    this.isLoadingMoreTransactions = true;
+    this.forceKeepTransactions = true;
+
+    try {
+      this.currentTransactionPage++;
+      this.transactionService.loadMoreTransactions();
+      this.updateDisplayedTransactionsFromService();
+    } catch (error) {
+      console.error('Error cargando más transacciones:', error);
+      this.utilService.showToast('Error al cargar más transacciones', 'error');
+      this.currentTransactionPage--;
+    } finally {
+      this.isLoadingMoreTransactions = false;
+    }
+  }
+
+  // Modificado: Cierra el modal y restablece estados
+  closeAllTransactionsModal(): void {
+    this.isInAllTransactionsModal = false;
+    this.forceKeepTransactions = false;
+    this.closeAllModals();
     this.updateDisplayedTransactions();
   }
-  get hasMoreTransactions(): boolean {
-    return this.transactionService.hasMoreTransactions();
-  }
-
-  closeAllTransactionsModal(): void {
-    this.closeAllModals();
-  }
-
-
 
   // --- MÉTODOS DE CONTACTOS FAVORITOS ---
-
   async openFavoritesModal(): Promise<void> {
-    // Cargar favoritos antes de abrir el modal para mejor UX
-    await this.favoriteService.loadFavoriteContacts(); // Usar caché si está disponible
+    await this.favoriteService.loadFavoriteContacts();
     this.openModal('favorites');
   }
 
   closeFavoritesModal(): void {
     this.closeAllModals();
   }
-
-
 
   openFavoriteDetailsModal(favorite: any): void {
     this.favoriteService.selectFavorite(favorite);
@@ -918,7 +919,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   backToFavoritesList(): void {
-    // Cerrar modal de detalles y volver a mostrar la lista de favoritos
     this.showFavoriteDetailsModal = false;
     this.selectedFavoriteContact = null;
     this.favoriteService.clearSelectedFavorite();
@@ -926,12 +926,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   async transferToFavorite(favorite: any): Promise<void> {
-    // Configurar datos de transferencia usando el service
     this.cuentaDestinoData = this.favoriteService.createTransferDataFromFavorite(favorite);
-    this.selectedFavoriteContact = favorite; // Guardar el favorito seleccionado
+    this.selectedFavoriteContact = favorite;
     this.transferStep = 3;
-
-    // Cerrar todos los modales y abrir el de transferencia inmediatamente
     this.closeAllModals();
     this.openModal('transfer');
   }
@@ -960,75 +957,76 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validar que idaccount existe y es válido
-    if (!this.transferCompletedData.idaccount) {
-      console.error('Error: idaccount no disponible en transferCompletedData:', this.transferCompletedData);
-      this.utilService.showToast('Error: ID de cuenta no disponible', 'error');
-      return;
-    }
+    this.isAddingFavorite = true;
 
-    let accountId: number;
+    try {
+      if (!this.transferCompletedData.idaccount) {
+        console.error('Error: idaccount no disponible en transferCompletedData:', this.transferCompletedData);
+        this.utilService.showToast('Error: ID de cuenta no disponible', 'error');
+        return;
+      }
 
-    // Verificar si los datos vienen de un favorito (donde idaccount es un CBU)
-    if (this.transferCompletedData.isFromFavorite) {
-      // Los datos vienen de un favorito, necesitamos buscar el ID real de la cuenta
-      this.utilService.showToast('Buscando información de la cuenta...', 'info');
+      let accountId: number;
 
-      try {
-        // Buscar la cuenta usando el CBU para obtener el ID real
-        const accountData = await this.dataService.buscarCuenta(this.transferCompletedData.cvu);
-        accountId = parseInt(accountData.idaccount);
-
+      if (typeof this.transferCompletedData.idaccount === 'number') {
+        accountId = this.transferCompletedData.idaccount;
+      } else {
+        accountId = parseInt(this.transferCompletedData.idaccount.toString());
+        
         if (isNaN(accountId)) {
-          this.utilService.showToast('Error: No se pudo obtener el ID de cuenta', 'error');
-          return;
+          const searchTerm = this.transferCompletedData.cvu || this.transferCompletedData.alias;
+          if (!searchTerm) {
+            this.utilService.showToast('Error: No se puede identificar la cuenta', 'error');
+            return;
+          }
+          
+          const accountData = await this.dataService.buscarCuenta(searchTerm);
+          accountId = parseInt(accountData.idaccount);
+          
+          if (isNaN(accountId)) {
+            this.utilService.showToast('Error: No se pudo obtener el ID de cuenta', 'error');
+            return;
+          }
         }
-      } catch (error) {
-        this.utilService.showToast('Error al buscar información de la cuenta', 'error');
+      }
+
+      const isAlreadyFavorite = await this.verificarSiEsFavorito(
+        accountId,
+        this.transferCompletedData?.cvu
+      );
+
+      const currentUser = this.dataService.getCurrentUserData();
+      const currentUserId = parseInt(currentUser?.idAccount || '0');
+      
+      if (currentUserId === accountId) {
+        this.utilService.showToast('No puedes agregarte a ti mismo como favorito', 'error');
         return;
       }
-    } else {
-      // Los datos vienen de una búsqueda normal, convertir directamente
-      accountId = parseInt(this.transferCompletedData.idaccount.toString());
 
-      if (isNaN(accountId)) {
-        this.utilService.showToast('Error: ID de cuenta inválido', 'error');
+      if (isAlreadyFavorite) {
+        this.utilService.showToast('Esta cuenta ya está en tus favoritos', 'error');
         return;
       }
-    }
 
-    // Verificar si ya existe como favorito
-    // Primero verificar por CBU (método original)
-    const isAlreadyFavoriteByCbu = this.favoriteContacts.some(fav =>
-      fav.accountCbu === this.transferCompletedData.cvu
-    );
+      const success = await this.favoriteService.addFavoriteContact(
+        accountId,
+        this.favoriteContactAlias.trim(),
+        this.favoriteContactDescription.trim() || undefined
+      );
 
-    // Verificar si estás intentando agregarte a ti mismo
-    const currentUser = this.dataService.getCurrentUserData();
+      if (success) {
+        this.utilService.showToast('Contacto agregado a favoritos', 'success');
+        this.closeAddFavoriteModal();
+        this.closeTransferModal();
+      } else {
+        this.utilService.showToast('Error al agregar el contacto a favoritos', 'error');
+      }
 
-    // Verificar ambas formas de comparación (string vs number)
-    const isSelfAsString = currentUser?.idAccount === accountId.toString();
-    const isSelfAsNumber = parseInt(currentUser?.idAccount || '0') === accountId;
-
-    if (isSelfAsString || isSelfAsNumber) {
-      this.utilService.showToast('No puedes agregarte a ti mismo como favorito', 'error');
-      return;
-    }
-
-    if (isAlreadyFavoriteByCbu) {
-      this.utilService.showToast('Esta cuenta ya está en tus favoritos', 'error');
-      return;
-    }
-
-    const success = await this.favoriteService.addFavoriteContact(
-      accountId,
-      this.favoriteContactAlias.trim(),
-      this.favoriteContactDescription.trim() || undefined
-    );
-
-    if (success) {
-      this.closeAddFavoriteModal();
-      this.closeTransferModal();
+    } catch (error) {
+      console.error('Error agregando a favoritos:', error);
+      this.utilService.showToast('Error al agregar el contacto a favoritos', 'error');
+    } finally {
+      this.isAddingFavorite = false;
     }
   }
 
@@ -1039,12 +1037,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   openEditFavoriteModal(favorite: any): void {
-    // Configurar datos del favorito para editar
     this.selectedFavoriteContact = favorite;
     this.favoriteContactAlias = favorite.contactAlias;
     this.favoriteContactDescription = favorite.description || '';
-
-    // Cerrar todos los modales y abrir el de edición inmediatamente
     this.closeAllModals();
     this.openModal('editFavorite');
   }
@@ -1067,23 +1062,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const success = await this.favoriteService.updateFavoriteContact(
-      this.selectedFavoriteContact.id,
-      this.favoriteContactAlias.trim(),
-      this.favoriteContactDescription.trim() || undefined
-    );
+    this.isUpdatingFavorite = true;
 
-    if (success) {
-      this.closeEditFavoriteModal();
+    try {
+      const success = await this.favoriteService.updateFavoriteContact(
+        this.selectedFavoriteContact.id,
+        this.favoriteContactAlias.trim(),
+        this.favoriteContactDescription.trim() || undefined
+      );
+
+      if (success) {
+        this.utilService.showToast('Contacto actualizado correctamente', 'success');
+        this.closeEditFavoriteModal();
+      } else {
+        this.utilService.showToast('Error al actualizar el contacto', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating favorite contact:', error);
+      this.utilService.showToast('Error al actualizar el contacto', 'error');
+    } finally {
+      this.isUpdatingFavorite = false;
     }
   }
 
   async removeFavoriteContact(favorite: any): Promise<void> {
-    const success = await this.favoriteService.removeFavoriteContact(favorite.id, favorite.contactAlias);
-
-    if (success) {
-      this.closeFavoriteDetailsModal();
-    }
+    this.openDeleteFavoriteModal(favorite);
   }
 
   // --- MÉTODOS DE NAVEGACIÓN ENTRE PASOS ---
@@ -1092,41 +1095,37 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   cancelarBusqueda(): void {
-    // Si la transferencia viene de un favorito, volver al modal de información del favorito
     if (this.cuentaDestinoData?.isFromFavorite && this.selectedFavoriteContact) {
       this.transferStep = 1;
       this.destinatarioInput = '';
       this.cuentaDestinoData = null;
       this.isScanning = false;
-      // NO limpiar selectedFavoriteContact aquí porque queremos volver al modal del favorito
       this.closeAllModals();
       this.showFavoriteDetailsModal = true;
       return;
     }
 
-    // Si no viene de favorito, comportamiento normal
     this.transferStep = 1;
     this.destinatarioInput = '';
     this.cuentaDestinoData = null;
-    this.selectedFavoriteContact = null; // Limpiar favorito seleccionado
+    this.selectedFavoriteContact = null;
     this.isScanning = false;
   }
+
   volverAConfirmacion(): void {
-    // Si la transferencia viene de un favorito, volver al modal de información del favorito
     if (this.cuentaDestinoData?.isFromFavorite && this.selectedFavoriteContact) {
-      this.transferStep = 2; // Resetear el step
-      this.montoTransfer = null; // Resetea el monto
+      this.transferStep = 2;
+      this.montoTransfer = null;
       this.closeAllModals();
       this.showFavoriteDetailsModal = true;
       return;
     }
 
-    // Si no viene de favorito, comportamiento normal
-    this.transferStep = 2; // Vuelve al paso de confirmar datos
-    this.montoTransfer = null; // Resetea el monto
+    this.transferStep = 2;
+    this.montoTransfer = null;
   }
 
-  volverBusqueda(): void { // Este método ya no se usa directamente desde el paso 3
+  volverBusqueda(): void {
     this.transferStep = 1;
     this.destinatarioInput = '';
     this.montoTransfer = null;
@@ -1144,30 +1143,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    // Activar loading como en el login
     this.isLoading = true;
-
-    // Obtener el token JWT del localStorage
     const jwt = localStorage.getItem('JWT');
 
     if (!jwt) {
-      // Simular un pequeño delay incluso si no hay JWT
       setTimeout(() => {
         this.performLocalLogout();
       }, 1500);
       return;
     }
 
-    // Llamar al endpoint de logout del backend
     this.authService.logoutUser().subscribe({
       next: (response) => {
-        // Simular un delay mínimo para mostrar el loading
         setTimeout(() => {
           this.performLocalLogout();
         }, 1500);
       },
       error: (error) => {
-        // Aunque falle el backend, limpiar la sesión local después del delay
         setTimeout(() => {
           this.performLocalLogout();
         }, 1500);
@@ -1176,15 +1168,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private performLocalLogout(): void {
-
-
-    // Limpiar localStorage usando el método del AuthService
     this.authService.clearLocalSession();
-
-    // Limpiar todos los cachés de los servicios
     this.clearAllCaches();
-
-    // Limpiar cualquier otro dato local si es necesario
     this.userData = {
       name: 'Cargando...',
       lastName: '',
@@ -1196,29 +1181,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       balance: 0,
       idAccount: ''
     };
-
     this.recentTransactions = [];
-
-    // Mostrar mensaje de éxito
     this.utilService.showToast('Sesión cerrada exitosamente', 'success');
-
-    // Desactivar loading como en el login
     this.isLoading = false;
-
-    // Redireccionar al login
     this.router.navigate(['/login'], { replaceUrl: true });
   }
 
   private clearAllCaches(): void {
     try {
-      // Limpiar cachés específicos de los servicios
       this.favoriteService.invalidateCache();
       this.transactionService.invalidateCache();
-
-      // Limpiar todos los cachés de ArCash usando el CacheService centralizado
       const clearedCount = this.cacheService.clearCachesByPrefix('arcash_');
-
-      // Limpiar también cachés específicos que pueden haber quedado
       const additionalCaches = [
         'arcash_favorites_cache',
         'arcash_favorites_cache_expiry',
@@ -1227,11 +1200,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         'arcash_user_cache',
         'arcash_user_cache_expiry'
       ];
-
       additionalCaches.forEach(cacheKey => {
         localStorage.removeItem(cacheKey);
       });
-
     } catch (error) {
       console.error('Error limpiando cachés:', error);
     }
@@ -1327,11 +1298,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const currentUser = this.dataService.getCurrentUserData();
     if (!currentUser) return 'Desconocido';
 
-    // Si la transacción es de entrada (income), el origen no es nuestra cuenta
     if (transaction.type === 'income') {
       return transaction.from || 'Cuenta externa';
     } else {
-      // Si es de salida (expense), el origen es nuestra cuenta
       return 'Mi cuenta';
     }
   }
@@ -1340,19 +1309,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const currentUser = this.dataService.getCurrentUserData();
     if (!currentUser) return 'Desconocido';
 
-    // Si la transacción es de entrada (income), el destino es nuestra cuenta
     if (transaction.type === 'income') {
       return 'Mi cuenta';
     } else {
-      // Si es de salida (expense), el destino no es nuestra cuenta
       return transaction.to || 'Cuenta externa';
     }
   }
 
   onModalBackdropClick(event: MouseEvent, modalType: string): void {
-    // Solo cerrar si se hace clic en el backdrop (no en el contenido del modal)
     if (event.target === event.currentTarget) {
-      // Usar el método optimizado para cerrar modales
       this.closeAllModals();
     }
   }
@@ -1361,7 +1326,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return transaction.id;
   }
 
-  // Método para formatear números de manera más legible
   formatNumber(value: number): string {
     if (value >= 1000000) {
       return (value / 1000000).toFixed(1) + 'M';
@@ -1373,51 +1337,103 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   trackFavorite(index: number, favorite: any): string {
-    // Usar índice + timestamp para garantizar unicidad
     return `${index}_${favorite.id}_${favorite.contactAlias}_${Date.now()}`;
   }
 
-  // Método para formatear números estilo MercadoPago
   formatMoney(value: number): string {
     if (value == null || isNaN(value)) return '0';
-
-    // Si es un número entero, no mostrar decimales
     if (value % 1 === 0) {
       return value.toLocaleString('es-AR');
     }
-
-    // Si tiene decimales, mostrar máximo 2 decimales pero sin ceros innecesarios
     const formatted = value.toLocaleString('es-AR', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2
     });
-
     return formatted;
   }
 
-
   removeTransactionFromList(transaction: Transaction): void {
-    // Agregar el ID de la transacción al conjunto de transacciones ocultas
     this.hiddenTransactionIds.add(transaction.id);
-
-    // Filtrar las transacciones para excluir las ocultas
     this.updateDisplayedTransactions();
-
     this.utilService.showToast('Transacción eliminada de la lista', 'success');
   }
 
+  // Modificado: Mejor control de la actualización de transacciones mostradas
   private updateDisplayedTransactions(): void {
-    // Filtrar las transacciones para excluir las que están en hiddenTransactionIds
+    // Si estamos en el modal, usar la lógica de paginación del servicio
+    if (this.isInAllTransactionsModal) {
+      this.updateDisplayedTransactionsFromService();
+      return;
+    }
+
+    // Lógica normal para fuera del modal
     const filteredTransactions = this.allTransactions.filter(
       transaction => !this.hiddenTransactionIds.has(transaction.id)
     );
 
-    // Actualizar las transacciones mostradas
     this.displayedTransactions = filteredTransactions.slice(
       0,
       (this.currentTransactionPage + 1) * this.transactionPageSize
     );
+
+    const totalFilteredTransactions = filteredTransactions.length;
+    const currentlyDisplayed = this.displayedTransactions.length;
+    
+    this.hasMoreTransactions = currentlyDisplayed < totalFilteredTransactions;
+    this.hasLoadedAllTransactions = !this.hasMoreTransactions;
   }
 
+  // Nuevo método: Actualizar desde el servicio para paginación
+  private updateDisplayedTransactionsFromService(): void {
+    const displayed = this.transactionService.getDisplayedTransactions();
+    this.displayedTransactions = displayed.filter(
+      transaction => !this.hiddenTransactionIds.has(transaction.id)
+    );
+    
+    this.hasMoreTransactions = this.transactionService.hasMoreTransactions();
+    this.hasLoadedAllTransactions = !this.hasMoreTransactions;
+  }
 
+  openDeleteFavoriteModal(favorite: any): void {
+    this.favoriteToDelete = favorite;
+    this.isDeletingFavorite = false;
+    this.openModal('deleteFavorite');
+  }
+
+  closeDeleteFavoriteModal(): void {
+    this.closeAllModals();
+    this.favoriteToDelete = null;
+    this.isDeletingFavorite = false;
+  }
+
+  async confirmDeleteFavorite(): Promise<void> {
+    if (!this.favoriteToDelete) {
+      return;
+    }
+
+    this.isDeletingFavorite = true;
+
+    try {
+      const success = await this.favoriteService.removeFavoriteContact(
+        this.favoriteToDelete.id, 
+        this.favoriteToDelete.contactAlias
+      );
+
+      if (success) {
+        this.utilService.showToast('Contacto eliminado de favoritos', 'success');
+        this.closeDeleteFavoriteModal();
+        
+        if (this.showFavoriteDetailsModal) {
+          this.closeFavoriteDetailsModal();
+        }
+      } else {
+        this.utilService.showToast('Error al eliminar el contacto', 'error');
+      }
+    } catch (error) {
+      console.error('Error eliminando favorito:', error);
+      this.utilService.showToast('Error al eliminar el contacto', 'error');
+    } finally {
+      this.isDeletingFavorite = false;
+    }
+  }
 }

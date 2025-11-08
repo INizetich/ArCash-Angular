@@ -1165,9 +1165,19 @@ button:disabled::before {
 }
 
 /* Botón de navegación - estilo mejorado y alineado a la derecha */
+.button-nav{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: end;
+    align-items: end;
+    gap: 1rem;
+}
+
+
 .nav-button {
     margin-bottom: 1.5rem;
-    margin-left: auto;
+   
     padding: 0.7rem 1.2rem;
     background: transparent;
     border: 2px solid var(--border-color);
@@ -1352,6 +1362,8 @@ button:disabled::before {
 
 /* ===== MEJORAS RESPONSIVE ESPECÍFICAS ===== */
 
+
+
 /* Ajustes para móviles en el formulario de administrador */
 @media (max-width: 768px) {
     .main {
@@ -1486,6 +1498,36 @@ button:disabled::before {
         width: 100%;
         min-height: 50px;
     }
+    
+    /* NAV-BUTTON RESPONSIVE - Mismo tamaño para ambos botones */
+    .button-nav {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .nav-button {
+        padding: 10px 14px;
+        font-size: 13px;
+        min-height: 44px;
+        flex: 1;
+        min-width: 0; /* Permite que se reduzcan uniformemente */
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+    
+    /* Asegurar que ambos botones tengan el mismo ancho base */
+    .nav-button:first-child {
+        flex: 1;
+    }
+    
+    .nav-button:last-child {
+        flex: 1.2; /* Un poco más de espacio para el texto más largo */
+    }
 }
 
 /* Ajustes adicionales para pantallas muy pequeñas */
@@ -1544,6 +1586,80 @@ button:disabled::before {
     .admin-main-view h2 {
         font-size: 1.3rem;
         margin-bottom: 1.5rem;
+    }
+    
+    /* NAV-BUTTON RESPONSIVE - Texto normal pero mismo tamaño */
+    .button-nav {
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+    
+    .nav-button {
+        padding: 9px 12px;
+        font-size: 12px;
+        min-height: 42px;
+        flex: 1;
+    }
+    
+    .nav-button:last-child {
+        flex: 1.3; /* Más espacio para el texto más largo */
+    }
+    
+    .nav-button svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0; /* Evita que el ícono se reduzca */
+    }
+}
+
+/* Ajustes para móviles extra pequeños */
+@media (max-width: 360px) {
+    /* NAV-BUTTON RESPONSIVE - Más compacto pero mismo tamaño */
+    .button-nav {
+        gap: 5px;
+    }
+    
+    .nav-button {
+        padding: 8px 10px;
+        font-size: 11px;
+        min-height: 40px;
+    }
+    
+    .nav-button:last-child {
+        flex: 1.4; /* Aún más espacio para el texto largo */
+    }
+    
+    .nav-button svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+/* Ajustes para móviles muy pequeños (320px o menos) */
+@media (max-width: 320px) {
+    /* NAV-BUTTON RESPONSIVE - Botones apilados verticalmente mismo ancho */
+    .button-nav {
+        gap: 8px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .nav-button {
+        padding: 10px 12px;
+        font-size: 12px;
+        min-height: 44px;
+        width: 100%;
+        flex: none; /* Reset flex para column layout */
+        justify-content: center;
+    }
+    
+    .nav-button:last-child {
+        flex: none; /* Reset en layout vertical */
+    }
+    
+    .nav-button svg {
+        width: 14px;
+        height: 14px;
     }
 }
 
@@ -1629,26 +1745,6 @@ html, body {
   }
 }
 
-/* ===== SOLUCIÓN PARA FOOTER QUE TAPA BOTONES ===== */
-
-/* Asegurar que el contenido principal tenga suficiente espacio */
-.main {
-    min-height: calc(100vh - 80px); /* Resta la altura aproximada del footer */
-    padding-bottom: 20px; /* Espacio extra en la parte inferior */
-}
-
-/* Contenedor del formulario con margen inferior */
-.formulario {
-    margin-bottom: 30px; /* Espacio extra debajo del formulario */
-}
-
-/* Ajustes específicos para el botón de crear administrador */
-.formulario button[type="submit"] {
-    position: relative;
-    z-index: 10; /* Asegurar que esté por encima del footer */
-    margin-bottom: 10px; /* Espacio extra debajo del botón */
-}
-
 /* En móviles, aumentar aún más el espacio */
 @media (max-width: 768px) {
     .main {
@@ -1698,4 +1794,22 @@ body {
     z-index: 15;
     margin-top: 20px;
     margin-bottom: 30px;
+}
+
+/* Asegurar que el contenido principal tenga suficiente espacio */
+.main {
+    min-height: calc(100vh - 80px); /* Resta la altura aproximada del footer */
+    padding-bottom: 20px; /* Espacio extra en la parte inferior */
+}
+
+/* Contenedor del formulario con margen inferior */
+.formulario {
+    margin-bottom: 30px; /* Espacio extra debajo del formulario */
+}
+
+/* Ajustes específicos para el botón de crear administrador */
+.formulario button[type="submit"] {
+    position: relative;
+    z-index: 10; /* Asegurar que esté por encima del footer */
+    margin-bottom: 10px; /* Espacio extra debajo del botón */
 }

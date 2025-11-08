@@ -127,7 +127,7 @@ export class RegisterFormComponent implements OnInit, OnDestroy {
         
         setTimeout(() => {
           this.showResendSection = true;
-        }, 15000);
+        }, 4000);
       },
       error: (error) => {
         this.loading = false;

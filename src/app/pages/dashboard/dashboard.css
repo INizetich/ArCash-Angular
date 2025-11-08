@@ -917,8 +917,6 @@ Boton de cerrar el modal de taxes
   transition: all 0.3s ease;
 }
 
-
-
 .close-button-favorite{
     position: absolute;
   top: -25px;
@@ -945,11 +943,22 @@ Boton de cerrar el modal de taxes
 }
 
 
+
+
 .close-button:hover{
   background-color: rgba(80, 80, 80, 0.068);
   transform: translateY(-2px);
   transition: all 0.3s ease;
 }
+
+
+.qr-close-button {
+  /* Mantenemos los estilos base pero ajustamos para móvil */
+  z-index: 10; /* Aseguramos que esté por encima del contenido */
+}
+
+
+
 
 .back-button,
 .back-button-list {
@@ -1767,7 +1776,27 @@ Boton de cerrar el modal de taxes
     width: 100%;
     justify-content: center;
   }
+
+  .qr-close-button {
+    top: 8px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    padding: 0.8rem;
+    font-size: 22px;
+  }
+  
+  /* Opcional: Ajustar también el contenedor del QR si es necesario */
+  .qr-container {
+    padding-top: 10px; /* Da más espacio en la parte superior */
+  }
+  
+  .qr-container h2 {
+    margin-top: 5px;
+    font-size: 1.2rem; /* Ajusta el tamaño del texto si es muy grande */
+  }
 }
+
 
 @media (max-width: 480px) {
   .balance-card {
@@ -1780,6 +1809,20 @@ Boton de cerrar el modal de taxes
 
   .transaction-item {
     padding: 0.75rem;
+  }
+
+   .qr-close-button {
+    top: 6px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    padding: 0.6rem;
+    font-size: 20px;
+  }
+  
+  .qr-container h2 {
+    font-size: 1.1rem;
+    margin-top: 8px;
   }
 
   .user-info {
@@ -2552,6 +2595,75 @@ Boton de cerrar el modal de taxes
   transform: translateY(-2px);
 }
 
+.button-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para inputs deshabilitados durante la carga */
+.form-group input:disabled,
+.form-group textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: rgba(var(--text-secondary), 0.05);
+}
+
+/* Spinner de carga */
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Asegurar que el botón mantenga su altura durante la carga */
+.form-actions .primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  gap: 8px;
+}
+
+/* Estado de carga - deshabilitar interacción con los inputs */
+.edit-favorite-form.loading * {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.modal-content.loading {
+  pointer-events: none;
+}
+
+.modal-content.loading .close-button {
+  display: none;
+}
+
 #add-favorite-step {
   text-align: center;
   padding: 1rem;
@@ -2886,4 +2998,300 @@ Boton de cerrar el modal de taxes
 
 [data-theme="dark"] .transaction-item-modal:hover {
   background-color: #2a2a2a;
+}
+
+/* === MODAL DE ELIMINACIÓN DE FAVORITOS === */
+.delete-favorite-modal {
+  max-width: 500px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.delete-confirmation-content {
+  padding: 2rem;
+  text-align: center;
+}
+
+.warning-icon {
+  margin-bottom: 1.5rem;
+}
+
+.warning-icon svg {
+  filter: drop-shadow(0 0 10px rgba(255, 0, 110, 0.3));
+}
+
+.confirmation-message h3 {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.confirmation-message p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
+.favorite-to-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(var(--plasma-pink-rgb, 255, 0, 110), 0.05);
+  border: 1px solid rgba(var(--plasma-pink-rgb, 255, 0, 110), 0.2);
+  border-radius: 12px;
+  margin: 1.5rem 0;
+}
+
+.favorite-avatar.small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--plasma-pink) 0%, var(--electric-purple) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.favorite-details {
+  text-align: left;
+  flex: 1;
+}
+
+.favorite-details strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.favorite-details span {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.cancel-btn {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.1);
+  border-color: var(--cyber-blue);
+  color: var(--cyber-blue);
+  transform: translateY(-2px);
+}
+
+.delete-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: linear-gradient(135deg, var(--plasma-pink) 0%, var(--electric-purple) 100%);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.delete-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 0, 110, 0.4);
+}
+
+.delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Efectos de tema específicos */
+[data-theme="dark"] .delete-favorite-modal {
+  background: var(--carbon);
+  border: 1px solid rgba(255, 0, 110, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .favorite-to-delete {
+  background: rgba(255, 0, 110, 0.1);
+  border: 1px solid rgba(255, 0, 110, 0.3);
+}
+
+:root:not([data-theme="dark"]) .delete-favorite-modal {
+  background: var(--platinum);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+:root:not([data-theme="dark"]) .favorite-to-delete {
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .delete-favorite-modal {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .confirmation-actions {
+    flex-direction: column;
+  }
+  
+  .cancel-btn,
+  .delete-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+
+  /* Estilos para la versión con animación */
+.cancel-btn.hidden {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+  width: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.confirmation-actions.single-button {
+  justify-content: center;
+}
+
+.close-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Transiciones suaves */
+.cancel-btn,
+.delete-btn,
+.close-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.confirmation-actions {
+  transition: justify-content 0.3s ease;
+}
+
+/* Estilos para el botón de cargar más transacciones */
+.load-more-btn {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  background: rgba(var(--cyber-blue-rgb, 0, 212, 255), 0.1);
+  border-color: var(--cyber-blue);
+  color: var(--cyber-blue);
+  transform: translateY(-2px);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.load-more-btn.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.load-more-container {
+  margin-top: 1rem;
+  padding: 1rem 0;
+}
+
+.all-transactions-loaded {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.load-more-btn .button-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.load-more-btn .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 }

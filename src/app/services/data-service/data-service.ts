@@ -1,7 +1,7 @@
 // data-service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http'; 
+import { HttpClient, HttpHeaders } from '@angular/common/http'; 
 import { BehaviorSubject, Observable, of, lastValueFrom } from 'rxjs'; 
 import { tap, catchError } from 'rxjs/operators';
 import Transaction from '../../models/transaction'; 
@@ -312,83 +312,135 @@ export class DataService {
   }
 
 
+async addFavoriteContact(accountId: number, contactAlias: string, description?: string): Promise<boolean> {
+  if (!localStorage.getItem('JWT')) throw new Error('No hay token');
+  
+  try {
+    const body = { 
+      accountId: accountId, 
+      contactAlias: contactAlias, 
+      description: description || '' 
+    };
+
+    const response = await lastValueFrom(
+      this.http.post<any>(`${this.baseUrl}/favorites/add`, body, {
+        headers: this.getAuthHeaders(),
+        observe: 'response'
+      })
+    );
+
+   
+    // Diferentes formas en que el backend podría indicar éxito
+    return response.status === 200 || 
+           response.status === 201 || 
+           response.body?.status === 'SUCCESS' ||
+           response.body?.success === true;
+
+  } catch (error: any) {
+    console.error('>>> Error DETALLADO agregando favorito:', {
+      status: error.status,
+      statusText: error.statusText,
+      error: error.error,
+      url: error.url
+    });
+
+    // Si el error tiene un mensaje específico del backend, mostrarlo
+    if (error.error && error.error.message) {
+      console.error('>>> Mensaje del backend:', error.error.message);
+    }
+
+    throw error;
+  }
+}
 
 
 
 
-  async getFavoriteContacts(): Promise<any[]> {
-     if (!localStorage.getItem('JWT')) throw new Error('No hay token');
-     try {
-       const response = await lastValueFrom(
-         this.http.get<any>(`${this.baseUrl}/favorites/list`)
-       );
-       return response?.favorites || [];
-     } catch (error) {
-       console.error('Error obteniendo favoritos:', error);
-      throw error;
-     }
-  }
+
+
+// Actualiza estos métodos para usar getAuthHeaders() también:
+
+async getFavoriteContacts(): Promise<any[]> {
+  if (!localStorage.getItem('JWT')) throw new Error('No hay token');
+  try {
+    const response = await lastValueFrom(
+      this.http.get<any>(`${this.baseUrl}/favorites/list`, {
+        headers: this.getAuthHeaders()
+      })
+    );
+    return response?.favorites || [];
+  } catch (error) {
+    console.error('Error obteniendo favoritos:', error);
+    throw error;
+  }
+}
+
+async getFavoriteContactsOrderedByUsage(): Promise<any[]> {
+  if (!localStorage.getItem('JWT')) throw new Error('No hay token');
+  try {
+    const response = await lastValueFrom(
+      this.http.get<any>(`${this.baseUrl}/favorites/list/recent`, {
+        headers: this.getAuthHeaders()
+      })
+    );
+    return response?.favorites || [];
+  } catch (error) {
+    console.error('Error obteniendo favoritos ordenados:', error);
+    throw error;
+  }
+}
+
+async updateFavoriteContact(contactId: number, contactAlias?: string, description?: string): Promise<boolean> {
+  if (!localStorage.getItem('JWT')) throw new Error('No hay token');
+  try {
+    const body: any = {};
+    if (contactAlias) body.contactAlias = contactAlias;
+    if (description !== undefined) body.description = description;
+    
+    const response = await lastValueFrom(
+      this.http.put<any>(`${this.baseUrl}/favorites/update/${contactId}`, body, {
+        headers: this.getAuthHeaders()
+      })
+    );
+    return response?.status === 'SUCCESS';
+  } catch (error) {
+    console.error('Error actualizando favorito:', error);
+    throw error;
+  }
+}
+
+async removeFavoriteContact(favoriteId: number): Promise<boolean> {
+  if (!localStorage.getItem('JWT')) throw new Error('No hay token');
+  try {
+    const response = await lastValueFrom(
+      this.http.delete<any>(`${this.baseUrl}/favorites/${favoriteId}`, {
+        headers: this.getAuthHeaders()
+      })
+    );
+    return response?.status === 'SUCCESS';
+  } catch (error) {
+    console.error('Error eliminando favorito:', error);
+    throw error;
+  }
+}
 
 
 
-  async getFavoriteContactsOrderedByUsage(): Promise<any[]> {
-     if (!localStorage.getItem('JWT')) throw new Error('No hay token');
-     try {
-       const response = await lastValueFrom(
-         this.http.get<any>(`${this.baseUrl}/favorites/list/recent`)
-       );
-       return response?.favorites || [];
-     } catch (error) {
-       console.error('Error obteniendo favoritos ordenados:', error);
-       throw error;
-     }
-  }
 
+private getAuthHeaders(): HttpHeaders {
+  const token = localStorage.getItem('JWT');
+  if (!token) {
+    throw new Error('No JWT token available');
+  }
+  
+  return new HttpHeaders({
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  });
+}
 
-
-  async addFavoriteContact(accountId: number, contactAlias: string, description?: string): Promise<boolean> {
-     if (!localStorage.getItem('JWT')) throw new Error('No hay token');
-     try {
-       const body = { accountId, contactAlias, description: description || '' };
-       const response = await lastValueFrom(
-         this.http.post<any>(`${this.baseUrl}/favorites/add`, body)
-       );
-       return response?.status === 'SUCCESS';
-     } catch (error) {
-       console.error('Error agregando favorito:', error);
-       throw error;
-     }
-  }
-
-
-
-  async updateFavoriteContact(contactId: number, contactAlias?: string, description?: string): Promise<boolean> {
-     if (!localStorage.getItem('JWT')) throw new Error('No hay token');
-     try {
-       const body: any = {};
-       if (contactAlias) body.contactAlias = contactAlias;
-       if (description !== undefined) body.description = description;
-       const response = await lastValueFrom(
-         this.http.put<any>(`${this.baseUrl}/favorites/update/${contactId}`, body)
-       );
-       return response?.status === 'SUCCESS';
-     } catch (error) {
-       console.error('Error actualizando favorito:', error);
-       throw error;
-     }
-  }
-
-  async removeFavoriteContact(favoriteId: number): Promise<boolean> {
-     if (!localStorage.getItem('JWT')) throw new Error('No hay token');
-     try {
-       const response = await lastValueFrom(
-         this.http.delete<any>(`${this.baseUrl}/favorites/${favoriteId}`)
-       );
-       return response?.status === 'SUCCESS';
-     } catch (error) {
-       console.error('Error eliminando favorito:', error);
-       throw error;
-     }
-  }
 
 }
+
+
+

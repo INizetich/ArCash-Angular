@@ -84,8 +84,7 @@ export class FavoriteService {
       const success = await this.dataService.addFavoriteContact(accountId, alias, description);
       
       if (success) {
-        this.utilService.showToast('Contacto agregado a favoritos', 'success');
-        // Forzar recarga desde servidor para actualizar el caché
+       
         await this.loadFavoriteContacts(true);
         return true;
       } else {
@@ -130,8 +129,6 @@ export class FavoriteService {
       const success = await this.dataService.updateFavoriteContact(id, alias, description);
       
       if (success) {
-        this.utilService.showToast('Contacto actualizado correctamente', 'success');
-        // Forzar recarga desde servidor para actualizar el caché
         await this.loadFavoriteContacts(true);
         return true;
       } else {
@@ -146,12 +143,10 @@ export class FavoriteService {
   }
 
   async removeFavoriteContact(id: number, contactName: string): Promise<boolean> {
-    if (confirm(`¿Estás seguro de que quieres eliminar a "${contactName}" de tus favoritos?`)) {
       try {
         const success = await this.dataService.removeFavoriteContact(id);
         
         if (success) {
-          this.utilService.showToast('Contacto eliminado de favoritos', 'success');
           // Forzar recarga desde servidor para actualizar el caché
           await this.loadFavoriteContacts(true);
           return true;
@@ -164,7 +159,7 @@ export class FavoriteService {
         this.utilService.showToast('Error al eliminar contacto', 'error');
         return false;
       }
-    }
+    
     return false;
   }
 
