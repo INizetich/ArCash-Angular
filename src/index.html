@@ -12,6 +12,46 @@
   
   <!-- Google Fonts - Montserrat -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap">
+
+  <script>
+  // Inicialización inmediata del tema para prevenir flash
+  (function() {
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
+    
+    // Forzar estilos inmediatamente
+    if (theme === 'dark') {
+      document.body.style.backgroundColor = '#1A1A2E';
+      document.body.style.color = '#E8EAF6';
+    } else {
+      document.body.style.backgroundColor = '#F8F9FA';
+      document.body.style.color = '#2C3E50';
+    }
+  })();
+
+  // Fix agresivo para autocompletado
+document.addEventListener('DOMContentLoaded', function() {
+    // Forzar transparencia en inputs
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+        // Resetear estilos de autocompletado
+        input.style.backgroundColor = 'transparent';
+        input.style.backgroundImage = 'none';
+        
+        // Observar cambios en el input
+        input.addEventListener('animationstart', function(e) {
+            if (e.animationName === 'autofill') {
+                this.style.backgroundColor = 'transparent';
+                this.style.backgroundImage = 'none';
+            }
+        });
+    });
+});
+</script>
 </head>
 <body>
   <app-root></app-root>

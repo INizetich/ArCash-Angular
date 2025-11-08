@@ -1,14 +1,25 @@
 <section class="formulario">
     <h2>Iniciar Sesión</h2>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate autocomplete="off">
 
         <div class="input-container">
             <label for="login-username">Username</label>
             <div class="input-wrapper">
-                <input class="effect-1" type="text" formControlName="username" id="login-username"> <span class="focus-border"></span>
+                <input 
+                    class="effect-1" 
+                    type="text" 
+                    formControlName="username" 
+                    id="login-username"
+                    autocomplete="username"
+                    autocorrect="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    [attr.aria-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+                    [attr.aria-describedby]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched ? 'username-error' : null">
+                <span class="focus-border"></span>
             </div>
-            <div>
+            <div id="username-error">
                 @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
                 <div class="error-container" role="alert">
                     @if (loginForm.get('username')?.hasError('required')) {
@@ -23,8 +34,18 @@
             <label for="login-password">Password</label>
 
             <div class="input-wrapper password-wrapper">
-                <input class="effect-1" [type]="showPassword ? 'text' : 'password'" formControlName="password"
-                    id="login-password"> <button type="button" class="password-toggle" (click)="togglePasswordVisibility()"
+                <input 
+                    class="effect-1" 
+                    [type]="showPassword ? 'text' : 'password'" 
+                    formControlName="password"
+                    id="login-password"
+                    autocomplete="current-password"
+                    autocorrect="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    [attr.aria-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                    [attr.aria-describedby]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched ? 'password-error' : null">
+                <button type="button" class="password-toggle" (click)="togglePasswordVisibility()"
                     [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         @if (!showPassword) {
@@ -45,8 +66,12 @@
                 </button>
                 <span class="focus-border"></span>
             </div>
-            <a class="access-link" (click)="goTo('forgot')">Olvidaste tu contraseña?</a>
-            <div>
+            
+            <a type="button" class="access-link" (click)="goTo('forgot')">
+                Olvidaste tu contraseña?
+            </a>
+
+            <div id="password-error">
                 @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
                 <div class="error-container" role="alert">
                     @if (loginForm.get('password')?.hasError('required')) {
@@ -56,6 +81,9 @@
                 }
             </div>
         </div>
+
+        <input type="text" name="fake-username" style="display: none;" autocomplete="username">
+        <input type="password" name="fake-password" style="display: none;" autocomplete="current-password">
 
         <button type="submit" [disabled]="loginForm.invalid || isLoading">
             {{ isLoading ? 'Iniciando...' : 'Iniciar Sesión' }}

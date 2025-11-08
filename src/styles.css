@@ -351,7 +351,7 @@ button, input, .access-btn {
     background: linear-gradient(135deg, #39FFCC 0%, #FF006E 100%) !important;
     border: none !important;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(57, 255, 204, 0.4);
+        box-shadow: 0 8px 25px rgba(57, 255, 204, 0.4);
 }
 
 
@@ -597,7 +597,6 @@ button, input, .access-btn {
     caret-color: var(--text-primary) !important; /* Tu cursor claro */
     
     /* 4. Mantiene el borde que le diste al input-wrapper */
-    border: 2px solid var(--quantum-violet) !important; 
     border-radius: 12px !important;
 }
 
@@ -617,7 +616,7 @@ button, input, .access-btn {
     caret-color: var(--text-primary) !important; /* Tu cursor oscuro */
     
     /* 4. Mantiene el borde que le diste al input-wrapper */
-    border: 2px solid var(--electric-purple) !important;
+
     border-radius: 12px !important;
 }
 
@@ -785,4 +784,102 @@ button, input, .access-btn {
         padding: 3px 8px;
         font-size: 11px;
     }
+}
+
+
+/* ============================================
+   FIX AGGRESIVO PARA AUTOFILL - TRANSPARENTE
+   ============================================ */
+
+/* RESET PARA TODOS LOS INPUTS EN AMBOS TEMAS */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-text-fill-color: inherit !important;
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    background-color: transparent !important;
+    transition: all 5000s ease-in-out 0s !important;
+    caret-color: inherit !important;
+    border-color: inherit !important;
+}
+
+/* MODO OSCURO ESPECÍFICO */
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover,
+[data-theme="dark"] input:-webkit-autofill:focus,
+[data-theme="dark"] input:-webkit-autofill:active {
+    -webkit-text-fill-color: #E8EAF6 !important;
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    background-color: transparent !important;
+    transition: all 5000s ease-in-out 0s !important;
+    caret-color: #39FFCC !important;
+    border-color: var(--border-color) !important;
+}
+
+/* MODO CLARO ESPECÍFICO */
+[data-theme="light"] input:-webkit-autofill,
+[data-theme="light"] input:-webkit-autofill:hover,
+[data-theme="light"] input:-webkit-autofill:focus,
+[data-theme="light"] input:-webkit-autofill:active {
+    -webkit-text-fill-color: #2C3E50 !important;
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    background-color: transparent !important;
+    transition: all 5000s ease-in-out 0s !important;
+    caret-color: #667EEA !important;
+    border-color: var(--border-color) !important;
+}
+
+/* FIREFOX */
+[data-theme="dark"] input:-moz-ui-valid {
+    background-color: transparent !important;
+    color: #E8EAF6 !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="light"] input:-moz-ui-valid {
+    background-color: transparent !important;
+    color: #2C3E50 !important;
+    border-color: var(--border-color) !important;
+}
+
+/* EDGE Y OTROS NAVEGADORES */
+[data-theme="dark"] input:autofill {
+    background-color: transparent !important;
+    color: #E8EAF6 !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="light"] input:autofill {
+    background-color: transparent !important;
+    color: #2C3E50 !important;
+    border-color: var(--border-color) !important;
+}
+
+/* FORZAR TRANSPARENCIA EN TODOS LOS INPUTS */
+[data-theme="dark"] input {
+    background-color: transparent !important;
+    color: #E8EAF6 !important;
+}
+
+[data-theme="light"] input {
+    background-color: transparent !important;
+    color: #2C3E50 !important;
+}
+
+/* ESPECÍFICO PARA INPUTS DEL LOGIN */
+[data-theme="dark"] .formulario input,
+[data-theme="dark"] .input-wrapper input,
+[data-theme="dark"] .effect-1 {
+    background-color: transparent !important;
+    color: #E8EAF6 !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="light"] .formulario input,
+[data-theme="light"] .input-wrapper input,
+[data-theme="light"] .effect-1 {
+    background-color: transparent !important;
+    color: #2C3E50 !important;
+    border-color: var(--border-color) !important;
 }
