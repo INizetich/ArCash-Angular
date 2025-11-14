@@ -24,6 +24,9 @@ graph TB
             LoginComp[Login Component]
             RegisterComp[Register Component]
             ForgotComp[Forgot Component]
+            RecoverPasswordComp[Recover Password Component]
+            ResendComp[Resend Component]
+            ValidateComp[Validate Component]
             DashboardComp[Dashboard Component]
             AdminComp[Admin Component]
         end
@@ -42,6 +45,10 @@ graph TB
             FavoriteService[Favorite Service]
             DeviceService[Device Service]
             CacheService[Cache Service]
+            RecoveryService[Recovery Service<br/>Password Recovery]
+            ResendService[Resend Service<br/>Email Resending]
+            ValidationService[Validation Service<br/>Token Validation]
+            ResendNavigationService[Resend Navigation Service]
         end
         
         subgraph "🛡️ Security"
@@ -63,6 +70,16 @@ graph TB
     
     %% Componentes a servicios principales
     LoginComp --> AuthService
+    ForgotComp --> UtilService
+    RecoverPasswordComp --> RecoveryService
+    RecoverPasswordComp --> UtilService
+    ResendComp --> ResendService
+    ResendComp --> UtilService
+    ValidateComp --> ValidationService
+    ValidateComp --> ResendService
+    ValidateComp --> ResendNavigationService
+    ValidateComp --> UtilService
+    ValidateComp --> ThemeService
     DashboardComp --> AuthService
     DashboardComp --> DataService
     DashboardComp --> TransactionService
@@ -77,6 +94,9 @@ graph TB
     DataService -.-> BackendAPI
     TransactionService -.-> BackendAPI
     AdminService -.-> BackendAPI
+    RecoveryService -.-> BackendAPI
+    ResendService -.-> BackendAPI
+    ValidationService -.-> BackendAPI
     
     %% Estilos
     classDef person fill:#08427b,stroke:#052e4b,stroke-width:2px,color:#fff
@@ -87,9 +107,9 @@ graph TB
     classDef backend fill:#999999,stroke:#666666,stroke-width:2px,color:#fff
     
     class Usuario person
-    class HomeComp,LoginComp,RegisterComp,ForgotComp,DashboardComp,AdminComp component
+    class HomeComp,LoginComp,RegisterComp,ForgotComp,RecoverPasswordComp,ResendComp,ValidateComp,DashboardComp,AdminComp component
     class AuthService,DataService,TransactionService,AdminService coreService
-    class ThemeService,UtilService,ModalService,FavoriteService,DeviceService,CacheService supportService
+    class ThemeService,UtilService,ModalService,FavoriteService,DeviceService,CacheService,RecoveryService,ResendService,ValidationService,ResendNavigationService supportService
     class AuthGuard,AdminGuard,GuestGuard,HomeGuard security
     class BackendAPI backend
 ```
@@ -189,6 +209,7 @@ graph TB
     RecoveryTokenService --> AuthController
     CotizationService --> TaxController
     FavoriteService --> FavoriteController
+    AuthService --> TokenRepos
     
     %% Database
     UserRepo --> MySQL
@@ -222,7 +243,7 @@ graph TB
 
 ## Descripción de Componentes
 
-### 🖥️ Frontend Angular Components
+### Frontend Angular Components
 
 #### **Home Component**
 - **Propósito**: Página de inicio y landing page
@@ -249,7 +270,7 @@ graph TB
 - **Funcionalidades**: CRUD de usuarios, deshabilitación de cuentas
 - **Dependencias**: AdminService, validación de rol admin
 
-### ⚙️ Frontend Services
+### Frontend Services
 
 #### **Auth Service**
 - **Responsabilidades**:
@@ -280,7 +301,7 @@ graph TB
   - Validaciones de permisos administrativos
 - **APIs utilizadas**: `/api/admin/*`
 
-### 🛡️ Frontend Security
+### Frontend Security
 
 #### **Auth Guard**
 - **Propósito**: Protege rutas que requieren autenticación
@@ -296,7 +317,7 @@ graph TB
 
 ---
 
-### 🌐 Backend Controllers (REST API)
+### Backend Controllers (REST API)
 
 #### **Auth Controller** (`/api/auth/*`)
 - **Endpoints principales**:
@@ -326,7 +347,7 @@ graph TB
   - `PUT /users/{id}/enable` - Habilitar usuario
 - **Responsabilidades**: Operaciones administrativas
 
-### 🔧 Backend Services (Business Logic)
+### Backend Services (Business Logic)
 
 #### **Auth Service**
 - **Responsabilidades**:
@@ -363,7 +384,7 @@ graph TB
   - Integración con DolarAPI
   - Actualización periódica (10 minutos)
 
-### 🛡️ Backend Security
+### Backend Security
 
 #### **JWT Utils**
 - **Funcionalidades**:
@@ -381,7 +402,7 @@ graph TB
   - Endpoints públicos vs protegidos
   - Configuración de sesiones stateless
 
-### 💾 Backend Data Layer
+### Backend Data Layer
 
 #### **Repositories (JPA)**
 - **User Repository**: Operaciones CRUD sobre tabla `users`
@@ -398,7 +419,7 @@ graph TB
 
 ---
 
-## 🔄 Flujos de Funcionamiento
+## Flujos de Funcionamiento
 
 ### **1. Flujo de Autenticación**
 ```

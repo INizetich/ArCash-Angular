@@ -3,93 +3,88 @@
 ## 1. Diagrama de Casos de Uso
 
 ```mermaid
-graph TD
-    %% Actores
-    Usuario((Usuario))
-    Admin((Administrador))
-    DolarAPI((DolarAPI))
-    ResendAPI((Resend API))
+flowchart TB
+  subgraph ArCash["ArCash System"]
+    direction TB
+    %% Agrupo los casos de usuario normal en columna
+    UC1["Registrarse"]
+    UC2["Iniciar Sesión"]
+    UC3["Verificar Email"]
+    UC4["Consultar Saldo"]
+    UC5["Transferir Dinero"]
+    UC6["Buscar Cuenta por Alias/CVU"]
+    UC7["Generar QR para Cobro"]
+    UC8["Escanear QR"]
+    UC9["Ver Historial Transacciones"]
+    UC10["Agregar Contacto Favorito"]
+    UC11["Gestionar Favoritos"]
+    UC12["Cambiar Alias"]
+    UC13["Calcular Impuestos ARS/USD"]
+    UC14["Recuperar Contraseña"]
+    UC15["Ingresar Dinero"]
     
-    %% Relación de herencia
-    Admin -.->|extends| Usuario
-    
-    %% Sistema
-    subgraph "ArCash System"
-        %% Casos de uso principales de usuario
-        UC1[Registrarse]
-        UC2[Iniciar Sesión]
-        UC3[Verificar Email]
-        UC4[Consultar Saldo]
-        UC5[Transferir Dinero]
-        UC6[Buscar Cuenta por Alias/CVU]
-        UC7[Generar QR para Cobro]
-        UC8[Escanear QR]
-        UC9[Ver Historial Transacciones]
-        UC10[Agregar Contacto Favorito]
-        UC11[Gestionar Favoritos]
-        UC12[Cambiar Alias]
-        UC13[Calcular Impuestos ARS/USD]
-        UC14[Recuperar Contraseña]
-        UC15[Ingresar Dinero]
-        
-        %% Casos de uso administrativos exclusivos
-        UC16[Gestionar Usuarios]
-        UC17[Ver Reportes Sistema]
-        UC18[Habilitar/Deshabilitar Usuarios]
-        
-        %% Casos de uso del sistema
-        UC19[Consultar Cotización USD]
-        UC20[Enviar Email Verificación]
-        UC21[Enviar Email Recuperación]
-    end
-    
-    %% Relaciones Usuario (posicionadas a la izquierda)
-    Usuario --> UC1
-    Usuario --> UC2
-    Usuario --> UC3
-    Usuario --> UC4
-    Usuario --> UC5
-    Usuario --> UC6
-    Usuario --> UC7
-    Usuario --> UC8
-    Usuario --> UC9
-    Usuario --> UC10
-    Usuario --> UC11
-    Usuario --> UC12
-    Usuario --> UC13
-    Usuario --> UC14
-    Usuario --> UC15
-    
-    %% Relaciones Admin exclusivas (posicionadas a la derecha)
-    Admin -.-> UC16
-    Admin -.-> UC17
-    Admin -.-> UC18
-    
-    %% Relaciones Sistemas Externos
-    DolarAPI --> UC19
-    ResendAPI --> UC20
-    ResendAPI --> UC21
-    
-    %% Relaciones Include/Extend
-    UC1 -.->|include| UC20
-    UC14 -.->|include| UC21
-    UC5 -.->|include| UC2
-    UC4 -.->|include| UC2
-    UC9 -.->|include| UC2
-    UC13 -.->|include| UC19
-    
-    %% Estilos
-    classDef person fill:#08427b,stroke:#052e4b,stroke-width:2px,color:#fff
-    classDef admin fill:#d35400,stroke:#a0392f,stroke-width:3px,color:#fff
-    classDef system fill:#1168bd,stroke:#0b4884,stroke-width:2px,color:#fff
-    classDef adminSystem fill:#e67e22,stroke:#d35400,stroke-width:2px,color:#fff
-    classDef external fill:#999999,stroke:#666666,stroke-width:2px,color:#fff
-    
-    class Usuario person
-    class Admin admin
-    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13,UC14,UC15,UC19,UC20,UC21 system
-    class UC16,UC17,UC18 adminSystem
-    class DolarAPI,ResendAPI external
+    %% Casos sólo de Admin
+    UC16["Gestionar Usuarios"]
+    UC18["Habilitar/Deshabilitar Usuarios"]
+
+    %% Externos, separados
+    UC19["Consultar Cotización USD"]
+    UC20["Enviar Email Verificación"]
+    UC21["Enviar Email Recuperación"]
+  end
+
+  %% Actores
+  Usuario(("Usuario")):::person
+  Admin(("Administrador")):::admin
+  DolarAPI(("DolarAPI")):::external
+  ResendAPI(("Resend API")):::external
+
+  %% Organización de nodos para reducir líneas cruzadas
+  %% Enlaces invisibles para mantener orden
+  UC1 ~~~ UC2 ~~~ UC3 ~~~ UC4 ~~~ UC5 ~~~ UC6 ~~~ UC7 ~~~ UC8 ~~~ UC9 ~~~ UC10 ~~~ UC11 ~~~ UC12 ~~~ UC13 ~~~ UC14 ~~~ UC15
+  UC16 ~~~ UC17 ~~~ UC18
+  UC19 ~~~ UC20 ~~~ UC21
+
+  %% Relaciones principales (Sin cambios)
+  Usuario --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8 & UC9 & UC10 & UC11 & UC12 & UC13 & UC14 & UC15
+  Admin -. extiende .-> Usuario
+  Admin -.-> UC16 & UC17 & UC18
+
+  DolarAPI --> UC19
+  ResendAPI --> UC20 & UC21
+
+  %% includes & relaciones secundarias (Sin cambios)
+  UC1 -. incluye .-> UC20
+  UC14 -. incluye .-> UC21
+  UC5 -. incluye .-> UC2
+  UC4 -. incluye .-> UC2
+  UC9 -. incluye .-> UC2
+  UC6 -. incluye .-> UC2
+  UC7 -. incluye .-> UC2
+  UC8 -. incluye .-> UC2
+  UC10 -. incluye .-> UC2
+  UC11 -. incluye .-> UC2
+  UC12 -. incluye .-> UC2
+  UC15 -. incluye .-> UC2
+  UC19 -. incluye .-> UC2
+  UC13 -. incluye .-> UC19
+
+  %% === EXTENDS AGREGADOS ===
+  %% "Recuperar Contraseña" es una extensión opcional de "Iniciar Sesión"
+  UC14 -. extiende .-> UC2
+  %% "Agregar Favorito" es una extensión opcional de "Transferir Dinero"
+  UC10 -. extiende .-> UC5
+
+
+  %% Estilos (Sin cambios)
+  classDef person fill:#08427b,stroke:#052e4b,stroke-width:2px,color:#fff
+  classDef admin fill:#d35400,stroke:#a0392f,stroke-width:3px,color:#fff
+  classDef system fill:#1168bd,stroke:#0b4884,stroke-width:2px,color:#fff
+  classDef adminSystem fill:#e67e22,stroke:#d35400,stroke-width:2px,color:#fff
+  classDef external fill:#999999,stroke:#666666,stroke-width:2px,color:#fff
+
+  class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13,UC14,UC15,UC19,UC20,UC21 system
+  class UC16,UC17,UC18 adminSystem
 ```
 
 **Descripción:**
@@ -127,20 +122,18 @@ sequenceDiagram
     U->>+F: 1. Ingresar datos transferencia<br/>(alias destino, monto)
     F->>F: 2. Validar formulario cliente
     
-   
-    
     F->>+B: 3. Petición POST al backend<br/>Body: {balance: monto}
     B->>B: 4. Extraer userID del JWT
     B->>+DB: 5. Buscar cuenta origen por ID
     DB-->>-B: 6. Datos cuenta origen
     
-    B->>+DB: 7. Buscar cuenta destino por ID  
+    B->>+DB: 7. Buscar cuenta destino por ID 
     DB-->>-B: 8. Datos cuenta destino
     
     B->>B: 9. Validar permisos usuario<br/>(cuenta origen le pertenece)
     
     
-    alt Validaciones exitosas
+    alt Validaciones exitosas (Paso 9 OK)
         B->>+DB: 10. Consultar saldo cuenta origen
         DB-->>-B: 11. Saldo actual
         
@@ -152,21 +145,28 @@ sequenceDiagram
             B->>DB: 16. COMMIT TRANSACTION
             DB-->>-B: 17. Transacción confirmada
             
-            B-->>F: 18. 200 OK<br/>{success: true, message: "Transferencia realizada correctamente"}
+            B-->>F: 18. 200 OK<br/>{success: true, message: "Transferencia realizada correctamente"} 
+            F->>F: 19. Actualizar saldo en UI
+            F->>F: 20. Recargar historial transacciones
+            F-->>U: 21. Mostrar resultado (Éxito)  
+            
         else Saldo insuficiente
-            B->>+DB: 19. INSERT transaction (state: FAILED)
-            DB-->>-B: 20. Registro creado
-            B-->>F: 21. 403 Forbidden<br/>{success: false, message: "Not enough cash, stranger."}
+            B->>+DB: 12.1. INSERT transaction (state: FAILED)
+            DB-->>-B: 12.2. Registro creado
+            B-->>F: 12.3. 403 Forbidden<br/>{success: false, message: "Saldo insuficiente"} 
+            F->>F: 12.4. Recargar historial transacciones
+            F-->>U: 12.5. Mostrar resultado (Error: Saldo) 
         end
-    else Error validación
-        B-->>F: 22. 404/403 Error<br/>{success: false, message: "Error específico"}
+        
+    else Error validación (Paso 9 Falla)
+        B-->>F: 9.1. 404/403 Error<br/>{success: false, message: "Error: Cuenta no encontrada o sin permisos"} 
+        F-->>U: 9.2. Mostrar resultado (Error: Validación)  
     end
     
     
-    B-->>-F: 23. Response del backend
-    F->>F: 24. Actualizar saldo en UI
-    F->>F: 25. Recargar historial transacciones
-    F-->>-U: 26. Mostrar resultado (éxito/error)
+    deactivate B
+    deactivate F
+   
 ```
 
 **Explicación del Diagrama:**
@@ -189,26 +189,44 @@ Note que no se envían emails por transferencias - solo se muestran notificacion
 stateDiagram-v2
     [*] --> No_Registrado
     
-    No_Registrado --> Pendiente_Verificacion : Registro (enabled=false, active=false)
+    No_Registrado --> Pendiente_Verificacion : Usuario se registra (enabled=false, active=false)
     
-    Pendiente_Verificacion --> Usuario_Activo : Verificación Email (enabled=true, active=true)
-    Pendiente_Verificacion --> No_Registrado : Token Expira
+    Pendiente_Verificacion --> Usuario_Activo : Usuario verifica email (enabled=true, active=true)
+    Pendiente_Verificacion --> No_Registrado : Token expira
     
-    Usuario_Activo --> Deshabilitado : Admin Deshabilita (active=false)
-    Deshabilitado --> Usuario_Activo : Admin Habilita (active=true)
+    Usuario_Activo --> Deshabilitado : Admin deshabilita (active=false)
+    Deshabilitado --> Usuario_Activo : Admin habilita (active=true)
     
+    %% Nodo de fin principal (como pidió el profesor)
+    Usuario_Activo --> Fin_Cuenta
+    Deshabilitado --> Fin_Cuenta
+    Fin_Cuenta --> [*]
+
+    %% === SUB-ESTADO PROLIJO ===
     state Usuario_Activo {
+        %% El sub-estado siempre inicia en "Sin_Saldo"
         [*] --> Sin_Saldo
-        Sin_Saldo --> Con_Saldo : Recibir dinero
-        Con_Saldo --> Sin_Saldo : Transferir todo
-        Con_Saldo --> Con_Saldo : Transferir parcial
         
-        state "Transferencia" as Transfer {
-            Con_Saldo --> Transfiriendo : Iniciar transferencia
-            Transfiriendo --> Con_Saldo : Transferencia exitosa
-            Transfiriendo --> Con_Saldo : Transferencia fallida
-        }
+        %% Flujos de ACREDITACIÓN (Ingreso de dinero)
+        Sin_Saldo --> Con_Saldo   : Se recibe dinero [monto > 0] / acreditarSaldo()
+        Con_Saldo --> Con_Saldo   : Se recibe dinero [monto > 0] / acreditarSaldo()
+
+        %% Flujos de DÉBITO (Salida de dinero)
+        Con_Saldo --> Sin_Saldo   : Se transfiere todo [monto == saldo] / ejecutarTransferencia()
+        Con_Saldo --> Con_Saldo   : Se transfiere parcial [monto < saldo] / ejecutarTransferencia()
+        
+        %% Flujo del PROCESO de transferencia (estado temporal)
+        Con_Saldo --> Transfiriendo : Se inicia transferencia
+        Transfiriendo --> Con_Saldo : Transferencia completa
+        Transfiriendo --> Con_Saldo : Transferencia falla
+
+        %% Nodo de fin explícito del sub-estado (sin etiqueta)
+        Con_Saldo --> [*]
+        Sin_Saldo --> [*]
+        Transfiriendo --> [*]
+        %% El nodo de fin del sub-estado es ahora explícito y no depende del padre.
     }
+    %% === FIN SUB-ESTADO ===
     
     note right of Pendiente_Verificacion
         - enabled = false, active = false
@@ -263,32 +281,52 @@ Dentro del estado activo, manejamos sub-estados de saldo: Sin Saldo, Con Saldo, 
 
 ```mermaid
 flowchart TD
-    Start([Usuario inicia registro]) --> Input[Completar formulario]
-    
-    Input --> Validate{Validar datos}
-    Validate -->|Datos inválidos| ShowError[Mostrar errores]
-    ShowError --> Input
-    
-    Validate -->|Datos válidos| CheckEmail{Email ya existe?}
-    CheckEmail -->|Sí| ShowEmailError[Error: Email en uso]
-    ShowEmailError --> Input
-    
-    CheckEmail -->|No| CreateUser[Crear usuario en BD]
-    CreateUser --> GenerateToken[Generar token verificación]
-    GenerateToken --> SendEmail[Enviar email verificación]
-    
-    SendEmail --> WaitVerification[Esperar verificación]
-    WaitVerification --> CheckToken{Token válido?}
-    
-    CheckToken -->|Token inválido/vencido| ResendOption{Reenviar email?}
-    ResendOption -->|Sí| SendEmail
-    ResendOption -->|No| End1([Registro cancelado])
-    
-    CheckToken -->|Token válido| ActivateAccount[Activar cuenta]
-    ActivateAccount --> CreateAccount[Crear cuenta ARS]
-    CreateAccount --> GenerateAlias[Generar alias único]
-    GenerateAlias --> SendWelcome[Enviar email bienvenida]
-    SendWelcome --> End2([Registro completado])
+    subgraph Usuario
+        Start(( )):::startNode --> Input[Completar formulario]
+        
+        Input --> Validate{Validar datos}
+        Validate -->|Datos inválidos| ShowError[Mostrar errores]
+        ShowError --> Input
+        Validate -->|Datos válidos| CheckEmail{Email ya existe?}
+        CheckEmail -->|Sí| ShowEmailError[Error: Email en uso]
+        ShowError --> Input
+    end
+
+    subgraph Sistema_Backend ["Sistema (Backend)"]
+        CheckEmail -->|No| CreateUser[Crear usuario en BD]
+        CreateUser --> GenerateToken[Generar token verificación]
+        GenerateToken --> CallSendEmail[Invocar API de Email]
+    end
+
+    subgraph ResendAPI_Externo ["ResendAPI (Externo)"]
+        CallSendEmail --> SendEmail[Enviar email verificación]
+    end
+
+    subgraph Usuario
+        SendEmail --> WaitVerification[Usuario recibe email<br/>y hace clic en enlace]
+        WaitVerification --> CheckToken{Verificar token en Backend}
+    end
+
+    subgraph Sistema_Backend ["Sistema (Backend)"]
+        CheckToken -->|Token inválido/vencido| ResendOption{Token inválido}
+        CheckToken -->|Token válido| ActivateAccount[Activar cuenta]
+        ActivateAccount --> CreateAccount[Crear cuenta ARS]
+        CreateAccount --> GenerateAlias[Generar alias único]
+        
+        GenerateAlias --> ShowSuccess[Mostrar pantalla de éxito]
+    end
+
+    subgraph Usuario
+        ResendOption --> ShowResend{Mostrar opción de reenvío}
+        ShowResend -->|Sí| CallSendEmail
+        
+        
+        ShowSuccess --> End2(( ))
+        ShowResend -->|No| End1(( ))
+    end
+
+
+    classDef startNode fill:#000,stroke:#000,stroke-width:1px;
 ```
 
 **Explicación del Diagrama:**
@@ -309,34 +347,45 @@ Si el token expira o es inválido, el usuario puede solicitar un reenvío del em
 
 ### Endpoint: POST /api/transactions/{idOrigen}/transfer/{idDestino}
 
-| **ID** | **Condición de Prueba** | **Datos de Entrada** | **Resultado Esperado** |
-|--------|------------------------|---------------------|----------------------|
-| TC001 | Transferencia válida exitosa | idOrigen: 1, idDestino: 2, amount: 1000, saldo: 5000, JWT válido | HTTP 200, {success: true, message: "Transferencia realizada correctamente"} |
-| TC002 | Saldo insuficiente | idOrigen: 1, idDestino: 2, amount: 1000, saldo: 500, JWT válido | HTTP 403, {success: false, message: "Not enough cash, stranger."} |
-| TC003 | Cuenta origen inexistente | idOrigen: 999, idDestino: 2, amount: 1000, JWT válido | HTTP 404, {success: false, message: "No se pudo encontrar la cuenta de orig."} |
-| TC004 | Cuenta destino inexistente | idOrigen: 1, idDestino: 999, amount: 1000, JWT válido | HTTP 404, {success: false, message: "No se pudo encontrar la cuenta de orig."} |
-| TC005 | Transferencia a sí mismo | idOrigen: 1, idDestino: 1, amount: 1000, JWT válido | HTTP 200, Transaction registrada con state: "FAILED" |
-| TC006 | Monto negativo | idOrigen: 1, idDestino: 2, amount: -100, JWT válido | Transacción no se ejecuta, return false |
-| TC007 | Monto cero | idOrigen: 1, idDestino: 2, amount: 0, JWT válido | Transacción no se ejecuta, return false |
-| TC008 | JWT no proporcionado | Sin header Authorization | HTTP 498, {success: false, message: "Token no valido"} |
-| TC009 | JWT inválido | Authorization: "Bearer token_invalido" | HTTP 498, {success: false, message: "Token inválido o nulo"} |
-| TC010 | Usuario no es dueño de cuenta origen | idOrigen: 2 (de otro usuario), JWT válido userID: 1 | HTTP 403, {success: false, message: "No tiene permiso para operar esta cuenta"} |
 
-### Endpoint: GET /api/transactions/search/{input}
+Análisis de Clases de Prueba:
+Este cuadro define todas las posibles categorías de entradas (clases) para la función de transferencia.
 
-| **ID** | **Condición de Prueba** | **Datos de Entrada** | **Resultado Esperado** |
-|--------|------------------------|---------------------|----------------------|
-| TC011 | Búsqueda por alias válido | input: "juan.perez.arcash" | HTTP 200, datos completos del usuario y cuenta |
-| TC012 | Búsqueda por CVU válido | input: "1234567890123456789012" | HTTP 200, datos completos del usuario y cuenta |
-| TC013 | Alias inexistente | input: "usuario.inexistente" | HTTP 404, {error: "Cuenta no encontrada."} |
-| TC014 | CVU inexistente | input: "0000000000000000000000" | HTTP 404, {error: "Cuenta no encontrada."} |
-| TC015 | Input vacío | input: "" | HTTP 404, {error: "Cuenta no encontrada."} |
 
-### Técnicas de Caja Negra Aplicadas:
-- **Partición de Equivalencia**: Saldos suficientes/insuficientes, tokens válidos/inválidos, cuentas existentes/inexistentes
-- **Análisis de Valores Límite**: Montos en 0, negativos, transferencias a sí mismo
-- **Análisis de Errores**: Casos de autenticación, autorización y validación
-- **Pruebas de Seguridad**: Validación de JWT y permisos de cuenta
+| **Variable**      | **Descripción**                | **Clases Válidas (CV)**                        | **Clases Inválidas (CI)**                       |
+|-------------------|-------------------------------|------------------------------------------------|-------------------------------------------------|
+| Autenticación     | Token JWT de la sesión        | CV1: Token válido y no expirado                | CI1: Sin token (Header ausente)<br>CI2: Token inválido (firma/formato)<br>CI3: Token expirado |
+| Autorización      | Propiedad de la cuenta        | CV2: userID del JWT es dueño de idOrigen       | CI4: userID del JWT no es dueño de idOrigen     |
+| Cuentas           | Existencia de idOrigen / idDestino | CV3: idOrigen existe<br>CV4: idDestino existe | CI5: idOrigen no existe<br>CI6: idDestino no existe |
+| Relación Cuentas  | Comparación entre cuentas     | CV5: idOrigen != idDestino                     | CI7: idOrigen == idDestino                      |
+| Monto             | Valor a transferir            | CV6: amount > 0                                | CI8: amount < 0<br>CI9: amount == 0           |
+| Saldo             | Lógica de negocio             | CV7: Saldo de idOrigen >= amount               | CI10: Saldo de idOrigen < amount                |
+
+
+
+
+
+
+Casos de Prueba:
+Este cuadro selecciona casos de prueba específicos basados en las clases definidas en la Tabla 1.
+
+
+**Tabla 2: Casos de Prueba Derivados**
+
+| **ID** | **Condición de Prueba** | **idOrigen** | **idDestino** | **Monto** | **Saldo** | **JWT** | **Resultado Esperado** |
+|--------|------------------------|-------------|--------------|----------|----------|---------|----------------------|
+| TC001 | Transferencia válida exitosa | 1 | 2 | 1000 | 5000 | Válido (User 1) | HTTP 200, {success: true, message: "Transferencia realizada correctamente"} |
+| TC002 | Saldo insuficiente | 1 | 2 | 1000 | 500 | Válido (User 1) | HTTP 403, {success: false, message: "Not enough cash, stranger"} |
+| TC003 | Cuenta origen inexistente | 999 | 2 | 1000 | - | Válido (User 1) | HTTP 404, {success: false, message: "No se pudo encontrar la cuenta de origen"} |
+| TC004 | Cuenta destino inexistente | 1 | 999 | 1000 | - | Válido (User 1) | HTTP 404, {success: false, message: "No se pudo encontrar la cuenta de destino"} |
+| TC005 | Transferencia a sí mismo | 1 | 1 | 1000 | - | Válido (User 1) | HTTP 200, Transaction registrada con state: "FAILED" |
+| TC006 | Monto negativo | 1 | 2 | -100 | - | Válido (User 1) | Transacción no se ejecuta, return false |
+| TC007 | Monto cero | 1 | 2 | 0 | - | Válido (User 1) | Transacción no se ejecuta, return false |
+| TC008 | JWT no proporcionado | - | - | - | - | Ausente | HTTP 498, {success: false, message: "Token no valido"} |
+| TC009 | JWT inválido | - | - | - | - | Inválido | HTTP 498, {success: false, message: "Token inválido o nulo"} |
+| TC010 | Usuario no es dueño | 2 | - | 1000 | - | Válido (User 1) | HTTP 403, {success: false, message: "No tiene permiso para operar esta cuenta"} |
+
+
 
 **Explicación del Diagrama:**
 
@@ -354,9 +403,16 @@ Este enfoque sistemático nos permite validar que el sistema se comporta correct
 
 ## 6. Diagrama de Prueba de Seguridad - ArCash
 
+### 1. Objetivo de la Prueba
+El objetivo principal de esta prueba es validar la robustez del sistema ArCash contra accesos no autorizados y operaciones fraudulentas. Se busca verificar empíricamente que cada punto de control de seguridad (autenticación, autorización y validación de lógica de negocio) funcione como se espera, bloqueando efectivamente los intentos maliciosos.
+
+
+### 5. Diagrama de Flujo de Seguridad (Mapa de Pruebas)
+El siguiente diagrama es el "mapa" que se usa para ejecutar las pruebas. Cada rombo de decisión (ej. VerificarPassword, ValidarToken, VerificarPropiedad) es un punto de control que será atacado y validado.
+
 ```mermaid
 flowchart TD
-    Start([Inicio]) --> InicioSesion[Inicio de Sesión]
+    Start(( )):::startNode --> InicioSesion[Inicio de Sesión]
     
     InicioSesion --> VerificarUsuario[Verificar Usuario]
     VerificarUsuario -->|Usuario no registrado| UsuarioNoExiste[Usuario No Existe]
@@ -380,73 +436,32 @@ flowchart TD
     VerificarSaldo -->|Fondos insuficientes| SaldoInsuficiente[Saldo Insuficiente]
     VerificarSaldo -->|Saldo disponible| TransferenciaAprobada[Transferencia Aprobada]
     
-    UsuarioNoExiste -->|Acceso denegado| End([Fin])
-    PasswordIncorrecta -->|Acceso denegado| End
-    UsuarioDeshabilitado -->|Acceso denegado| End
-    TokenInvalido -->|Sesión terminada| End
-    CuentaAjena -->|Operación no autorizada| End
-    SaldoInsuficiente -->|Transferencia rechazada| End
-    TransferenciaAprobada -->|Transferencia completada| End
+    UsuarioNoExiste -->|Acceso denegado| End(( ))
+    PasswordIncorrecta -->|Acceso denegado| End(( ))
+    UsuarioDeshabilitado -->|Acceso denegado| End(( ))
+    TokenInvalido -->|Sesión terminada| End(( ))
+    CuentaAjena -->|Operación no autorizada| End(( ))
+    SaldoInsuficiente -->|Transferencia rechazada| End(( ))
+    TransferenciaAprobada -->|Transferencia completada| End(( ))
+
+    classDef startNode fill:#000,stroke:#000,stroke-width:1px;
 ```
 
-**Explicación del Diagrama:**
-
+### Explicación del Diagrama
 Este diagrama representa el flujo completo de validaciones de seguridad que ejecuta ArCash desde el momento que un usuario intenta acceder al sistema hasta que completa una transferencia de dinero.
 
-El proceso inicia cuando el usuario solicita acceso al sistema. Primero se verifica si el usuario existe en la base de datos - si no existe, se deniega el acceso inmediatamente.
+El proceso inicia cuando el usuario solicita acceso al sistema. Primero se verifica si el usuario existe en la base de datos; si no existe, se deniega el acceso inmediatamente.
 
-Si el usuario existe, se valida la contraseña usando el algoritmo BCrypt. Este algoritmo es computacionalmente costoso, lo que previene ataques de fuerza bruta. Si la contraseña es incorrecta, se deniega el acceso.
+Si el usuario existe, se valida la contraseña usando el algoritmo BCrypt, que es computacionalmente costoso y previene ataques de fuerza bruta. Si la contraseña es incorrecta, se deniega el acceso.
 
 Una vez validada la contraseña, se verifica el estado del usuario. Los administradores pueden deshabilitar usuarios, por lo que se controla que el usuario esté activo antes de permitir el acceso.
 
 Cuando la sesión está iniciada correctamente, el usuario puede solicitar transferencias. Aquí comienza un segundo nivel de validaciones de seguridad.
 
-Primero se valida el token JWT que contiene la información de la sesión. Si el token está expirado o es inválido, se termina la sesión inmediatamente.
+- Primero se valida el token JWT que contiene la información de la sesión. Si el token está expirado o es inválido, se termina la sesión inmediatamente.
+- Con un token válido, se verifica que el usuario sea propietario de la cuenta desde la cual quiere transferir dinero. Esta validación crucial previene que usuarios accedan a cuentas ajenas.
+- Finalmente, se verifica que la cuenta tenga saldo suficiente para realizar la transferencia. Solo si pasa todas estas validaciones, la transferencia es aprobada y completada.
 
-Con un token válido, se verifica que el usuario sea propietario de la cuenta desde la cual quiere transferir dinero. Esta validación crucial previene que usuarios accedan a cuentas ajenas.
+Cada punto de falla en este flujo (los caminos que llevan a End) termina el proceso, garantizando que el sistema sea seguro contra múltiples tipos de ataques.
 
-Finalmente, se verifica que la cuenta tenga saldo suficiente para realizar la transferencia. Solo si pasa todas estas validaciones, la transferencia es aprobada y completada.
-
-Cada punto de falla en este flujo termina el proceso y registra el intento para auditoría, garantizando que el sistema sea seguro contra múltiples tipos de ataques.
-
-### Validaciones de Seguridad Implementadas
-
-**Control de Acceso:**
-- Verificación de existencia de usuario en base de datos
-- Validación de contraseña con algoritmo BCrypt
-- Control de estado activo del usuario
-
-**Autenticación de Sesión:**
-- Validación de token JWT en cada operación
-- Verificación de expiración de token
-- Control de integridad de la sesión
-
-**Autorización de Operaciones:**
-- Validación de propiedad de cuenta
-- Verificación de permisos de operación
-- Control de saldo disponible antes de transferencias
-
-### Flujos de Validación Implementados
-
-**Proceso de Autenticación:**
-1. Verificación de existencia del usuario
-2. Validación de contraseña mediante BCrypt
-3. Control de estado activo del usuario
-4. Generación de token JWT válido
-
-**Proceso de Autorización:**
-1. Validación de token JWT en cada solicitud
-2. Verificación de propiedad de cuenta
-3. Control de permisos específicos
-4. Validación de saldo disponible
-
-**Manejo de Errores de Seguridad:**
-- Acceso denegado para credenciales inválidas
-- Sesión terminada para tokens expirados
-- Operaciones bloqueadas para cuentas ajenas
-- Transferencias rechazadas por saldo insuficiente
-
-Este diagrama de estado representa las validaciones críticas de seguridad que protegen el sistema ArCash en cada operación financiera.
-
----
 

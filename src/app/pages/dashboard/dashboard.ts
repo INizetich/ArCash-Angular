@@ -178,22 +178,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.initializeServices();
     this.startSimpleLoading();
 
-    // V--- CAMBIO: INICIA EL POLLING UNIFICADO ---V
     if (isPlatformBrowser(this.platformId)) {
       this.startDataPolling(10000); 
     }
-    // ^-----------------------------------------^
+    
   }
 
   ngOnDestroy(): void {
-    // Limpiar todas las suscripciones guardadas
+    
     this.subscriptions.forEach(sub => sub.unsubscribe());
-    // V--- CAMBIO: DETIENE EL POLLING UNIFICADO ---V
+    
     this.stopDataPolling();
-    // ^------------------------------------------^
+    
   }
 
-  // V--- CAMBIO: MÉTODOS DE POLLING UNIFICADOS ---V
+  
   private startDataPolling(intervalMs: number = 10000): void {
     this.stopDataPolling(); // Evita duplicados
 
@@ -231,7 +230,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.dataPollingSubscription = null;
     }
   }
-  // ^---- FIN MÉTODOS POLLING UNIFICADOS ----^
+  
 
   private async initializeServices(): Promise<void> {
     try {
